@@ -1,0 +1,57 @@
+# DISCLAIMER: Technical demo code — legal wrappers required in production
+# SPDX-License-Identifier: MIT
+#
+# AssetMint development stack
+# Testnet-12 ONLY — no mainnet connections
+
+version: '3.8'
+
+services:
+  # Self-hosted DKG Edge Node (see infrastructure/dkg-node/ for full config)
+  dkg-mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DKG_MYSQL_ROOT_PASSWORD:-assetmint_testnet}
+      MYSQL_DATABASE: dkg_edge
+      MYSQL_USER: dkg
+      MYSQL_PASSWORD: ${DKG_MYSQL_PASSWORD:-dkg_testnet_pass}
+    volumes:
+      - dkg_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  dkg-redis:
+    image: redis:7-alpine
+    volumes:
+      - dkg_redis_data:/data
+
+  dkg-blazegraph:
+    image: nawer/blazegraph:2.1.5
+    volumes:
+      - dkg_blazegraph_data:/var/lib/blazegraph
+
+  # Compliance API (Rust/Axum)
+  # Build: cd services/compliance-rust && cargo build --release
+  # compliance-api:
+  #   build: ./services/compliance-rust
+  #   ports:
+  #     - "${COMPLIANCE_API_PORT:-3001}:3001"
+  #   environment:
+  #     - RUST_LOG=info
+
+  # Oracle Pool (Rust/Axum)
+  # Build: cd services/oracle-pool && cargo build --release
+  # oracle-api:
+  #   build: ./services/oracle-pool
+  #   ports:
+  #     - "${ORACLE_API_PORT:-3002}:3002"
+  #   environment:
+  #     - RUST_LOG=info
+
+volumes:
+  dkg_mysql_data:
+  dkg_redis_data:
+  dkg_blazegraph_data:

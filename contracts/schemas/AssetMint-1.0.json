@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://assetmint.io/schemas/AssetMint-1.0.json",
+  "_disclaimer": "Technical demo code — legal wrappers required in production. SPDX-License-Identifier: MIT",
+  "title": "AssetMint-1.0 Real-World Asset Schema",
+  "description": "Defines the on-chain and off-chain metadata structure for tokenized RWAs on Kaspa Testnet-12",
+  "type": "object",
+  "required": ["protocol", "ticker", "metadata", "covenant"],
+  "properties": {
+    "protocol": {
+      "type": "string",
+      "const": "AssetMint-1.0",
+      "description": "Protocol identifier and version"
+    },
+    "ticker": {
+      "type": "string",
+      "pattern": "^[A-Z0-9-]+$",
+      "description": "Asset ticker symbol (e.g., KPROP-NYC-TEST)",
+      "examples": ["KPROP-NYC-TEST"]
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["dkg_ual", "zk_compliance", "oracle_attested"],
+      "properties": {
+        "dkg_ual": {
+          "type": "string",
+          "description": "OriginTrail Universal Asset Locator for the Knowledge Asset"
+        },
+        "zk_compliance": {
+          "type": "boolean",
+          "description": "Whether ZK-KYC (Groth16) is enabled for this asset"
+        },
+        "oracle_attested": {
+          "type": "boolean",
+          "description": "Whether oracle attestation is required for state transitions"
+        },
+        "compliance_logic": {
+          "type": "object",
+          "properties": {
+            "transfer_restricted": { "type": "boolean" },
+            "clawback_enabled": { "type": "boolean" },
+            "kyc_required": { "type": "boolean" },
+            "jurisdiction_whitelist": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "covenant": {
+      "type": "object",
+      "required": ["script_hash"],
+      "properties": {
+        "script_hash": {
+          "type": "string",
+          "description": "Hash of the compiled SilverScript covenant"
+        },
+        "p2sh_address": {
+          "type": "string",
+          "description": "P2SH address derived from the covenant script"
+        }
+      }
+    },
+    "token": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "const": "ASTM",
+          "description": "Protocol token symbol (KRC-20)"
+        },
+        "type": {
+          "type": "string",
+          "const": "KRC-20",
+          "description": "Token standard"
+        }
+      }
+    },
+    "reserves": {
+      "type": "object",
+      "properties": {
+        "attestation_hash": {
+          "type": "string",
+          "description": "Hash of the latest proof-of-reserves attestation"
+        },
+        "collateral_ratio": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Current collateral ratio (e.g., 1.5 = 150%)"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,32 @@
+# DISCLAIMER: Technical demo code — legal wrappers required in production
+# SPDX-License-Identifier: MIT
+
+[package]
+name = "zk-circuits"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Groth16 ZK-KYC circuits: KYC verification, trusted setup, key generation"
+
+[dependencies]
+ark-groth16 = "0.5"
+ark-bn254 = "0.5"
+ark-relations = "0.5"
+ark-std = "0.5"
+ark-serialize = { version = "0.5", features = ["derive"] }
+ark-ff = "0.5"
+ark-ec = "0.5"
+ark-r1cs-std = "0.5"
+ark-crypto-primitives = { version = "0.5", features = ["crh"] }
+
+sha2.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+hex.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+
+rand = "0.8"
+
+[dev-dependencies]
+ark-std = "0.5"

@@ -1,0 +1,31 @@
+# DISCLAIMER: Technical demo code — legal wrappers required in production
+# SPDX-License-Identifier: MIT
+
+[workspace]
+resolver = "2"
+members = [
+    "packages/kaspa-adapter",
+    "services/compliance-rust",
+    "services/oracle-pool",
+    "services/sync",
+    "tokenomics",
+    "zk-circuits",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/assetmint/assetmint"
+description = "Institutional-grade RWA tokenization on Kaspa Testnet-12"
+
+[workspace.dependencies]
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+ed25519-dalek = "2"
+hex = "0.4"
+thiserror = "2"
+tracing = "0.1"
+tracing-subscriber = "0.3"

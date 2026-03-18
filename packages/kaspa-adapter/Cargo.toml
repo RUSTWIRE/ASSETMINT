@@ -1,0 +1,25 @@
+# DISCLAIMER: Technical demo code — legal wrappers required in production
+# SPDX-License-Identifier: MIT
+
+[package]
+name = "kaspa-adapter"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Kaspa Testnet-12 adapter: WASM bindings, transaction builder, UTXO management"
+
+[dependencies]
+tokio.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+hex.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+
+# Kaspa-specific (will resolve from rusty-kaspa or crates.io)
+# kaspa-consensus-core = { path = "../../vendor/rusty-kaspa/consensus/core" }
+# kaspa-rpc-core = { path = "../../vendor/rusty-kaspa/rpc/core" }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["test-util"] }

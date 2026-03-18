@@ -1,0 +1,73 @@
+# DISCLAIMER: Technical demo code — legal wrappers required in production
+# SPDX-License-Identifier: MIT
+#
+# Self-hosted OriginTrail DKG Edge Node for AssetMint
+# All Knowledge Assets are PRIVATE by default
+# Endpoint: http://localhost:8900
+
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DKG_MYSQL_ROOT_PASSWORD:-assetmint_testnet}
+      MYSQL_DATABASE: dkg_edge
+      MYSQL_USER: dkg
+      MYSQL_PASSWORD: ${DKG_MYSQL_PASSWORD:-dkg_testnet_pass}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  blazegraph:
+    image: nawer/blazegraph:2.1.5
+    ports:
+      - "9999:9999"
+    volumes:
+      - blazegraph_data:/var/lib/blazegraph
+
+  dkg-edge-node:
+    # NOTE: Replace with official OriginTrail Edge Node image when available
+    # For now, use the installer script approach
+    # See: https://github.com/OriginTrail/edge-node-installer
+    build:
+      context: .
+      dockerfile: Dockerfile.dkg
+    ports:
+      - "8900:8900"
+    environment:
+      - DKG_PRIVATE_MODE=true
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_USER=dkg
+      - MYSQL_PASSWORD=${DKG_MYSQL_PASSWORD:-dkg_testnet_pass}
+      - MYSQL_DATABASE=dkg_edge
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - BLAZEGRAPH_HOST=blazegraph
+      - BLAZEGRAPH_PORT=9999
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      blazegraph:
+        condition: service_started
+
+volumes:
+  mysql_data:
+  redis_data:
+  blazegraph_data:

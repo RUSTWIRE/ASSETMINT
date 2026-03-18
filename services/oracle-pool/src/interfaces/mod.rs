@@ -1,0 +1,4 @@
+// DISCLAIMER: Technical demo code — legal wrappers required in production
+// SPDX-License-Identifier: MIT
+
+pub mod oracle_pool;

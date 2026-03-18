@@ -1,0 +1,39 @@
+# Vendor repos (cloned separately)
+vendor/
+
+# Rust build artifacts
+target/
+**/*.rs.bk
+
+# Node.js
+node_modules/
+.next/
+dist/
+*.tsbuildinfo
+
+# Environment files (never commit secrets)
+.env
+.env.local
+.env.*.local
+
+# ZK keys (generated, may be large)
+zk-circuits/src/keys/*.bin
+zk-circuits/src/keys/*.pk
+zk-circuits/src/keys/*.vk
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
+firebase-debug.log
+
+# Compiled SilverScript output (regenerable)
+contracts/silverscript/compiled/
