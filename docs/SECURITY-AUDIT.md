@@ -22,6 +22,33 @@
 
 ---
 
+## Security Fixes Applied (2026-03-19)
+
+The following critical and high-severity issues identified in this audit have been FIXED:
+
+| Issue | Severity | Status | Fix |
+|-------|----------|--------|-----|
+| Toy hash function in ZK circuit | Critical | **FIXED** | 80-round Feistel MiMC with NUMS constants |
+| Deterministic RNG in trusted setup | Critical | **FIXED** | `OsRng` (system entropy) |
+| Hardcoded claim issuer key | Critical | **FIXED** | `CLAIM_ISSUER_KEY` env var |
+| Private keys in API requests | Critical | **FIXED** | Server-side `OPERATOR_PRIVATE_KEY` |
+| No authentication on API | High | **FIXED** | API key auth on write endpoints |
+| Rate limiter not applied | High | **FIXED** | Middleware properly wired |
+| No input validation | High | **FIXED** | DID regex + hex key validation |
+| CORS allow all origins | High | **FIXED** | Restricted to `CORS_ORIGIN` |
+| No body size limit | High | **FIXED** | 1MB limit (API + metadata) |
+| XOR threshold unguarded | Medium | **FIXED** | `#[deprecated]` + env gate |
+
+### Remaining Known Issues
+| Issue | Severity | Status |
+|-------|----------|--------|
+| No TLS/HTTPS | High | Open — use reverse proxy |
+| Recursive ZK boolean witness | Medium | Open — documented limitation |
+| XOR threshold (not MuSig2) | Medium | Gated but not replaced |
+| No audit log persistence | Low | Open — stdout only |
+
+---
+
 ## Table of Contents
 
 1. [Executive Summary](#1-executive-summary)

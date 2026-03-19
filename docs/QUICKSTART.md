@@ -58,6 +58,32 @@ Expected response:
 
 `kaspa_connected` will be `true` if a local kaspad instance is running on TN12.
 
+## Security Configuration
+
+AssetMint uses environment variables for security-sensitive configuration. In demo mode (no env vars set), the platform uses default test values with warnings.
+
+| Variable | Purpose | Default | Required for Production |
+|----------|---------|---------|----------------------|
+| `CLAIM_ISSUER_KEY` | Ed25519 claim signing key (64 hex chars) | Test key `[42u8; 32]` with WARNING | Yes |
+| `OPERATOR_PRIVATE_KEY` | Server-side Kaspa signing key (64 hex chars) | Alice test key with WARNING | Yes |
+| `API_KEY` | API key for write endpoint authentication | None (auth skipped) | Yes |
+| `CORS_ORIGIN` | Allowed CORS origin | `http://localhost:3000` | Yes |
+| `IDENTITY_DB_PATH` | SQLite database path for identity persistence | In-memory (lost on restart) | Yes |
+| `ZK_KEYS_DIR` | Directory for ZK proving/verification keys | `/tmp/assetmint_compliance_keys` | Yes |
+| `ALLOW_UNSAFE_THRESHOLD` | Enable XOR threshold signing (testing only) | Disabled | No |
+
+### Production Startup
+
+```bash
+export CLAIM_ISSUER_KEY=$(openssl rand -hex 32)
+export OPERATOR_PRIVATE_KEY=$(openssl rand -hex 32)
+export API_KEY=$(openssl rand -hex 16)
+export CORS_ORIGIN=https://your-domain.com
+export IDENTITY_DB_PATH=/var/lib/assetmint/identities.db
+export ZK_KEYS_DIR=/var/lib/assetmint/zk-keys
+make demo
+```
+
 ## Next Steps
 
 See [DEMO-WALKTHROUGH.md](DEMO-WALKTHROUGH.md) for a full guided tour of the minting wizard, compliance checks, and covenant contracts.

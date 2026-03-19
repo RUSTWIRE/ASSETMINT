@@ -2,7 +2,7 @@
 
 **Date:** 2026-03-19
 **Status:** Post-M5, Live on Kaspa Testnet-12
-**Honest Score: 8.5/10**
+**Honest Score: 8.8/10**
 
 ---
 
@@ -28,6 +28,11 @@ This report is written for a technical auditor. Every claim has a code reference
 8. **Covenant builder with 3 TN12-proven patterns** (CHECKSIG, compliance, self-propagating)
 9. **On-chain staking with timelock covenant UTXOs** (CHECKLOCKTIMEVERIFY)
 10. **Metadata->DAG commit**: `POST /metadata/publish-and-commit`
+11. **API key authentication on write endpoints (X-API-Key header)**
+12. **DID format validation and primary key hex validation**
+13. **CORS restricted to localhost:3000 (configurable via CORS_ORIGIN)**
+14. **Rate limiter middleware: 100 req/min per IP**
+15. **Server-side operator key (no private keys in API requests)**
 
 ### What's Demo-Only in the UI
 1. **Clawback page**: Shows mock examples (covenant execution not implemented)
@@ -73,7 +78,7 @@ The base Groth16 circuit genuinely works. The recursive circuit is a demonstrati
 - KYC circuit: proves Merkle inclusion of address hash without revealing address
 - Trusted setup generates proving + verification keys
 - Proof generation and verification tested: `test_proof_generation`, `test_full_prove_verify_cycle`
-- Hash function: simplified `H(a,b) = (a+b)^5 + a*b + 7` -- NOT Poseidon, NOT production-grade
+- Hash function: 80-round Feistel MiMC with NUMS constants -- NOT Poseidon, but cryptographically improved
 - ZK proof is a mandatory gate on `POST /transfer` (requires `zk_proof` + `zk_public_inputs` fields)
 - `GET /zk-proof/{address}` endpoint generates proofs on demand
 - 7 unit tests in zk-circuits, 2 in assetmint-core
@@ -288,7 +293,7 @@ These numbers are real, from Criterion benchmarks and release-mode test runs.
 | Merkle proof verification | Fast | 133,938/sec | `tests/load_test.rs` |
 | ZK proof generation | < 200ms | ~50ms | `zk_prover::tests::test_proof_generation` |
 | ZK proof verification | < 50ms | ~5ms | `zk_verifier::tests::test_full_prove_verify_cycle` |
-| Lib test count | Comprehensive | 105 passing | `cargo test --lib` (see breakdown below) |
+| Lib test count | Comprehensive | 113 passing | `cargo test --lib` (see breakdown below) |
 | Live TN12 transactions | >= 1 | 16 confirmed | 3 transfers + 2 wallet funding + 7 contract deploys + 2 covenant deploy + 2 covenant spend |
 
 ---
@@ -326,7 +331,7 @@ Note: These are P2SH funding transactions. The contracts are deployed (locked in
 
 ---
 
-## Test Summary (105 lib tests, all passing)
+## Test Summary (113 lib tests, all passing)
 
 | Crate | Lib Tests | What They Cover |
 |-------|-----------|-----------------|
@@ -364,7 +369,14 @@ Additional non-lib tests (not included in 96 count):
 | 13 | Formal verification | 7/10 | Property specs for all 7 contracts with line refs + STRIDE threat model with 12 threats. No TLA+/Coq. |
 | 14 | Documentation | 7/10 | Architecture, security audit, rubric exist. Previously inflated scores. |
 
-**Weighted Score: 8.5/10**
+**Weighted Score: 8.8/10**
+
+Score change from 8.5 → 8.8:
+- 80-round MiMC hash replacing toy hash (+0.1)
+- OsRng replacing deterministic seeds (+0.05)
+- API key auth on write endpoints (+0.05)
+- Private keys removed from API requests (+0.05)
+- DID/key validation + CORS restriction (+0.05)
 
 Score change from 8.2 → 8.5:
 - Compliance covenant executed on TN12 with KIP-10 value conservation (+0.2)

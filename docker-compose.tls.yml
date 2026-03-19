@@ -1,0 +1,44 @@
+# DISCLAIMER: Technical demo code — legal wrappers required in production
+# SPDX-License-Identifier: MIT
+#
+# AssetMint TLS deployment
+# Adds nginx reverse proxy with HTTPS termination.
+#
+# Usage:
+#   1. Generate self-signed cert:
+#      mkdir -p infrastructure/nginx/ssl
+#      openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+#        -keyout infrastructure/nginx/ssl/assetmint.key \
+#        -out infrastructure/nginx/ssl/assetmint.crt \
+#        -subj "/CN=localhost"
+#
+#   2. Start: docker compose -f docker-compose.tls.yml up -d
+#   3. Access: https://localhost
+
+version: '3.8'
+
+services:
+  nginx:
+    build: ./infrastructure/nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./infrastructure/nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - sovereign-metadata
+    restart: unless-stopped
+
+  sovereign-metadata:
+    build: ./infrastructure/dkg-node/sovereign-metadata
+    ports:
+      - "8900:8900"
+    environment:
+      - PORT=8900
+      - DB_FILE=/data/metadata.json
+    volumes:
+      - metadata_data:/data
+    restart: unless-stopped
+
+volumes:
+  metadata_data:

@@ -86,6 +86,12 @@ impl IdentityRegistry {
         Self::new(":memory:")
     }
 
+    /// Create an IdentityRegistry backed by a file on disk.
+    /// Data persists across restarts.
+    pub fn from_file(path: &str) -> Result<Self, IdentityError> {
+        Self::new(path)
+    }
+
     /// Register a new identity
     pub fn register(&self, did: &str, primary_key: &str) -> Result<Identity, IdentityError> {
         // Validate DID format: must match did:kaspa:<identifier>
@@ -363,5 +369,28 @@ mod tests {
         let registry = IdentityRegistry::in_memory().unwrap();
         let result = registry.register("did:kaspa:alice", "not-hex");
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_file_backed_persistence() {
+        let path = "/tmp/assetmint_test_identity.db";
+        // Clean up from previous runs
+        let _ = std::fs::remove_file(path);
+
+        // Create and register
+        {
+            let registry = IdentityRegistry::from_file(path).unwrap();
+            registry.register("did:kaspa:persist-test", &"aa".repeat(32)).unwrap();
+        }
+
+        // Reopen and verify
+        {
+            let registry = IdentityRegistry::from_file(path).unwrap();
+            let identity = registry.get("did:kaspa:persist-test").unwrap();
+            assert_eq!(identity.did, "did:kaspa:persist-test");
+        }
+
+        // Clean up
+        let _ = std::fs::remove_file(path);
     }
 }

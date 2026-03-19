@@ -8,7 +8,7 @@ The definitive institutional-grade, ZK-private, sovereign Real-World Asset (RWA)
 
 ## Architecture
 
-- **Compliance Engine** (`services/assetmint-core/`) — Full Rust port of Polymesh SDK patterns: identity registry, claims, transfer rules, Groth16 ZK-KYC proofs (105 tests, 16 confirmed TN12 transactions)
+- **Compliance Engine** (`services/assetmint-core/`) — Full Rust port of Polymesh SDK patterns: identity registry, claims, transfer rules, Groth16 ZK-KYC proofs (113 tests, 16 confirmed TN12 transactions)
 - **SilverScript Covenants** (`contracts/silverscript/`) — On-chain enforcement via KIP-10 introspection opcodes
 - **Sovereign Metadata Service** (`infrastructure/dkg-node/sovereign-metadata/`) — Self-hosted private metadata store with SHA-256 integrity hashes and tamper detection, running on port 8900 (replaces OriginTrail DKG)
 - **Oracle Pool** (`services/oracle-pool/`) — Simulated centralized multisig oracle (upgrade stub for future miner-attested)
@@ -47,6 +47,18 @@ This starts the compliance API on port 3001 and the dashboard on port 3000. See 
 | Sovereign Metadata | `http://localhost:8900` |
 | Compliance API | `http://localhost:3001` |
 | Oracle API | `http://localhost:3002` |
+
+## Configuration
+
+| Variable | Purpose | Default |
+|----------|---------|---------|
+| `CLAIM_ISSUER_KEY` | Claim signing key (hex) | Test key (WARNING) |
+| `OPERATOR_PRIVATE_KEY` | Kaspa signing key (hex) | Test key (WARNING) |
+| `API_KEY` | Write endpoint auth | None (demo mode) |
+| `CORS_ORIGIN` | Allowed origin | `http://localhost:3000` |
+| `IDENTITY_DB_PATH` | SQLite path | In-memory |
+
+See [docs/QUICKSTART.md](docs/QUICKSTART.md) for full security configuration.
 
 ## Test Assets
 

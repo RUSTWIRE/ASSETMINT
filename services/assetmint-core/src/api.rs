@@ -8,10 +8,12 @@
 use axum::{
     extract::{Path, Query, State},
     http::StatusCode,
-    middleware,
+    middleware::{self, Next},
+    response::Response,
     routing::{get, post},
     Json, Router,
 };
+use axum::http::Request;
 use serde::{Deserialize, Serialize};
 use std::sync::{Arc, Mutex};
 use tracing::info;
@@ -967,6 +969,34 @@ fn parse_claim_type(type_str: &str, jurisdiction: Option<&str>) -> Result<ClaimT
     }
 }
 
+// ── Audit Middleware ──────────────────────────────────────────────────
+
+/// Audit logging middleware — logs all requests with method, path, and status.
+async fn audit_log_middleware(
+    request: Request<axum::body::Body>,
+    next: Next,
+) -> Response {
+    let method = request.method().clone();
+    let path = request.uri().path().to_string();
+    let ip = request
+        .headers()
+        .get("x-forwarded-for")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("unknown")
+        .to_string();
+
+    let start = std::time::Instant::now();
+    let response = next.run(request).await;
+    let duration = start.elapsed();
+
+    println!(
+        "[K-RWA] AUDIT: {} {} from {} -> {} ({:?})",
+        method, path, ip, response.status(), duration
+    );
+
+    response
+}
+
 // ── Router ────────────────────────────────────────────────────────────
 
 /// Build the Axum router with all compliance + Kaspa endpoints
@@ -1016,6 +1046,7 @@ pub fn build_router(state: Arc<AppState>) -> Router {
         .layer(axum::extract::DefaultBodyLimit::max(1_048_576)) // 1MB
         .layer(axum::Extension(rate_limiter))
         .layer(middleware::from_fn(rate_limit_middleware))
+        .layer(middleware::from_fn(audit_log_middleware))
 }
 
 /// Create default AppState for testing (no Kaspa connection)
@@ -1077,8 +1108,11 @@ pub fn create_default_state() -> Result<Arc<AppState>, Box<dyn std::error::Error
 pub async fn create_live_state(
     kaspa_endpoint: &str,
 ) -> Result<Arc<AppState>, Box<dyn std::error::Error>> {
-    let registry = IdentityRegistry::in_memory()
+    let db_path = std::env::var("IDENTITY_DB_PATH")
+        .unwrap_or_else(|_| "/tmp/assetmint_identities.db".to_string());
+    let registry = IdentityRegistry::from_file(&db_path)
         .map_err(|e| format!("Failed to create registry: {}", e))?;
+    println!("[K-RWA] Identity registry: {}", db_path);
     let compliance = ComplianceEngine::new();
 
     // Read issuer key from env, fall back to testnet issuer key
