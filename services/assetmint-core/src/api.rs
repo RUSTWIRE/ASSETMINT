@@ -798,6 +798,158 @@ async fn commit_audit(
     }))
 }
 
+// ── Metadata publish-and-commit ───────────────────────────────────────
+
+/// POST /metadata/publish-and-commit
+///
+/// 1. Forward asset metadata to the sovereign metadata service (localhost:8900/publish)
+/// 2. Get back UAL + metadata_hash
+/// 3. Optionally commit the metadata_hash on-chain via commit_audit_hash()
+///
+/// DISCLAIMER: Technical demo — legal wrappers required in production.
+
+#[derive(Deserialize)]
+pub struct MetadataPublishRequest {
+    /// Arbitrary asset metadata JSON (forwarded as-is to the sovereign service)
+    pub metadata: serde_json::Value,
+    /// Optional: address to fund the on-chain commit from
+    pub from_address: Option<String>,
+    /// Optional: hex-encoded private key for signing the on-chain commit
+    pub private_key: Option<String>,
+}
+
+#[derive(Serialize)]
+pub struct MetadataPublishResponse {
+    pub ual: String,
+    pub metadata_hash: String,
+    pub status: String,
+    /// Transaction ID if the hash was committed on-chain (None if Kaspa unavailable or keys omitted)
+    pub onchain_tx_id: Option<String>,
+    pub onchain_committed: bool,
+}
+
+/// Response shape returned by the sovereign metadata service POST /publish
+#[derive(Deserialize)]
+struct SovereignPublishResponse {
+    ual: String,
+    metadata_hash: String,
+    #[allow(dead_code)]
+    status: String,
+}
+
+#[axum::debug_handler]
+async fn metadata_publish_and_commit(
+    State(state): State<Arc<AppState>>,
+    Json(req): Json<MetadataPublishRequest>,
+) -> Result<Json<MetadataPublishResponse>, (StatusCode, Json<ApiError>)> {
+    info!("{} API: POST /metadata/publish-and-commit", LOG_PREFIX);
+
+    // 1. Forward metadata to sovereign metadata service
+    let sovereign_url = std::env::var("SOVEREIGN_METADATA_URL")
+        .unwrap_or_else(|_| "http://localhost:8900".to_string());
+
+    let http_client = reqwest::Client::new();
+    let sovereign_resp = http_client
+        .post(format!("{}/publish", sovereign_url))
+        .json(&req.metadata)
+        .send()
+        .await
+        .map_err(|e| {
+            error_response(
+                StatusCode::BAD_GATEWAY,
+                format!("Sovereign metadata service unreachable: {}", e),
+            )
+        })?;
+
+    if !sovereign_resp.status().is_success() {
+        let status = sovereign_resp.status();
+        let body = sovereign_resp.text().await.unwrap_or_default();
+        return Err(error_response(
+            StatusCode::BAD_GATEWAY,
+            format!("Sovereign metadata service returned {}: {}", status, body),
+        ));
+    }
+
+    let publish_result: SovereignPublishResponse = sovereign_resp.json().await.map_err(|e| {
+        error_response(
+            StatusCode::BAD_GATEWAY,
+            format!("Invalid response from sovereign metadata service: {}", e),
+        )
+    })?;
+
+    info!(
+        "{} Metadata published: UAL={} hash={}",
+        LOG_PREFIX, publish_result.ual, publish_result.metadata_hash
+    );
+
+    // 2. Optionally commit the metadata_hash on-chain
+    let mut onchain_tx_id: Option<String> = None;
+    let mut onchain_committed = false;
+
+    if let (Some(ref from_address), Some(ref private_key)) = (&req.from_address, &req.private_key)
+    {
+        if let Some(ref client) = state.kaspa_client {
+            // Decode the metadata hash into [u8; 32]
+            let hash_bytes: [u8; 32] = hex::decode(&publish_result.metadata_hash)
+                .map_err(|e| {
+                    error_response(
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        format!("Invalid metadata_hash hex from sovereign service: {}", e),
+                    )
+                })?
+                .try_into()
+                .map_err(|_| {
+                    error_response(
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        "metadata_hash is not 32 bytes",
+                    )
+                })?;
+
+            let wallet = Wallet::from_hex(private_key).map_err(|e| {
+                error_response(
+                    StatusCode::BAD_REQUEST,
+                    format!("Invalid private_key: {}", e),
+                )
+            })?;
+
+            let tx_id = client
+                .commit_audit_hash(from_address, hash_bytes, wallet.keypair())
+                .await
+                .map_err(|e| {
+                    error_response(
+                        StatusCode::BAD_GATEWAY,
+                        format!("On-chain commit failed: {}", e),
+                    )
+                })?;
+
+            info!(
+                "{} Metadata hash committed on-chain: TX {}",
+                LOG_PREFIX, tx_id
+            );
+            onchain_tx_id = Some(tx_id.to_string());
+            onchain_committed = true;
+        } else {
+            info!(
+                "{} Kaspa client not available — skipping on-chain commit",
+                LOG_PREFIX
+            );
+        }
+    } else {
+        info!(
+            "{} No from_address/private_key provided — skipping on-chain commit",
+            LOG_PREFIX
+        );
+    }
+
+    Ok(Json(MetadataPublishResponse {
+        ual: publish_result.ual,
+        metadata_hash: publish_result.metadata_hash,
+        status: "published".to_string(),
+        onchain_tx_id,
+        onchain_committed,
+    }))
+}
+
 // ── Helpers ───────────────────────────────────────────────────────────
 
 fn parse_claim_type(type_str: &str, jurisdiction: Option<&str>) -> Result<ClaimType, String> {
@@ -838,6 +990,7 @@ pub fn build_router(state: Arc<AppState>) -> Router {
         .route("/vc/issue", post(vc_issue))
         .route("/vc/verify", post(vc_verify))
         .route("/zk-proof/{address}", get(generate_zk_proof))
+        .route("/metadata/publish-and-commit", post(metadata_publish_and_commit))
         .route("/oracle/attestation", get(oracle_attestation))
         .layer(cors)
         .with_state(state)

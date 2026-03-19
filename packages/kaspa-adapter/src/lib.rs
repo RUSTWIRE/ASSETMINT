@@ -15,6 +15,7 @@ pub mod client;
 pub mod wallet;
 pub mod tx_builder;
 pub mod script;
+pub mod covenant_builder;
 
 pub use wallet::ThresholdWallet;
 

@@ -6,7 +6,7 @@
 > Checklist tracking all deliverables across 5 milestones.
 > Status markers: `[x]` = genuinely complete, `[~]` = partially done, `[ ]` = not done.
 
-## Overall Status: PARTIALLY COMPLETE (7.5/10)
+## Overall Status: PARTIALLY COMPLETE (8.0/10)
 
 | Milestone | Status | Lib Tests | Description |
 |-----------|--------|-----------|-------------|
@@ -28,7 +28,7 @@
 - [x] Cargo workspace with 6 crates
 - [x] Vendor repos cloned (silverscript, kaspa-wasm, etc.)
 - [x] SilverScript compiler built (`vendor/silverscript/target/release/silverc`)
-- [~] DKG Edge Node config -- Docker Compose exists, node never started
+- [x] Sovereign Metadata Service -- running on :8900, SHA-256 integrity hashes, Docker containerized (`infrastructure/dkg-node/sovereign-metadata/`). Replaces OriginTrail DKG Edge Node.
 - [x] Git branches created
 
 ## M1: SilverScript Contracts + ZK Circuits
@@ -85,6 +85,7 @@ Note: This is NOT a port using `polymesh-api` crate. That crate is never importe
 - [x] `oracle-pool/src/attestation.rs` -- Ed25519 multisig (2-of-3)
 - [x] `fetch_coingecko_price()` -- real HTTP request to CoinGecko API
 - [x] `get_live_aggregated_price()` -- combines 1 live + 2 simulated sources
+- [x] `GET /oracle/attestation` endpoint -- live attested price with 2-of-3 Ed25519 multisig, exposed in compliance API (`api.rs`)
 - [ ] On-chain attestation committed via `state-verity.sil` -- never done
 - [x] 12 unit tests passing
 
@@ -93,7 +94,7 @@ Note: This is NOT a port using `polymesh-api` crate. That crate is never importe
 - [x] `check_and_transition()` -- correctly detects DKG/oracle/compliance changes
 - [ ] `run()` loop -- empty. Logs "Polling DKG..." and sleeps. No HTTP request made. (lines 215-226)
 - [x] `run_polling()` -- genuinely functional compliance sync loop (lines 233-298). Polls `/merkle-root` via `reqwest::Client`, detects root changes, triggers `check_and_transition()`. Handles API errors with retry.
-- [~] `run_polling()` is not yet wired into application startup -- nobody calls it
+- [x] `run_polling()` IS wired into application startup -- `main.rs` spawns `svc.run_polling(&compliance_url)` via `tokio::spawn`
 - [x] 9 unit tests passing, including `test_merkle_root_polling_transition` and `test_no_state_set_errors`
 
 ## M4: Frontend + E2E
@@ -130,7 +131,7 @@ Note: This is NOT a port using `polymesh-api` crate. That crate is never importe
 - [~] Recursive ZK compliance history -- DEMO ONLY. Boolean witness pattern, not in-circuit verification. See `kyc_circuit.rs` line 209.
 - [~] Live CoinGecko oracle -- `fetch_coingecko_price()` is real, but result is mixed with 2 simulated sources. No on-chain attestation.
 - [ ] ASTM KRC-20 inscription broadcast -- `deploy_astm.rs` exists but OP_RETURN rejected by Kaspa
-- [~] DKG Edge Node -- startup script + TypeScript client methods exist, node never started or connected
+- [x] Sovereign Metadata Service -- replaces DKG Edge Node, running on :8900, SHA-256 integrity hashes, tamper detection via `POST /verify`, Docker containerized
 
 ### Documentation
 - [x] Architecture documentation (`docs/ARCHITECTURE.md`)
@@ -187,7 +188,7 @@ ASSETMINT/
 │   ├── oracle.rs        # Price feeds (1 real CoinGecko + 2 simulated)
 │   └── attestation.rs   # Ed25519 multisig (2-of-3)
 ├── services/sync/src/
-│   └── state_sync.rs    # State machine works; run() loop is empty
+│   └── state_sync.rs    # State machine works; run_polling() wired to startup in main.rs
 ├── tokenomics/src/
 │   ├── token.rs         # KRC-20 inscription JSON (format only, cannot broadcast)
 │   ├── staking.rs       # Staking math (in-memory only, not on-chain)
@@ -203,6 +204,9 @@ ASSETMINT/
 ├── docs/
 │   ├── ARCHITECTURE.md
 │   └── SECURITY-AUDIT.md
-├── FUNCTIONALITY-REPORT.md   # Honest assessment (7.3/10)
+├── infrastructure/dkg-node/sovereign-metadata/
+│   ├── server.js        # Sovereign metadata service (replaces OriginTrail DKG)
+│   └── Dockerfile       # node:22-alpine, port 8900
+├── FUNCTIONALITY-REPORT.md   # Honest assessment (7.9/10)
 └── ROLLS-ROYCE-RUBRIC.md     # This file
 ```

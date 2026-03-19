@@ -10,6 +10,7 @@ pub mod token;
 pub mod staking;
 pub mod governance;
 pub mod fee_model;
+pub mod on_chain;
 
 /// Log prefix for all AssetMint tokenomics operations
 pub const LOG_PREFIX: &str = "[K-RWA]";

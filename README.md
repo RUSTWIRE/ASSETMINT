@@ -10,7 +10,7 @@ The definitive institutional-grade, ZK-private, sovereign Real-World Asset (RWA)
 
 - **Compliance Engine** (`services/compliance-rust/`) — Full Rust port of Polymesh SDK patterns: identity registry, claims, transfer rules, Groth16 ZK-KYC proofs
 - **SilverScript Covenants** (`contracts/silverscript/`) — On-chain enforcement via KIP-10 introspection opcodes
-- **DKG Edge Node** (`infrastructure/dkg-node/`) — Self-hosted OriginTrail Knowledge Graph for private asset metadata
+- **Sovereign Metadata Service** (`infrastructure/dkg-node/sovereign-metadata/`) — Self-hosted private metadata store with SHA-256 integrity hashes and tamper detection, running on port 8900 (replaces OriginTrail DKG)
 - **Oracle Pool** (`services/oracle-pool/`) — Simulated centralized multisig oracle (upgrade stub for future miner-attested)
 - **ASTM Token** (`tokenomics/`) — KRC-20 protocol token with staking and governance
 - **Frontend** (`apps/dashboard-fe/`) — Forked Hedera RWA DeFi accelerator, adapted for Kaspa
@@ -44,7 +44,7 @@ This starts the compliance API on port 3001 and the dashboard on port 3000. See 
 | Service | Endpoint |
 |---------|----------|
 | Kaspa Testnet-12 | `ws://tn12-node.kaspa.com:17210` |
-| DKG Edge Node | `http://localhost:8900` |
+| Sovereign Metadata | `http://localhost:8900` |
 | Compliance API | `http://localhost:3001` |
 | Oracle API | `http://localhost:3002` |
 

@@ -15,6 +15,7 @@
 | Dashboard (Next.js) | 3000 | Investor-facing frontend |
 | Compliance API (Axum) | 3001 | Identity, claims, ZK proofs, transfers |
 | Oracle API | 3002 | Reserve attestations |
+| Sovereign Metadata | 8900 | Private asset metadata with SHA-256 integrity |
 
 ---
 
@@ -578,6 +579,96 @@ An honest breakdown of what is live on-chain versus simulated in this demo.
 | `POST` | `/audit/commit` | Commit audit hash to Kaspa DAG |
 | `POST` | `/vc/issue` | Issue a W3C Verifiable Credential |
 | `POST` | `/vc/verify` | Verify a W3C Verifiable Credential |
+
+---
+
+## Step 12: Publish Asset to Sovereign Metadata
+
+The sovereign metadata service replaces the OriginTrail DKG Edge Node with a
+self-hosted, private-by-default metadata store. All data stays on your
+infrastructure.
+
+**What to do:**
+
+```bash
+curl -s -X POST http://localhost:8900/publish \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Test Asset","ticker":"KTEST","type":"real-estate","jurisdiction":"US"}' | jq
+```
+
+**What to expect:**
+
+```json
+{
+  "ual": "did:assetmint:sovereign/a1b2c3d4e5f67890",
+  "metadata_hash": "f0e1d2c3b4a5968778695a4b3c2d1e0f...",
+  "status": "published",
+  "private": true,
+  "verify_instruction": "Commit metadata_hash on-chain via POST /audit/commit to make it verifiable on Kaspa DAG"
+}
+```
+
+**Why this matters:** The metadata is stored locally with a SHA-256 integrity
+hash. The UAL (`did:assetmint:sovereign/...`) is a unique identifier for the
+asset. The `metadata_hash` can be committed to the Kaspa DAG via
+`POST /audit/commit` to create a tamper-evident on-chain anchor.
+
+---
+
+## Step 13: Verify Metadata Integrity
+
+Check that metadata has not been tampered with by recomputing its SHA-256 hash
+and comparing against the stored hash.
+
+**What to do:**
+
+```bash
+curl -s -X POST http://localhost:8900/verify \
+  -H "Content-Type: application/json" \
+  -d '{
+    "ual": "did:assetmint:sovereign/a1b2c3d4e5f67890",
+    "metadata": {"name":"Test Asset","ticker":"KTEST","type":"real-estate","jurisdiction":"US"}
+  }' | jq
+```
+
+**What to expect:**
+
+```json
+{
+  "verified": true,
+  "ual": "did:assetmint:sovereign/a1b2c3d4e5f67890",
+  "stored_hash": "f0e1d2c3b4a5968778695a4b3c2d1e0f...",
+  "computed_hash": "f0e1d2c3b4a5968778695a4b3c2d1e0f...",
+  "tampered": false
+}
+```
+
+**Why this matters:** If the metadata has been modified since publication,
+`verified` will be `false` and `tampered` will be `true`. This provides
+tamper detection without requiring on-chain storage of the full metadata --
+only the hash needs to be anchored on Kaspa.
+
+---
+
+## Step 14: Fetch Oracle Attestation
+
+Get a live attested price with 2-of-3 Ed25519 multisig from the oracle pool.
+
+**What to do:**
+
+```bash
+curl -s "http://localhost:3001/oracle/attestation?asset_id=KAS" | jq
+```
+
+**What to expect:**
+
+A JSON response containing the aggregated KAS price, attestation timestamp,
+and Ed25519 multisig signatures from the oracle pool.
+
+**Why this matters:** The oracle endpoint aggregates one live CoinGecko price
+with two simulated sources, then creates a 2-of-3 Ed25519 multisig attestation.
+This is exposed as a real API endpoint but attestations are not yet committed
+on-chain via `state-verity.sil`.
 
 ---
 

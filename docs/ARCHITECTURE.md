@@ -20,7 +20,6 @@ AssetMint demonstrates RWA tokenization on Kaspa's UTXO model. It combines Silve
 - Axum REST API serving real compliance evaluations
 
 **What is simulated or missing:**
-- DKG Edge Node (config only, never started)
 - Recursive ZK (boolean witness, not in-circuit verification)
 - Threshold Schnorr (XOR aggregation, not MuSig2)
 - ASTM token (inscription format only, cannot broadcast via OP_RETURN)
@@ -39,21 +38,21 @@ AssetMint demonstrates RWA tokenization on Kaspa's UTXO model. It combines Silve
 │   /mint ──────── Step 3 real (ZK API), Steps 2,5 simulated              │
 │   /clawback, /assets, /reserves, /astm, /settings ── display pages      │
 ├───────────────┬────────────────┬─────────────────────────────────────────┤
-│ Compliance    │  Oracle API    │  DKG Edge Node                          │
-│ API (Axum)    │  (Axum)        │  (OriginTrail)                          │
+│ Compliance    │  Oracle API    │  Sovereign Metadata                     │
+│ API (Axum)    │  (Axum)        │  (Node.js)                              │
 │ :3001         │  :3002         │  :8900                                  │
 │               │                │                                         │
-│ REAL ─────────│─ PARTIAL ──────│─ NOT CONNECTED ─────────────────────────│
-│ Identity reg  │  CoinGecko     │  Docker config exists                   │
-│ Claims engine │  fetch works   │  Node never started                     │
-│ Rule eval     │  2 simulated   │  Returns mock UALs                      │
-│ ZK prover     │  sources mixed │                                         │
-│ Kaspa wRPC    │  No on-chain   │                                         │
-│ POST /transfer│  attestation   │                                         │
+│ REAL ─────────│─ PARTIAL ──────│─ REAL ─────────────────────────────────│
+│ Identity reg  │  CoinGecko     │  SHA-256 integrity hashes               │
+│ Claims engine │  fetch works   │  Tamper detection (POST /verify)        │
+│ Rule eval     │  2 simulated   │  Docker containerized                   │
+│ ZK prover     │  sources mixed │  Replaces OriginTrail DKG               │
+│ Kaspa wRPC    │  Attestation   │  did:assetmint:sovereign/ UALs          │
+│ POST /transfer│  API endpoint  │                                         │
 ├───────────────┴────────────────┴─────────────────────────────────────────┤
 │                  Rust Workspace (6 crates)                               │
 │                                                                          │
-│  assetmint-core [REAL]  │  oracle-pool [PARTIAL]  │  sync [EMPTY LOOP]  │
+│  assetmint-core [REAL]  │  oracle-pool [PARTIAL]  │  sync [POLLING WIRED] │
 │  tokenomics [FORMAT ONLY]│  kaspa-adapter [REAL]   │  zk-circuits [REAL] │
 ├──────────────────────────────────────────────────────────────────────────┤
 │               SilverScript Contracts (5 deployed)                        │
@@ -63,7 +62,7 @@ AssetMint demonstrates RWA tokenization on Kaspa's UTXO model. It combines Silve
 ├──────────────────────────────────────────────────────────────────────────┤
 │          Kaspa Testnet-12 (wRPC: ws://127.0.0.1:17210)                  │
 │          PHANTOM/GHOSTDAG  •  10 BPS  •  Blake2b                        │
-│          8 confirmed TXs (3 transfers + 5 contract deploys)             │
+│          12+ confirmed TXs (3 transfers + 2 funding + 7 contract deploys)│
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -73,13 +72,13 @@ AssetMint demonstrates RWA tokenization on Kaspa's UTXO model. It combines Silve
 |------------|--------|----------|
 | Dashboard -> Compliance API | REAL | `api.evaluateTransfer()`, `api.complianceTransfer()` in `transfer/page.tsx` |
 | Dashboard -> Compliance API (mint ZK) | REAL | `GET /zk-proof/{address}` in `mint/page.tsx` step 3 |
-| Dashboard -> DKG | NOT CONNECTED | `mint/page.tsx` line 405: "DKG Edge Node: Not Connected" |
+| Dashboard -> Sovereign Metadata | REAL | Sovereign metadata service on :8900 with SHA-256 integrity hashes |
 | Compliance API -> Kaspa TN12 | REAL | `KaspaClient` in `api.rs`, `submit_transaction` works |
 | Compliance API -> ZK Prover | REAL | `ZkProver::generate_proof()` called from API |
 | Oracle -> CoinGecko | REAL | `fetch_coingecko_price()` in `oracle.rs` line 134 |
 | Oracle -> Kaspa TN12 | NOT CONNECTED | No attestation committed via `state-verity.sil` |
 | Sync -> DKG | NOT CONNECTED | `run()` is empty loop (`state_sync.rs` line 215-226) |
-| Sync -> Compliance API | NOT CONNECTED | No HTTP request in `run()` |
+| Sync -> Compliance API | REAL | `run_polling()` polls `/merkle-root` via `reqwest::Client`, wired to startup in `main.rs` |
 | Tokenomics -> Kaspa TN12 | NOT CONNECTED | In-memory state machine only |
 
 ---
@@ -105,9 +104,9 @@ oracle-pool [PARTIAL - 12 tests]
     └── chrono 0.4 (timestamp handling)
     NOTE: reqwest call to CoinGecko is real; on-chain attestation never happens
 
-sync [MOSTLY STUB - 9 tests]
-    └── reqwest 0.12 (imported but never used in run() loop)
-    NOTE: check_and_transition() state machine works; run() is empty
+sync [PARTIAL - 9 tests]
+    └── reqwest 0.12 (used by run_polling() to poll /merkle-root)
+    NOTE: check_and_transition() state machine works; run_polling() wired to startup in main.rs; run() is empty
 
 tokenomics [IN-MEMORY ONLY - 30 tests]
     └── workspace deps only (serde, sha2, ed25519-dalek, thiserror, tracing)
@@ -142,13 +141,30 @@ This flow is fully implemented and tested on TN12:
 
 Evidence: 3 confirmed transfer TXs on TN12.
 
+### Real Flow: Sovereign Metadata to Kaspa DAG
+
+This flow uses the sovereign metadata service to publish asset data and anchor integrity hashes on-chain:
+
+```
+Sovereign Metadata (:8900) → SHA-256 hash → Kaspa DAG commitment
+```
+
+1. Client calls `POST /publish` on sovereign metadata service (:8900) with asset metadata
+2. Service computes SHA-256 hash of canonical JSON (sorted keys)
+3. Service stores metadata locally, returns UAL (`did:assetmint:sovereign/{hash}`) and `metadata_hash`
+4. Client calls `POST /audit/commit` on compliance API (:3001) with `metadata_hash`
+5. Compliance API commits hash to Kaspa DAG as an on-chain transaction
+6. Later, `POST /verify` on :8900 checks metadata integrity against stored hash (tamper detection)
+
+Note: The sovereign metadata service replaces the OriginTrail DKG Edge Node. Data stays on your infrastructure (private-by-default). The hash anchoring step (4-5) is not automatic -- the caller must explicitly commit.
+
 ### Described but NOT Implemented: Full Mint-to-Transfer Lifecycle
 
 The architecture doc previously described a 9-step lifecycle. Here is the honest status of each step:
 
 | Step | Description | Status |
 |------|-------------|--------|
-| 1. Asset Onboarding | Publish to DKG, get UAL | NOT WORKING -- DKG never connected, returns mock hash |
+| 1. Asset Onboarding | Publish to sovereign metadata, get UAL | WORKING -- sovereign metadata service on :8900, returns `did:assetmint:sovereign/` UAL with SHA-256 hash |
 | 2. Identity Registration | `POST /identity` | WORKING -- writes to SQLite |
 | 3. Claim Issuance | `POST /claim` | WORKING -- Ed25519 signed, expiry enforced |
 | 4. Compliance Evaluation | `GET /compliance/evaluate` | WORKING -- composable rules engine |
@@ -330,7 +346,7 @@ None of these are connected to Kaspa. No covenant UTXOs for staking, no OP_RETUR
 |---------|------|----------|--------|
 | Compliance API | 3001 | HTTP (Axum) | WORKING |
 | Oracle API | 3002 | HTTP (Axum) | PARTIAL (CoinGecko works, no on-chain) |
-| DKG Edge Node | 8900 | HTTP | NOT CONNECTED |
+| Sovereign Metadata | 8900 | HTTP (Node.js) | WORKING -- SHA-256 hashes, tamper detection, Docker containerized |
 | Kaspa wRPC | 17210 | WebSocket | WORKING |
 
 ### Development Environment
@@ -357,7 +373,10 @@ ASSETMINT/
 │       ├── *.json                 # Compiled artifacts (5 of 7)
 │       └── *-args.json            # Constructor argument files
 ├── infrastructure/
-│   └── dkg-node/                  # OriginTrail DKG config (NOT RUNNING)
+│   └── dkg-node/
+│       └── sovereign-metadata/    # Sovereign metadata service (:8900, RUNNING)
+│           ├── server.js          # Node.js HTTP service with SHA-256 integrity
+│           └── Dockerfile         # node:22-alpine container
 ├── packages/
 │   ├── kaspa-adapter/             # Kaspa node client (REAL)
 │   │   ├── src/wallet.rs          # Threshold Schnorr (XOR demo)
@@ -369,13 +388,13 @@ ASSETMINT/
 │   │   ├── tests/                 # E2E, proptest, load tests
 │   │   └── benches/               # Criterion benchmarks
 │   ├── oracle-pool/               # Price feed oracle (PARTIAL)
-│   └── sync/                      # State sync (EMPTY LOOP)
+│   └── sync/                      # State sync (run_polling wired to startup)
 ├── tokenomics/                    # ASTM token (IN-MEMORY ONLY)
 ├── vendor/                        # Vendored dependencies
 ├── zk-circuits/                   # Groth16 KYC circuit (REAL) + recursive (DEMO)
 ├── Cargo.toml                     # Workspace root
 ├── docker-compose.yml             # Infrastructure services
-├── FUNCTIONALITY-REPORT.md        # Honest assessment (7.2/10)
+├── FUNCTIONALITY-REPORT.md        # Honest assessment (7.9/10)
 ├── ROLLS-ROYCE-RUBRIC.md          # Honest rubric with [x]/[~]/[ ] markers
 └── CONTEXT.md                     # Development context
 ```

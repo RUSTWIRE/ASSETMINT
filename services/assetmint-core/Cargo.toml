@@ -45,6 +45,9 @@ kaspa-adapter = { path = "../../packages/kaspa-adapter" }
 sync = { path = "../sync" }
 oracle-pool = { path = "../oracle-pool" }
 
+# HTTP client (sovereign metadata service)
+reqwest = { version = "0.12", features = ["json"] }
+
 # Logging
 tracing-subscriber = "0.3"
 
