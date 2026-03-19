@@ -4,7 +4,7 @@
 "use client";
 
 import { useState } from "react";
-import { Gem, Lock, Vote, Clock, TrendingUp, Info, AlertTriangle, ExternalLink } from "lucide-react";
+import { Gem, Lock, Vote, Clock, TrendingUp, Info, ExternalLink } from "lucide-react";
 import { DemoBanner } from "@/components/demo-banner";
 import { useWalletStore } from "@/store/wallet";
 import { KTT_TOKENS, KTT_REGISTRY, KTT_TRANSFER_COUNT } from "@/lib/ktt";
@@ -153,14 +153,6 @@ export default function ASTMPage() {
         </div>
       </div>
 
-      <div className="bg-amber-50/5 border border-amber-500/20 rounded-lg p-3 mb-4">
-        <div className="flex items-start gap-2">
-          <AlertTriangle className="h-4 w-4 text-amber-500 mt-0.5 shrink-0" />
-          <p className="text-amber-200/70 text-sm">
-            <strong className="text-amber-300">Demo Mode:</strong> ASTM staking and governance below use simulated data. Real token operations use the KTT standard shown above.
-          </p>
-        </div>
-      </div>
 
       <div>
         <h2 className="text-2xl font-bold text-white">ASTM Token</h2>
@@ -169,12 +161,6 @@ export default function ASTMPage() {
         </p>
       </div>
 
-      <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4 flex items-start gap-2">
-        <AlertTriangle className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
-        <p className="text-amber-800 text-sm">
-          <strong>Demo Mode:</strong> ASTM KRC-20 token is not deployed on Kaspa TN12. KRC-20 inscriptions require the Kasplex commit-reveal protocol. Token staking and governance logic works in-memory only.
-        </p>
-      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Staking Panel */}

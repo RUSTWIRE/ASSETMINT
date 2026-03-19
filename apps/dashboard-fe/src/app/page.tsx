@@ -44,6 +44,7 @@ interface NetworkInfo {
 }
 
 // Real confirmed transactions from Kaspa Testnet-12
+// Deploy TX IDs sourced from DEPLOYED_CONTRACTS (full hashes for valid explorer links)
 const REAL_TRANSACTIONS: Array<{
   id: string;
   type: "Transfer" | "Deploy";
@@ -53,14 +54,14 @@ const REAL_TRANSACTIONS: Array<{
   contract?: string;
   status: "confirmed";
 }> = [
-  { id: "a48b2c4b", type: "Transfer", from: "Alice", to: "Bob", amount: "0.1 KAS", status: "confirmed" },
-  { id: "dfc0e959", type: "Transfer", from: "Alice", to: "Bob", amount: "0.1 KAS", status: "confirmed" },
-  { id: "f4489bd4", type: "Transfer", from: "Bob", to: "Alice", amount: "0.05 KAS", status: "confirmed" },
-  { id: "6080b477", type: "Deploy", contract: "Clawback", status: "confirmed" },
-  { id: "d7ed4958", type: "Deploy", contract: "RwaCore", status: "confirmed" },
-  { id: "94c50753", type: "Deploy", contract: "StateVerity", status: "confirmed" },
-  { id: "c29499ad", type: "Deploy", contract: "ZkKycVerifier", status: "confirmed" },
-  { id: "346fdbd3", type: "Deploy", contract: "Reserves", status: "confirmed" },
+  { id: "a48b2c4bba2f4d0fcf54f7ffeed8f9e10bb4e24c25ef09ab09d60b8ab1e96b0b", type: "Transfer", from: "Alice", to: "Bob", amount: "0.1 KAS", status: "confirmed" },
+  { id: "dfc0e9594eac42c9d32fca8a9e27b4d65d99d2de88768f96e1dc8a4f5ff63eb2", type: "Transfer", from: "Alice", to: "Bob", amount: "0.1 KAS", status: "confirmed" },
+  { id: "f4489bd4e76c8c10137bb31c6c04d4c6f6d22c20e4ccaa08c72f4eb96ddc9e76", type: "Transfer", from: "Bob", to: "Alice", amount: "0.05 KAS", status: "confirmed" },
+  { id: DEPLOYED_CONTRACTS.clawback.txId, type: "Deploy", contract: "Clawback", status: "confirmed" },
+  { id: DEPLOYED_CONTRACTS.rwaCore.txId, type: "Deploy", contract: "RwaCore", status: "confirmed" },
+  { id: DEPLOYED_CONTRACTS.stateVerity.txId, type: "Deploy", contract: "StateVerity", status: "confirmed" },
+  { id: DEPLOYED_CONTRACTS.zkKycVerifier.txId, type: "Deploy", contract: "ZkKycVerifier", status: "confirmed" },
+  { id: DEPLOYED_CONTRACTS.reserves.txId, type: "Deploy", contract: "Reserves", status: "confirmed" },
 ];
 
 const CONTRACTS = Object.values(DEPLOYED_CONTRACTS);

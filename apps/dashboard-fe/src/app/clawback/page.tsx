@@ -4,7 +4,7 @@
 "use client";
 
 import { useState } from "react";
-import { ShieldAlert, Loader2, AlertTriangle, ExternalLink, Info } from "lucide-react";
+import { ShieldAlert, Loader2, AlertTriangle, ExternalLink } from "lucide-react";
 import { DemoBanner } from "@/components/demo-banner";
 import { useWalletStore } from "@/store/wallet";
 import { DEPLOYED_CONTRACTS } from "@/lib/contracts";
@@ -53,40 +53,6 @@ export default function ClawbackPage() {
         <p className="text-gray-400 text-sm mt-1">
           Admin panel for regulatory clawback operations -- issuer only
         </p>
-      </div>
-
-      {/* Demo Mode Banner */}
-      <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 flex items-start gap-3">
-        <Info className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
-        <div>
-          <p className="text-sm text-amber-400 font-medium">
-            Demo Mode
-          </p>
-          <p className="text-xs text-gray-400 mt-1">
-            Clawback operations require covenant execution (P2SH spending),
-            which is not yet implemented. The deployed Clawback contract is at:{" "}
-            <a
-              href={explorer.addressUrl(clawbackContract.p2shAddress)}
-              target="_blank"
-              rel="noopener"
-              className="text-indigo-400 hover:text-indigo-300 font-mono"
-            >
-              {clawbackContract.p2shAddress.slice(0, 18)}...
-              <ExternalLink className="w-3 h-3 inline ml-1" />
-            </a>{" "}
-            (TX:{" "}
-            <a
-              href={explorer.txUrl(clawbackContract.txId)}
-              target="_blank"
-              rel="noopener"
-              className="text-blue-400 hover:text-blue-300 font-mono"
-            >
-              {clawbackContract.txId.slice(0, 10)}...
-              <ExternalLink className="w-3 h-3 inline ml-1" />
-            </a>
-            )
-          </p>
-        </div>
       </div>
 
       {/* Warning Banner */}

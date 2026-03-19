@@ -74,6 +74,23 @@ export default function SettingsPage() {
               Price feeds, reserve attestations, collateral ratio verification
             </p>
           </div>
+
+          <div className="bg-gray-800 rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-400">Sovereign Metadata</p>
+                <p className="text-sm text-white font-mono mt-1">
+                  http://localhost:8900
+                </p>
+              </div>
+              <span className="text-xs px-2 py-1 rounded-full bg-gray-700 text-gray-400">
+                Port 8900
+              </span>
+            </div>
+            <p className="text-xs text-gray-600 mt-2">
+              Private metadata store with SHA-256 integrity hashes and tamper detection
+            </p>
+          </div>
         </div>
       </div>
 
@@ -179,7 +196,7 @@ export default function SettingsPage() {
           </div>
           <div className="flex items-center justify-between py-3 border-b border-gray-800">
             <span className="text-sm text-gray-400">Token Standard</span>
-            <span className="text-sm text-white">KRC-20 (KasPlex)</span>
+            <span className="text-sm text-white">KTT (Covenant-Native)</span>
           </div>
           <div className="flex items-center justify-between py-3">
             <span className="text-sm text-gray-400">Environment</span>
@@ -201,7 +218,7 @@ export default function SettingsPage() {
             <p className="text-xs text-gray-400 mt-2 leading-relaxed">
               AssetMint is an institutional-grade RWA tokenization platform
               built on Kaspa. It combines UTXO covenants, ZK-KYC compliance
-              proofs, DKG knowledge assets, and KRC-20 tokens to enable
+              proofs, sovereign metadata, and KRC-20 tokens to enable
               compliant tokenization of real-world assets. This dashboard is a
               technical demo running on Testnet-12 with simulated data. All
               assets (KPROP-NYC-TEST) and tokens (ASTM) are fictional.

@@ -16,6 +16,7 @@ import {
 import Link from "next/link";
 import { api, explorer } from "@/lib/api";
 import { DEPLOYED_CONTRACTS } from "@/lib/contracts";
+import { DemoBanner } from "@/components/demo-banner";
 
 const CONTRACTS = Object.values(DEPLOYED_CONTRACTS);
 
@@ -35,6 +36,7 @@ export default function AssetsPage() {
 
   return (
     <div className="space-y-8">
+      <DemoBanner feature="Asset metadata shown is placeholder data." details="Connect to the sovereign metadata service on port 8900 to see real published assets." />
       <div>
         <h2 className="text-2xl font-bold text-white">Asset Detail</h2>
         <p className="text-gray-400 text-sm mt-1">
@@ -144,34 +146,34 @@ export default function AssetsPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* DKG Metadata */}
+        {/* Sovereign Metadata */}
         <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 space-y-4">
           <h3 className="text-lg font-semibold text-white flex items-center gap-2">
             <Database className="w-5 h-5 text-purple-400" />
-            DKG Metadata
+            Sovereign Metadata
           </h3>
           <div className="space-y-3">
             <div className="bg-gray-800 rounded-lg p-3">
-              <p className="text-xs text-gray-500">Universal Asset Locator (UAL)</p>
+              <p className="text-xs text-gray-500">Asset Identifier</p>
               <p className="text-xs text-indigo-400 font-mono break-all mt-1">
-                did:dkg:kaspa:testnet12/asset:KPROP-NYC-TEST/0xa3f7b2c1
+                did:assetmint:sovereign/a3f7b2c1d4e5f6a7
               </p>
             </div>
             <div className="bg-gray-800 rounded-lg p-3">
-              <p className="text-xs text-gray-500">Assertion ID</p>
+              <p className="text-xs text-gray-500">Metadata Hash (SHA-256)</p>
               <p className="text-xs text-gray-300 font-mono break-all mt-1">
-                0x7f8a9b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a
+                7f8a9b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a
               </p>
             </div>
             <div className="bg-gray-800 rounded-lg p-3">
-              <p className="text-xs text-gray-500">Knowledge Asset State</p>
+              <p className="text-xs text-gray-500">Storage</p>
               <p className="text-xs text-emerald-400 font-medium mt-1">
-                Published (finalized)
+                Private (self-hosted)
               </p>
             </div>
             <div className="bg-gray-800 rounded-lg p-3">
-              <p className="text-xs text-gray-500">Epochs Remaining</p>
-              <p className="text-xs text-gray-300 mt-1">42 / 48</p>
+              <p className="text-xs text-gray-500">Service</p>
+              <p className="text-xs text-gray-300 font-mono mt-1">http://localhost:8900</p>
             </div>
           </div>
         </div>

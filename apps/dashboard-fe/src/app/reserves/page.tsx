@@ -25,6 +25,7 @@ import {
 } from "recharts";
 import { api, explorer } from "@/lib/api";
 import { DEPLOYED_CONTRACTS } from "@/lib/contracts";
+import { DemoBanner } from "@/components/demo-banner";
 
 const reservesContract = DEPLOYED_CONTRACTS.reserves;
 
@@ -92,6 +93,7 @@ export default function ReservesPage() {
 
   return (
     <div className="space-y-8">
+      <DemoBanner feature="Reserve data uses simulated values." details="Collateral ratios, reserve breakdown, and attestation history shown are mock data. The deployed Reserves covenant contract is real (TX verified on TN12)." />
       <div>
         <h2 className="text-2xl font-bold text-white">Proof of Reserves</h2>
         <p className="text-gray-400 text-sm mt-1">

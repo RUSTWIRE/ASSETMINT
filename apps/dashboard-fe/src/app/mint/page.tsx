@@ -34,7 +34,7 @@ interface StepResult {
 
 const STEPS = [
   { id: 1, title: "Asset Details", description: "Enter asset metadata" },
-  { id: 2, title: "DKG Publish", description: "Local hash only — DKG not connected" },
+  { id: 2, title: "DKG Publish", description: "Publish to sovereign metadata service" },
   { id: 3, title: "ZK-KYC Proof", description: "Generate compliance proof" },
   { id: 4, title: "Deploy Covenant", description: "UTXO covenant contracts" },
   { id: 5, title: "KRC-20 Mint", description: "Preview only — not broadcast" },
@@ -397,19 +397,19 @@ export default function MintPage() {
         {currentStep === 2 && (
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-white">
-              DKG Knowledge Asset Publication
+              Sovereign Metadata Publication
             </h3>
             <div className="bg-yellow-900/20 border border-yellow-700/40 rounded-lg p-4">
               <div className="flex items-start gap-3">
                 <AlertTriangle className="w-5 h-5 text-yellow-500 mt-0.5 shrink-0" />
                 <div>
                   <p className="text-sm text-yellow-400 font-medium">
-                    DKG Edge Node: Not Connected
+                    Sovereign Metadata: Local Hash Only
                   </p>
                   <p className="text-xs text-yellow-600 mt-1">
-                    Metadata is stored locally in form state (centralized
-                    metadata storage). A real deployment would publish to the
-                    OriginTrail DKG for decentralized asset provenance.
+                    Metadata is hashed locally in form state. To publish to the
+                    sovereign metadata service, use POST http://localhost:8900/publish
+                    or POST /metadata/publish-and-commit for atomic DAG commitment.
                   </p>
                 </div>
               </div>
@@ -471,7 +471,7 @@ export default function MintPage() {
                     <p className="text-xs text-gray-500 mt-2">
                       Start the compliance API:{" "}
                       <code className="bg-gray-800 px-1.5 py-0.5 rounded">
-                        cargo run -p compliance-rust
+                        cargo run -p assetmint-core
                       </code>
                     </p>
                   </div>
