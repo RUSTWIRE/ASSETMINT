@@ -39,6 +39,9 @@ ark-snark = "0.5"
 # Crypto
 rand = "0.8"
 
+# Validation
+regex = "1"
+
 # Internal
 zk-circuits = { path = "../../zk-circuits" }
 kaspa-adapter = { path = "../../packages/kaspa-adapter" }

@@ -8,6 +8,7 @@
 use axum::{
     extract::{Path, Query, State},
     http::StatusCode,
+    middleware,
     routing::{get, post},
     Json, Router,
 };
@@ -21,7 +22,8 @@ use crate::merkle::MerkleTree;
 use crate::rules::{ComplianceEngine, ComplianceResult};
 use crate::zk_prover::{ZkProof, ZkProver, ZkWitness};
 use crate::zk_verifier::ZkVerifier;
-use crate::rate_limit::RateLimiter;
+use crate::auth::api_key_middleware;
+use crate::rate_limit::{RateLimiter, rate_limit_middleware};
 use crate::LOG_PREFIX;
 use kaspa_adapter::client::KaspaClient;
 use kaspa_adapter::wallet::Wallet;
@@ -34,6 +36,9 @@ pub struct AppState {
     pub kaspa_client: Option<KaspaClient>,
     pub zk_prover: Mutex<ZkProver>,
     pub zk_verifier: Mutex<ZkVerifier>,
+    /// Operator private key (hex) used to sign on-chain transactions server-side.
+    /// Loaded from OPERATOR_PRIVATE_KEY env var at startup.
+    pub operator_private_key: String,
 }
 
 /// API error response
@@ -137,7 +142,6 @@ pub struct BalanceResponse {
 pub struct TransferRequest {
     pub sender_did: String,
     pub receiver_did: String,
-    pub sender_private_key: String,
     pub receiver_address: String,
     pub amount_sompis: u64,
     pub asset_id: String,
@@ -187,7 +191,6 @@ fn compute_audit_hash(result: &ComplianceResult, sender_did: &str, receiver_did:
 pub struct AuditCommitRequest {
     pub decision_hash: String,
     pub from_address: String,
-    pub private_key: String,
 }
 
 #[derive(Serialize)]
@@ -570,8 +573,8 @@ async fn compliance_transfer(
         .as_ref()
         .ok_or_else(|| error_response(StatusCode::SERVICE_UNAVAILABLE, "Kaspa not connected"))?;
 
-    let wallet = Wallet::from_hex(&req.sender_private_key)
-        .map_err(|e| error_response(StatusCode::BAD_REQUEST, format!("Invalid key: {}", e)))?;
+    let wallet = Wallet::from_hex(&state.operator_private_key)
+        .map_err(|e| error_response(StatusCode::INTERNAL_SERVER_ERROR, format!("Invalid operator key: {}", e)))?;
     let sender_addr = wallet.address_string();
 
     let tx_id = client
@@ -777,8 +780,8 @@ async fn commit_audit(
         .try_into()
         .map_err(|_| error_response(StatusCode::BAD_REQUEST, "Hash must be exactly 32 bytes"))?;
 
-    let wallet = Wallet::from_hex(&req.private_key)
-        .map_err(|e| error_response(StatusCode::BAD_REQUEST, format!("Invalid key: {}", e)))?;
+    let wallet = Wallet::from_hex(&state.operator_private_key)
+        .map_err(|e| error_response(StatusCode::INTERNAL_SERVER_ERROR, format!("Invalid operator key: {}", e)))?;
 
     let tx_id = client
         .commit_audit_hash(&req.from_address, audit_bytes, wallet.keypair())
@@ -815,8 +818,6 @@ pub struct MetadataPublishRequest {
     pub metadata: serde_json::Value,
     /// Optional: address to fund the on-chain commit from
     pub from_address: Option<String>,
-    /// Optional: hex-encoded private key for signing the on-chain commit
-    pub private_key: Option<String>,
 }
 
 #[derive(Serialize)]
@@ -887,8 +888,7 @@ async fn metadata_publish_and_commit(
     let mut onchain_tx_id: Option<String> = None;
     let mut onchain_committed = false;
 
-    if let (Some(ref from_address), Some(ref private_key)) = (&req.from_address, &req.private_key)
-    {
+    if let Some(ref from_address) = req.from_address {
         if let Some(ref client) = state.kaspa_client {
             // Decode the metadata hash into [u8; 32]
             let hash_bytes: [u8; 32] = hex::decode(&publish_result.metadata_hash)
@@ -906,10 +906,10 @@ async fn metadata_publish_and_commit(
                     )
                 })?;
 
-            let wallet = Wallet::from_hex(private_key).map_err(|e| {
+            let wallet = Wallet::from_hex(&state.operator_private_key).map_err(|e| {
                 error_response(
-                    StatusCode::BAD_REQUEST,
-                    format!("Invalid private_key: {}", e),
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    format!("Invalid operator key: {}", e),
                 )
             })?;
 
@@ -937,7 +937,7 @@ async fn metadata_publish_and_commit(
         }
     } else {
         info!(
-            "{} No from_address/private_key provided — skipping on-chain commit",
+            "{} No from_address provided — skipping on-chain commit",
             LOG_PREFIX
         );
     }
@@ -972,33 +972,50 @@ fn parse_claim_type(type_str: &str, jurisdiction: Option<&str>) -> Result<ClaimT
 /// Build the Axum router with all compliance + Kaspa endpoints
 pub fn build_router(state: Arc<AppState>) -> Router {
     use tower_http::cors::{Any, CorsLayer};
+    use axum::http::HeaderValue;
 
+    let cors_origin = std::env::var("CORS_ORIGIN").unwrap_or_else(|_| "http://localhost:3000".to_string());
     let cors = CorsLayer::new()
-        .allow_origin(Any)
+        .allow_origin(cors_origin.parse::<HeaderValue>().unwrap_or_else(|_| {
+            eprintln!("[K-RWA] WARNING: Invalid CORS_ORIGIN, falling back to localhost:3000");
+            "http://localhost:3000".parse().unwrap()
+        }))
         .allow_methods(Any)
         .allow_headers(Any);
 
     // 100 requests per minute per IP
     let rate_limiter = RateLimiter::new(100, 60);
 
-    Router::new()
-        .route("/identity", post(register_identity))
-        .route("/claim", post(issue_claim))
-        .route("/compliance/evaluate", get(evaluate_transfer))
-        .route("/merkle-root", get(get_merkle_root))
+
+    // Read endpoints (no auth required)
+    let read_routes = Router::new()
         .route("/health", get(health))
         .route("/network", get(network_info))
         .route("/balance", get(get_balance))
+        .route("/compliance/evaluate", get(evaluate_transfer))
+        .route("/zk-proof/{address}", get(generate_zk_proof))
+        .route("/merkle-root", get(get_merkle_root))
+        .route("/oracle/attestation", get(oracle_attestation));
+
+    // Write endpoints (auth required)
+    let write_routes = Router::new()
+        .route("/identity", post(register_identity))
+        .route("/claim", post(issue_claim))
         .route("/transfer", post(compliance_transfer))
         .route("/audit/commit", post(commit_audit))
         .route("/vc/issue", post(vc_issue))
         .route("/vc/verify", post(vc_verify))
-        .route("/zk-proof/{address}", get(generate_zk_proof))
         .route("/metadata/publish-and-commit", post(metadata_publish_and_commit))
-        .route("/oracle/attestation", get(oracle_attestation))
-        .layer(cors)
-        .layer(axum::Extension(rate_limiter))
+        .layer(middleware::from_fn(api_key_middleware));
+
+    Router::new()
+        .merge(read_routes)
+        .merge(write_routes)
         .with_state(state)
+        .layer(cors)
+        .layer(axum::extract::DefaultBodyLimit::max(1_048_576)) // 1MB
+        .layer(axum::Extension(rate_limiter))
+        .layer(middleware::from_fn(rate_limit_middleware))
 }
 
 /// Create default AppState for testing (no Kaspa connection)
@@ -1009,7 +1026,29 @@ pub fn create_default_state() -> Result<Arc<AppState>, Box<dyn std::error::Error
     let registry = IdentityRegistry::in_memory()
         .map_err(|e| format!("Failed to create registry: {}", e))?;
     let compliance = ComplianceEngine::new();
-    let claim_issuer = ClaimIssuer::new("did:kaspa:assetmint-issuer", &[42u8; 32]);
+    // Load claim issuer key from environment (or use test default with warning)
+    let issuer_key: [u8; 32] = match std::env::var("CLAIM_ISSUER_KEY") {
+        Ok(hex_key) => {
+            let bytes = hex::decode(&hex_key).expect("[K-RWA] CLAIM_ISSUER_KEY must be valid hex");
+            assert_eq!(bytes.len(), 32, "[K-RWA] CLAIM_ISSUER_KEY must be exactly 32 bytes (64 hex chars)");
+            let mut arr = [0u8; 32];
+            arr.copy_from_slice(&bytes);
+            println!("[K-RWA] Claim issuer key loaded from CLAIM_ISSUER_KEY environment variable");
+            arr
+        }
+        Err(_) => {
+            eprintln!("[K-RWA] WARNING: CLAIM_ISSUER_KEY not set — using default test key. NOT SECURE for production.");
+            [42u8; 32]
+        }
+    };
+    let claim_issuer = ClaimIssuer::new("did:kaspa:assetmint-issuer", &issuer_key);
+
+    // Load operator private key from environment
+    let operator_private_key = std::env::var("OPERATOR_PRIVATE_KEY").unwrap_or_else(|_| {
+        eprintln!("[K-RWA] WARNING: OPERATOR_PRIVATE_KEY not set — using default test key. NOT SECURE.");
+        // Default test key (Alice's key from integration tests)
+        "ab08984d79824336161553b77e366abde831ebde78d78f0440e6833b2f2e2f92".to_string()
+    });
 
     // Run trusted setup for ZK prover/verifier
     let tree_depth = 2;
@@ -1030,6 +1069,7 @@ pub fn create_default_state() -> Result<Arc<AppState>, Box<dyn std::error::Error
         kaspa_client: None,
         zk_prover: Mutex::new(zk_prover),
         zk_verifier: Mutex::new(zk_verifier),
+        operator_private_key,
     }))
 }
 
@@ -1053,6 +1093,12 @@ pub async fn create_live_state(
         .try_into()
         .map_err(|_| "ISSUER_PRIVATE_KEY must be exactly 32 bytes (64 hex chars)")?;
     let claim_issuer = ClaimIssuer::new("did:kaspa:assetmint-issuer", &issuer_key);
+
+    // Load operator private key from environment
+    let operator_private_key = std::env::var("OPERATOR_PRIVATE_KEY").unwrap_or_else(|_| {
+        eprintln!("[K-RWA] WARNING: OPERATOR_PRIVATE_KEY not set — using default test key. NOT SECURE.");
+        "ab08984d79824336161553b77e366abde831ebde78d78f0440e6833b2f2e2f92".to_string()
+    });
 
     info!("{} Connecting to Kaspa at {}", LOG_PREFIX, kaspa_endpoint);
     let client = KaspaClient::new(kaspa_endpoint)
@@ -1091,6 +1137,7 @@ pub async fn create_live_state(
         kaspa_client: Some(client),
         zk_prover: Mutex::new(zk_prover),
         zk_verifier: Mutex::new(zk_verifier),
+        operator_private_key,
     }))
 }
 
@@ -1120,6 +1167,10 @@ mod tests {
     use axum::body::Body;
     use axum::http::Request;
     use tower::ServiceExt;
+
+    fn hex64(byte: u8) -> String {
+        std::iter::repeat(format!("{:02x}", byte)).take(32).collect::<String>()
+    }
 
     fn test_app() -> Router {
         let state = create_default_state().unwrap();
@@ -1151,7 +1202,7 @@ mod tests {
                     .uri("/identity")
                     .header("content-type", "application/json")
                     .body(Body::from(
-                        r#"{"did":"did:kaspa:alice","primary_key":"0xabc"}"#,
+                        format!(r#"{{"did":"did:kaspa:alice","primary_key":"{}"}}"#, hex64(0xab)),
                     ))
                     .unwrap(),
             )
@@ -1166,8 +1217,8 @@ mod tests {
         let app = build_router(state.clone());
 
         // Register two identities
-        let _ = state.registry.register("did:kaspa:alice", "0xa").unwrap();
-        let _ = state.registry.register("did:kaspa:bob", "0xb").unwrap();
+        let _ = state.registry.register("did:kaspa:alice", &hex64(0x0a)).unwrap();
+        let _ = state.registry.register("did:kaspa:bob", &hex64(0x0b)).unwrap();
 
         // Issue KYC claims via API
         let resp = app
@@ -1258,8 +1309,8 @@ mod tests {
         let state = create_default_state().unwrap();
         let app = build_router(state.clone());
 
-        state.registry.register("did:kaspa:a", "0xa").unwrap();
-        state.registry.register("did:kaspa:b", "0xb").unwrap();
+        state.registry.register("did:kaspa:a", &hex64(0x0a)).unwrap();
+        state.registry.register("did:kaspa:b", &hex64(0x0b)).unwrap();
 
         let resp = app
             .oneshot(
@@ -1279,7 +1330,7 @@ mod tests {
         let app = build_router(state.clone());
 
         // Register identity first
-        state.registry.register("did:kaspa:vc-alice", "0xabc").unwrap();
+        state.registry.register("did:kaspa:vc-alice", &hex64(0xab)).unwrap();
 
         let resp = app
             .oneshot(
@@ -1308,7 +1359,7 @@ mod tests {
         let state = create_default_state().unwrap();
         let app = build_router(state.clone());
 
-        state.registry.register("did:kaspa:vc-bob", "0xdef").unwrap();
+        state.registry.register("did:kaspa:vc-bob", &hex64(0xde)).unwrap();
 
         // Issue VC
         let issue_resp = app

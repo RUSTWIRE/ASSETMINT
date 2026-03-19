@@ -12,8 +12,7 @@ use ark_ff::PrimeField;
 use ark_groth16::{Groth16, ProvingKey};
 use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
 use ark_snark::SNARK;
-use ark_std::rand::SeedableRng;
-use rand::rngs::StdRng;
+use rand::rngs::OsRng;
 use thiserror::Error;
 use tracing::info;
 
@@ -154,7 +153,8 @@ impl ZkProver {
         );
 
         // Generate Groth16 proof
-        let mut rng = StdRng::seed_from_u64(0xCAFE_BABE);
+        // Cryptographically secure RNG for proof generation
+        let mut rng = OsRng;
         let proof = Groth16::<Bn254>::prove(pk, circuit, &mut rng)
             .map_err(|e: ark_relations::r1cs::SynthesisError| ProverError::ProofGenFailed(e.to_string()))?;
 
@@ -277,7 +277,8 @@ impl ZkProver {
         };
 
         // Generate Groth16 proof
-        let mut rng = StdRng::seed_from_u64(0xCAFE_BABE);
+        // Cryptographically secure RNG for proof generation
+        let mut rng = OsRng;
         let proof = Groth16::<Bn254>::prove(pk, circuit, &mut rng)
             .map_err(|e: ark_relations::r1cs::SynthesisError| {
                 ProverError::ProofGenFailed(e.to_string())

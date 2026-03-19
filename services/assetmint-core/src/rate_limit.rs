@@ -5,13 +5,11 @@
 // Uses a sliding window counter per IP address.
 
 use axum::{
-    extract::ConnectInfo,
     http::{Request, StatusCode},
     middleware::Next,
     response::Response,
 };
 use std::collections::HashMap;
-use std::net::SocketAddr;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
@@ -58,20 +56,22 @@ impl RateLimiter {
     }
 }
 
-/// Axum middleware function for rate limiting.
+/// Axum middleware that checks rate limit using Extension<RateLimiter>.
 pub async fn rate_limit_middleware(
-    ConnectInfo(addr): ConnectInfo<SocketAddr>,
     request: Request<axum::body::Body>,
     next: Next,
 ) -> Result<Response, StatusCode> {
-    // Extract rate limiter from request extensions
-    let limiter = request
-        .extensions()
-        .get::<RateLimiter>()
-        .cloned();
+    let limiter = request.extensions().get::<RateLimiter>().cloned();
+
+    // Extract IP from request (ConnectInfo may not be available in all setups)
+    let ip = request
+        .headers()
+        .get("x-forwarded-for")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("unknown")
+        .to_string();
 
     if let Some(limiter) = limiter {
-        let ip = addr.ip().to_string();
         if !limiter.check(&ip) {
             return Err(StatusCode::TOO_MANY_REQUESTS);
         }

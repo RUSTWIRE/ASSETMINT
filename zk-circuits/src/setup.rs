@@ -4,15 +4,14 @@
 //! Groth16 trusted setup for ZK-KYC circuits.
 //! Generates proving and verification keys.
 //!
-//! NOTE: For testnet demo, uses deterministic setup with a fixed seed.
+//! Uses cryptographically secure RNG (OsRng). Keys must be saved to disk.
 //! Production MUST use multi-party computation (MPC) ceremony.
 
 use ark_bn254::{Bn254, Fr};
 use ark_groth16::{Groth16, ProvingKey, VerifyingKey};
 use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
 use ark_snark::SNARK;
-use ark_std::rand::SeedableRng;
-use rand::rngs::StdRng;
+use rand::rngs::OsRng;
 use thiserror::Error;
 use tracing::info;
 
@@ -37,7 +36,7 @@ pub struct SetupKeys {
 
 /// Run the Groth16 trusted setup for the KYC circuit.
 ///
-/// Uses a deterministic seed for testnet reproducibility.
+/// Cryptographically secure RNG -- keys must be saved to disk.
 /// Production deployments MUST use a proper MPC ceremony.
 ///
 /// Returns serialized keys saved to disk, and the keys in memory.
@@ -50,9 +49,8 @@ pub fn run_trusted_setup(tree_depth: usize, keys_dir: &str) -> Result<SetupKeys,
     // Create empty circuit (no witness) for setup
     let circuit: KycCircuit<Fr> = KycCircuit::new_empty(tree_depth);
 
-    // Deterministic RNG for testnet reproducibility
-    // WARNING: Not secure for production — use MPC ceremony
-    let mut rng = StdRng::seed_from_u64(0xDEAD_BEEF_CAFE_BABE);
+    // Cryptographically secure RNG — keys must be saved to disk
+    let mut rng = OsRng;
 
     let start = std::time::Instant::now();
 
@@ -111,9 +109,8 @@ pub fn run_recursive_trusted_setup(tree_depth: usize, keys_dir: &str) -> Result<
     // Create empty recursive circuit (no witness) for setup
     let circuit: RecursiveKycCircuit<Fr> = RecursiveKycCircuit::new_empty(tree_depth);
 
-    // Deterministic RNG for testnet reproducibility
-    // WARNING: Not secure for production — use MPC ceremony
-    let mut rng = StdRng::seed_from_u64(0xDEAD_BEEF_CAFE_BABE);
+    // Cryptographically secure RNG — keys must be saved to disk
+    let mut rng = OsRng;
 
     let start = std::time::Instant::now();
 

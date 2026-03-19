@@ -23,6 +23,7 @@ pub mod merkle;
 pub mod zk_prover;
 pub mod zk_verifier;
 pub mod api;
+pub mod auth;
 pub mod rate_limit;
 
 /// Log prefix for all AssetMint compliance operations

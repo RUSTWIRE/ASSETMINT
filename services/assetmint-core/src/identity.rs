@@ -22,6 +22,8 @@ pub enum IdentityError {
     AlreadyExists(String),
     #[error("[K-RWA] Storage error: {0}")]
     StorageError(String),
+    #[error("[K-RWA] Invalid DID: {0}")]
+    InvalidDid(String),
 }
 
 /// A registered identity (DID) in the compliance system
@@ -86,6 +88,23 @@ impl IdentityRegistry {
 
     /// Register a new identity
     pub fn register(&self, did: &str, primary_key: &str) -> Result<Identity, IdentityError> {
+        // Validate DID format: must match did:kaspa:<identifier>
+        let did_re = regex::Regex::new(r"^did:kaspa:[a-zA-Z0-9_-]{1,128}$").unwrap();
+        if !did_re.is_match(did) {
+            return Err(IdentityError::InvalidDid(format!(
+                "DID must match format did:kaspa:<identifier> (1-128 alphanumeric chars), got: {}",
+                did
+            )));
+        }
+
+        // Validate primary_key: must be valid hex, exactly 64 chars (32 bytes)
+        if primary_key.len() != 64 || hex::decode(primary_key).is_err() {
+            return Err(IdentityError::InvalidDid(format!(
+                "primary_key must be 64 hex characters (32 bytes), got length: {}",
+                primary_key.len()
+            )));
+        }
+
         info!("{} Registering identity: {}", LOG_PREFIX, did);
         let db = self.db.lock().map_err(|e| IdentityError::StorageError(e.to_string()))?;
 
@@ -258,29 +277,37 @@ fn deserialize_claim_type(type_str: &str, data: Option<&str>) -> ClaimType {
 mod tests {
     use super::*;
 
+    fn hex64(byte: u8) -> String {
+        format!("{}", std::iter::repeat(format!("{:02x}", byte)).take(32).collect::<String>())
+    }
+
     #[test]
     fn test_register_and_get() {
         let registry = IdentityRegistry::in_memory().unwrap();
-        let id = registry.register("did:kaspa:alice", "0xabc123").unwrap();
+        let key = hex64(0xab);
+        let id = registry.register("did:kaspa:alice", &key).unwrap();
         assert_eq!(id.did, "did:kaspa:alice");
         assert!(!id.revoked);
 
         let fetched = registry.get("did:kaspa:alice").unwrap();
-        assert_eq!(fetched.primary_key, "0xabc123");
+        assert_eq!(fetched.primary_key, key);
     }
 
     #[test]
     fn test_duplicate_registration() {
         let registry = IdentityRegistry::in_memory().unwrap();
-        registry.register("did:kaspa:alice", "0xabc123").unwrap();
-        let err = registry.register("did:kaspa:alice", "0xdef456");
+        let key1 = hex64(0xab);
+        let key2 = hex64(0xcd);
+        registry.register("did:kaspa:alice", &key1).unwrap();
+        let err = registry.register("did:kaspa:alice", &key2);
         assert!(err.is_err());
     }
 
     #[test]
     fn test_revoke() {
         let registry = IdentityRegistry::in_memory().unwrap();
-        registry.register("did:kaspa:bob", "0xbob123").unwrap();
+        let key = hex64(0xbb);
+        registry.register("did:kaspa:bob", &key).unwrap();
         registry.revoke("did:kaspa:bob").unwrap();
         let id = registry.get("did:kaspa:bob").unwrap();
         assert!(id.revoked);
@@ -289,21 +316,25 @@ mod tests {
     #[test]
     fn test_approved_addresses() {
         let registry = IdentityRegistry::in_memory().unwrap();
-        registry.register("did:kaspa:a", "0xa").unwrap();
-        registry.register("did:kaspa:b", "0xb").unwrap();
-        registry.register("did:kaspa:c", "0xc").unwrap();
+        let key_a = hex64(0x0a);
+        let key_b = hex64(0x0b);
+        let key_c = hex64(0x0c);
+        registry.register("did:kaspa:a", &key_a).unwrap();
+        registry.register("did:kaspa:b", &key_b).unwrap();
+        registry.register("did:kaspa:c", &key_c).unwrap();
         registry.revoke("did:kaspa:b").unwrap();
 
         let approved = registry.get_approved_addresses().unwrap();
         assert_eq!(approved.len(), 2);
-        assert!(approved.contains(&"0xa".to_string()));
-        assert!(approved.contains(&"0xc".to_string()));
+        assert!(approved.contains(&key_a));
+        assert!(approved.contains(&key_c));
     }
 
     #[test]
     fn test_add_and_load_claims() {
         let registry = IdentityRegistry::in_memory().unwrap();
-        registry.register("did:kaspa:alice", "0xabc").unwrap();
+        let key = hex64(0xab);
+        registry.register("did:kaspa:alice", &key).unwrap();
 
         let claim = Claim {
             claim_type: ClaimType::KycVerified,
@@ -318,5 +349,19 @@ mod tests {
         let id = registry.get("did:kaspa:alice").unwrap();
         assert_eq!(id.claims.len(), 1);
         assert_eq!(id.claims[0].claim_type, ClaimType::KycVerified);
+    }
+
+    #[test]
+    fn test_invalid_did_format_rejected() {
+        let registry = IdentityRegistry::in_memory().unwrap();
+        let result = registry.register("invalid-did", &"aa".repeat(32));
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_invalid_primary_key_rejected() {
+        let registry = IdentityRegistry::in_memory().unwrap();
+        let result = registry.register("did:kaspa:alice", "not-hex");
+        assert!(result.is_err());
     }
 }

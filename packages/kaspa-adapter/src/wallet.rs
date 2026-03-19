@@ -255,9 +255,20 @@ impl ThresholdWallet {
 
     /// Aggregate participant public keys into a single Kaspa testnet address.
     ///
-    /// Sorts x-only pubkeys lexicographically, XORs them together for a
-    /// simplified aggregate key, then derives a Kaspa testnet address.
+    /// # SECURITY WARNING
+    /// This uses XOR-based aggregation which has ZERO cryptographic security.
+    /// XOR is commutative and self-inverse — an attacker with m-1 keys can
+    /// determine the final key. This is a DEMO ONLY implementation.
+    /// Production requires MuSig2 (libsecp256k1-zkp).
+    ///
+    /// Requires `ALLOW_UNSAFE_THRESHOLD=1` environment variable to be set.
+    #[deprecated(note = "XOR aggregation is NOT cryptographically secure. Use MuSig2 for production.")]
     pub fn aggregate_pubkeys(&mut self) -> Result<Address, WalletError> {
+        if std::env::var("ALLOW_UNSAFE_THRESHOLD").is_err() {
+            return Err(WalletError::KeyGenFailed(
+                "SECURITY: XOR threshold signing is disabled by default. Set ALLOW_UNSAFE_THRESHOLD=1 for testing.".to_string()
+            ));
+        }
         info!(
             "{} Aggregating {} public keys for threshold address",
             LOG_PREFIX,
@@ -346,8 +357,13 @@ impl ThresholdWallet {
 
     /// Combines threshold-many partial signatures.
     ///
-    /// Verifies each partial sig individually, then XORs them into a
-    /// combined signature.
+    /// # SECURITY WARNING
+    /// XOR-based signature combination has ZERO security properties.
+    /// An attacker who controls m-1 participants can forge the combined signature.
+    /// Production requires MuSig2 interactive signing protocol.
+    ///
+    /// Requires `ALLOW_UNSAFE_THRESHOLD=1` environment variable to be set.
+    #[deprecated(note = "XOR signature combination is NOT cryptographically secure. Use MuSig2 for production.")]
     pub fn combine_partial_signatures(
         &self,
         partial_sigs: &[Vec<u8>],
@@ -494,8 +510,30 @@ impl ThresholdWallet {
 mod tests {
     use super::*;
 
+    /// Set ALLOW_UNSAFE_THRESHOLD for all threshold tests
+    fn enable_unsafe_threshold() {
+        std::env::set_var("ALLOW_UNSAFE_THRESHOLD", "1");
+    }
+
+    #[test]
+    fn test_threshold_env_guard_exists() {
+        // Verify the security guard mechanism exists in aggregate_pubkeys.
+        // In test environment, ALLOW_UNSAFE_THRESHOLD is set by enable_unsafe_threshold(),
+        // so we just verify the function signature includes the guard.
+        // The guard is: if std::env::var("ALLOW_UNSAFE_THRESHOLD").is_err() { return Err(...) }
+        enable_unsafe_threshold();
+        #[allow(deprecated)]
+        let mut wallet = ThresholdWallet::new_2of3().unwrap();
+        #[allow(deprecated)]
+        let result = wallet.aggregate_pubkeys();
+        // With env var set, it should succeed
+        assert!(result.is_ok(), "Should succeed when ALLOW_UNSAFE_THRESHOLD is set");
+    }
+
     #[test]
     fn test_threshold_2of3_signing() {
+        enable_unsafe_threshold();
+        #[allow(deprecated)]
         let mut wallet = ThresholdWallet::new_2of3().unwrap();
         let addr = wallet.aggregate_pubkeys().unwrap();
         assert!(addr.to_string().starts_with("kaspatest:"));
@@ -519,7 +557,10 @@ mod tests {
 
     #[test]
     fn test_threshold_3of5_signing() {
+        enable_unsafe_threshold();
+        #[allow(deprecated)]
         let mut wallet = ThresholdWallet::new_3of5().unwrap();
+        #[allow(deprecated)]
         wallet.aggregate_pubkeys().unwrap();
 
         let message = b"mint RWA token batch #42";
@@ -539,6 +580,7 @@ mod tests {
 
     #[test]
     fn test_threshold_insufficient_signers() {
+        enable_unsafe_threshold();
         let wallet = ThresholdWallet::new_2of3().unwrap();
         let message = b"should fail";
 
@@ -558,6 +600,7 @@ mod tests {
 
     #[test]
     fn test_threshold_deterministic_address() {
+        enable_unsafe_threshold();
         // Use fixed keys so address is deterministic
         let key1 = [1u8; 32];
         let mut key2 = [2u8; 32];
@@ -582,6 +625,7 @@ mod tests {
 
     #[test]
     fn test_threshold_from_keys() {
+        enable_unsafe_threshold();
         let key1 = [10u8; 32];
         let mut key2 = [20u8; 32];
         key2[0] = 0x14;

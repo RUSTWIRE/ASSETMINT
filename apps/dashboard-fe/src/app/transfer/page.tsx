@@ -77,7 +77,6 @@ export default function TransferPage() {
       const result = await api.complianceTransfer(
         senderDid || wallet?.did || "",
         receiverDid,
-        wallet?.privateKey || "",
         receiverAddress,
         Number(amount),
         assetId

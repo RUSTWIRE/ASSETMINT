@@ -64,7 +64,6 @@ export const api = {
   complianceTransfer: (
     senderDid: string,
     receiverDid: string,
-    senderPrivateKey: string,
     receiverAddress: string,
     amountSompis: number,
     assetId: string
@@ -75,7 +74,6 @@ export const api = {
       body: JSON.stringify({
         sender_did: senderDid,
         receiver_did: receiverDid,
-        sender_private_key: senderPrivateKey,
         receiver_address: receiverAddress,
         amount_sompis: amountSompis,
         asset_id: assetId,
