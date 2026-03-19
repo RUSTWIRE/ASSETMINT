@@ -104,22 +104,34 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    // POST /publish — Store asset metadata
+    // POST /publish — Store asset metadata with verifiable hash
     if (url.pathname === '/publish' && req.method === 'POST') {
       const metadata = await parseBody(req);
       const ual = generateUAL(metadata);
+
+      // Compute canonical metadata hash for on-chain verification
+      const canonicalJson = JSON.stringify(metadata, Object.keys(metadata).sort());
+      const metadataHash = crypto.createHash('sha256').update(canonicalJson).digest('hex');
+
       const record = {
         ual,
         metadata,
+        metadata_hash: metadataHash,
         created_at: new Date().toISOString(),
         private: true,
         sovereign: true,
       };
       store[ual] = record;
       saveStore();
-      console.log(`${LOG_PREFIX} Published asset: ${ual}`);
+      console.log(`${LOG_PREFIX} Published asset: ${ual} (hash: ${metadataHash.substring(0, 16)}...)`);
       res.writeHead(201);
-      res.end(JSON.stringify({ ual, status: 'published', private: true }));
+      res.end(JSON.stringify({
+        ual,
+        metadata_hash: metadataHash,
+        status: 'published',
+        private: true,
+        verify_instruction: 'Commit metadata_hash on-chain via POST /audit/commit to make it verifiable on Kaspa DAG',
+      }));
       return;
     }
 
@@ -139,6 +151,35 @@ const server = http.createServer(async (req, res) => {
       }
       res.writeHead(200);
       res.end(JSON.stringify(record));
+      return;
+    }
+
+    // POST /verify — Verify metadata integrity against stored hash
+    if (url.pathname === '/verify' && req.method === 'POST') {
+      const body = await parseBody(req);
+      const { ual, metadata } = body;
+      if (!ual || !metadata) {
+        res.writeHead(400);
+        res.end(JSON.stringify({ error: 'Provide ual and metadata' }));
+        return;
+      }
+      const record = store[ual];
+      if (!record) {
+        res.writeHead(404);
+        res.end(JSON.stringify({ verified: false, error: 'Asset not found' }));
+        return;
+      }
+      const canonicalJson = JSON.stringify(metadata, Object.keys(metadata).sort());
+      const computedHash = crypto.createHash('sha256').update(canonicalJson).digest('hex');
+      const matches = computedHash === record.metadata_hash;
+      res.writeHead(200);
+      res.end(JSON.stringify({
+        verified: matches,
+        ual,
+        stored_hash: record.metadata_hash,
+        computed_hash: computedHash,
+        tampered: !matches,
+      }));
       return;
     }
 
