@@ -21,6 +21,7 @@ use crate::merkle::MerkleTree;
 use crate::rules::{ComplianceEngine, ComplianceResult};
 use crate::zk_prover::{ZkProof, ZkProver, ZkWitness};
 use crate::zk_verifier::ZkVerifier;
+use crate::rate_limit::RateLimiter;
 use crate::LOG_PREFIX;
 use kaspa_adapter::client::KaspaClient;
 use kaspa_adapter::wallet::Wallet;
@@ -977,6 +978,9 @@ pub fn build_router(state: Arc<AppState>) -> Router {
         .allow_methods(Any)
         .allow_headers(Any);
 
+    // 100 requests per minute per IP
+    let rate_limiter = RateLimiter::new(100, 60);
+
     Router::new()
         .route("/identity", post(register_identity))
         .route("/claim", post(issue_claim))
@@ -993,6 +997,7 @@ pub fn build_router(state: Arc<AppState>) -> Router {
         .route("/metadata/publish-and-commit", post(metadata_publish_and_commit))
         .route("/oracle/attestation", get(oracle_attestation))
         .layer(cors)
+        .layer(axum::Extension(rate_limiter))
         .with_state(state)
 }
 

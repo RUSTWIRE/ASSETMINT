@@ -8,7 +8,7 @@ The definitive institutional-grade, ZK-private, sovereign Real-World Asset (RWA)
 
 ## Architecture
 
-- **Compliance Engine** (`services/assetmint-core/`) — Full Rust port of Polymesh SDK patterns: identity registry, claims, transfer rules, Groth16 ZK-KYC proofs (105 tests, 12 confirmed TN12 transactions)
+- **Compliance Engine** (`services/assetmint-core/`) — Full Rust port of Polymesh SDK patterns: identity registry, claims, transfer rules, Groth16 ZK-KYC proofs (105 tests, 16 confirmed TN12 transactions)
 - **SilverScript Covenants** (`contracts/silverscript/`) — On-chain enforcement via KIP-10 introspection opcodes
 - **Sovereign Metadata Service** (`infrastructure/dkg-node/sovereign-metadata/`) — Self-hosted private metadata store with SHA-256 integrity hashes and tamper detection, running on port 8900 (replaces OriginTrail DKG)
 - **Oracle Pool** (`services/oracle-pool/`) — Simulated centralized multisig oracle (upgrade stub for future miner-attested)

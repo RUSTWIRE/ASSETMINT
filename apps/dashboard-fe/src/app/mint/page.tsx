@@ -98,7 +98,7 @@ export default function MintPage() {
     completeStep(1);
   };
 
-  // ── Step 2: DKG — honest about not being connected ──
+  // ── Step 2: DKG — try sovereign metadata service, fall back to local hash ──
   const executeStep2 = async () => {
     setStepStatuses((prev) => ({ ...prev, [2]: "processing" }));
     const metadata = {
@@ -110,6 +110,38 @@ export default function MintPage() {
       timestamp: new Date().toISOString(),
     };
     const metadataJson = JSON.stringify(metadata, null, 2);
+
+    try {
+      // Try to publish to sovereign metadata service
+      const response = await fetch("http://localhost:8900/publish", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: metadataJson,
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setStepResults((prev) => ({
+          ...prev,
+          [2]: {
+            success: true,
+            data: {
+              dkgConnected: true,
+              metadataJson,
+              assetReference: result.metadata_hash,
+              ual: result.ual,
+              sovereignMetadata: true,
+            },
+          },
+        }));
+        completeStep(2);
+        return;
+      }
+    } catch {
+      // Sovereign metadata service not available — fall back to local hash
+    }
+
+    // Fallback: local SHA-256 hash only
     const hash = await sha256Hex(metadataJson);
     setStepResults((prev) => ({
       ...prev,
@@ -119,6 +151,7 @@ export default function MintPage() {
           dkgConnected: false,
           metadataJson,
           assetReference: hash,
+          sovereignMetadata: false,
         },
       },
     }));
@@ -399,26 +432,53 @@ export default function MintPage() {
             <h3 className="text-lg font-semibold text-white">
               Sovereign Metadata Publication
             </h3>
-            <div className="bg-yellow-900/20 border border-yellow-700/40 rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 text-yellow-500 mt-0.5 shrink-0" />
-                <div>
-                  <p className="text-sm text-yellow-400 font-medium">
-                    Sovereign Metadata: Local Hash Only
-                  </p>
-                  <p className="text-xs text-yellow-600 mt-1">
-                    Metadata is hashed locally in form state. To publish to the
-                    sovereign metadata service, use POST http://localhost:8900/publish
-                    or POST /metadata/publish-and-commit for atomic DAG commitment.
-                  </p>
+            {(!stepResults[2]?.data?.sovereignMetadata) && (
+              <div className="bg-yellow-900/20 border border-yellow-700/40 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className="w-5 h-5 text-yellow-500 mt-0.5 shrink-0" />
+                  <div>
+                    <p className="text-sm text-yellow-400 font-medium">
+                      Sovereign Metadata: Local Hash Only
+                    </p>
+                    <p className="text-xs text-yellow-600 mt-1">
+                      Metadata is hashed locally in form state. To publish to the
+                      sovereign metadata service, use POST http://localhost:8900/publish
+                      or POST /metadata/publish-and-commit for atomic DAG commitment.
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
             {stepResults[2]?.success && stepResults[2].data && (
               <div className="space-y-3">
+                {Boolean(stepResults[2].data.sovereignMetadata) && (
+                  <div className="bg-emerald-900/20 border border-emerald-700/40 rounded-lg p-4">
+                    <div className="flex items-start gap-3">
+                      <CheckCircle2 className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0" />
+                      <div>
+                        <p className="text-sm text-emerald-400 font-medium">
+                          Published to Sovereign Metadata Service
+                        </p>
+                        <p className="text-xs text-emerald-600 mt-1">
+                          Metadata stored at http://localhost:8900 with SHA-256 integrity hash.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {Boolean(stepResults[2].data.ual) && (
+                  <div className="bg-gray-800 rounded-lg p-4">
+                    <p className="text-xs text-gray-500 mb-1">UAL (Universal Asset Locator)</p>
+                    <p className="text-sm text-indigo-400 font-mono break-all">
+                      {String(stepResults[2].data.ual)}
+                    </p>
+                  </div>
+                )}
                 <div className="bg-gray-800 rounded-lg p-4">
                   <p className="text-xs text-gray-500 mb-1">
-                    Asset Reference (SHA-256 of metadata)
+                    {stepResults[2].data.sovereignMetadata
+                      ? "Metadata Hash (from sovereign service)"
+                      : "Asset Reference (local SHA-256)"}
                   </p>
                   <p className="text-sm text-emerald-400 font-mono break-all">
                     {String(stepResults[2].data.assetReference)}

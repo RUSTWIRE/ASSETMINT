@@ -62,6 +62,10 @@ const REAL_TRANSACTIONS: Array<{
   { id: DEPLOYED_CONTRACTS.stateVerity.txId, type: "Deploy", contract: "StateVerity", status: "confirmed" },
   { id: DEPLOYED_CONTRACTS.zkKycVerifier.txId, type: "Deploy", contract: "ZkKycVerifier", status: "confirmed" },
   { id: DEPLOYED_CONTRACTS.reserves.txId, type: "Deploy", contract: "Reserves", status: "confirmed" },
+  { id: "5139f1fdda2ff841107730bce5ead83c29635b2484ddff33697898725e201e70", type: "Deploy", contract: "CHECKSIG Covenant", status: "confirmed" },
+  { id: "ccfdab27756445ce5fa565cbf98efc34bb5487a3f07b4e529f63ee9955dc7775", type: "Transfer", from: "Covenant", to: "Recipient", amount: "0.9999 KAS", status: "confirmed" },
+  { id: "6c1fee2b7387cadd777a5af8b62144f2c7dfc712a1eb463a9134594b6a2e429f", type: "Deploy", contract: "Compliance Covenant", status: "confirmed" },
+  { id: "d0bcf48c8e879ee9d72a40ebe4424e671389848bcea5cd9c5ed1bafe0f392a56", type: "Transfer", from: "Compliance", to: "Recipient", amount: "0.9999 KAS", status: "confirmed" },
 ];
 
 const CONTRACTS = Object.values(DEPLOYED_CONTRACTS);

@@ -11,7 +11,7 @@
 - **M3**: ASTM token, staking with timelock covenants, governance, fee model, simulated multisig oracle with Ed25519 attestations. 35 tokenomics tests.
 - **M4**: Next.js 15 dashboard (8 pages), Kaspa wallet/API layer, E2E integration test. 7 ZK tests.
 - **M5**: Sovereign metadata service (port 8900), covenant builder with 3 TN12-proven patterns, on-chain staking module, metadata-to-DAG commit endpoint. **105 tests pass**.
-- **LIVE KASPA**: kaspa-adapter wired to real rusty-kaspa RPC (kaspa-wrpc-client @ c6819f3). 12 confirmed TN12 transactions. Mempool-aware UTXO selection. Covenant execution proven (TX 27385b04).
+- **LIVE KASPA**: kaspa-adapter wired to real rusty-kaspa RPC (kaspa-wrpc-client @ c6819f3). 16 confirmed TN12 transactions. Mempool-aware UTXO selection. Covenant execution proven (TX 27385b04).
 
 ### Running the Stack
 ```bash

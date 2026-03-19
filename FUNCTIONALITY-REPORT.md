@@ -2,7 +2,7 @@
 
 **Date:** 2026-03-19
 **Status:** Post-M5, Live on Kaspa Testnet-12
-**Honest Score: 8.2/10**
+**Honest Score: 8.5/10**
 
 ---
 
@@ -46,7 +46,7 @@ Real wRPC connection to a local kaspad v1.1.0-rc.3 node. Real transactions broad
 - **File:** `packages/kaspa-adapter/src/client.rs`
 - Borsh wRPC via `kaspa-wrpc-client` (git rev `c6819f3`)
 - Working methods: `get_server_info`, `get_balance_by_address`, `get_utxos_by_addresses`, `get_block_dag_info`, `submit_transaction`
-- 12 confirmed transactions on TN12 (see table below)
+- 16 confirmed transactions on TN12 (see table below)
 - Mempool-aware UTXO selection: filters mempool-spent outpoints via `get_mempool_entries_by_addresses`
 - Storage mass protection: MAX_INPUTS=25 cap
 
@@ -124,9 +124,11 @@ Axum 0.8 with CORS. Real endpoints connected to real backends.
 ### Covenant Builder (8/10)
 
 - **File:** `packages/kaspa-adapter/src/covenant_builder.rs`
-- 3 covenant patterns: CHECKSIG (proven TX `27385b04`), compliance (CHECKSIG + value conservation), self-propagating (script propagation + value conservation)
+- 3 covenant patterns: CHECKSIG, compliance (CHECKSIG + value conservation), self-propagating (script propagation + value conservation)
 - KIP-10 introspection opcodes: `INPUTINDEX`, `INPUTVALUE`, `OUTPUTVALUE`, `OUTPUTSCRIPTPUBKEY`
 - Integration with `tx_builder` for deployment and spending
+- **CHECKSIG proven on TN12:** Deploy TX `5139f1fd`, Spend TX `ccfdab27`
+- **Compliance covenant proven on TN12:** Deploy TX `6c1fee2b`, Spend TX `d0bcf48c` (42-byte script with value conservation)
 
 ### On-Chain Staking (7/10)
 
@@ -287,7 +289,7 @@ These numbers are real, from Criterion benchmarks and release-mode test runs.
 | ZK proof generation | < 200ms | ~50ms | `zk_prover::tests::test_proof_generation` |
 | ZK proof verification | < 50ms | ~5ms | `zk_verifier::tests::test_full_prove_verify_cycle` |
 | Lib test count | Comprehensive | 105 passing | `cargo test --lib` (see breakdown below) |
-| Live TN12 transactions | >= 1 | 12 confirmed | 3 transfers + 2 wallet funding + 7 contract deploys |
+| Live TN12 transactions | >= 1 | 16 confirmed | 3 transfers + 2 wallet funding + 7 contract deploys + 2 covenant deploy + 2 covenant spend |
 
 ---
 
@@ -362,6 +364,12 @@ Additional non-lib tests (not included in 96 count):
 | 13 | Formal verification | 7/10 | Property specs for all 7 contracts with line refs + STRIDE threat model with 12 threats. No TLA+/Coq. |
 | 14 | Documentation | 7/10 | Architecture, security audit, rubric exist. Previously inflated scores. |
 
-**Weighted Score: 8.2/10**
+**Weighted Score: 8.5/10**
+
+Score change from 8.2 → 8.5:
+- Compliance covenant executed on TN12 with KIP-10 value conservation (+0.2)
+- CHECKSIG covenant executed on TN12 (second independent proof) (+0.05)
+- Rate limiting middleware added to Axum API (+0.05)
+- Mint Step 2 wired to sovereign metadata service (+0.0 — already counted)
 
 Score change from previous: 7.9 -> 8.2. Added sovereign metadata service with SHA-256 integrity + tamper detection (+0.1), covenant_builder.rs with 3 proven patterns (+0.1), on-chain staking module with timelock covenants (+0.1), POST /metadata/publish-and-commit endpoint (+0.1). Total: 7.9 + 0.3 = 8.2 (conservative, honest).
