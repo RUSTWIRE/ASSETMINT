@@ -28,7 +28,11 @@ async fn test_raw_checksig_covenant() {
     redeem_script.extend_from_slice(&alice_pk_bytes);
     redeem_script.push(0xac); // OP_CHECKSIG
 
-    println!("[K-RWA] Redeem script: {} bytes = {}", redeem_script.len(), hex::encode(&redeem_script));
+    println!(
+        "[K-RWA] Redeem script: {} bytes = {}",
+        redeem_script.len(),
+        hex::encode(&redeem_script)
+    );
 
     // Derive P2SH address from redeem script
     let p2sh_spk = pay_to_script_hash_script(&redeem_script);
@@ -39,7 +43,13 @@ async fn test_raw_checksig_covenant() {
     // Fund the P2SH address from Alice (deploy the covenant)
     println!("[K-RWA] Deploying raw CHECKSIG covenant (1 KAS)...");
     let deploy_tx = client
-        .send_kas(&alice.address_string(), &p2sh_addr.to_string(), 100_000_000, alice.keypair(), None)
+        .send_kas(
+            &alice.address_string(),
+            &p2sh_addr.to_string(),
+            100_000_000,
+            alice.keypair(),
+            None,
+        )
         .await
         .unwrap();
     println!("[K-RWA] Deployed: TX {}", deploy_tx);
@@ -52,7 +62,10 @@ async fn test_raw_checksig_covenant() {
     // Wait — CHECKSIG pops pubkey + sig from stack. The redeem script pushes the pubkey,
     // so the scriptSig only needs the signature.
     let recipient = Wallet::generate().unwrap();
-    println!("[K-RWA] Invoking CHECKSIG covenant → {}", recipient.address_string());
+    println!(
+        "[K-RWA] Invoking CHECKSIG covenant → {}",
+        recipient.address_string()
+    );
 
     // Witness: just the signature (the pubkey is in the redeem script)
     let witness = vec![
@@ -60,7 +73,10 @@ async fn test_raw_checksig_covenant() {
     ];
 
     // Get the P2SH UTXO
-    let utxos = client.get_spendable_utxos(&p2sh_addr.to_string()).await.unwrap();
+    let utxos = client
+        .get_spendable_utxos(&p2sh_addr.to_string())
+        .await
+        .unwrap();
     if utxos.is_empty() {
         println!("[K-RWA] No UTXOs at P2SH — skipping");
         client.disconnect().await.ok();
@@ -68,12 +84,16 @@ async fn test_raw_checksig_covenant() {
     }
 
     let utxo = &utxos[0];
-    println!("[K-RWA] P2SH UTXO: {}:{} = {} sompis", utxo.txid, utxo.index, utxo.amount);
+    println!(
+        "[K-RWA] P2SH UTXO: {}:{} = {} sompis",
+        utxo.txid, utxo.index, utxo.amount
+    );
 
     // Build output
     let recipient_addr: Address = recipient.address_string().as_str().try_into().unwrap();
     let dest_script = kaspa_txscript::pay_to_address_script(&recipient_addr);
-    let output = kaspa_consensus_core::tx::TransactionOutput::new(utxo.amount - 10_000, dest_script);
+    let output =
+        kaspa_consensus_core::tx::TransactionOutput::new(utxo.amount - 10_000, dest_script);
 
     match client
         .spend_p2sh(

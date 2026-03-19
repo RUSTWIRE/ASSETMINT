@@ -6,7 +6,7 @@
 > Checklist tracking all deliverables across 5 milestones.
 > Status markers: `[x]` = genuinely complete, `[~]` = partially done, `[ ]` = not done.
 
-## Overall Status: PARTIALLY COMPLETE (8.0/10)
+## Overall Status: PARTIALLY COMPLETE (~8.2/10)
 
 | Milestone | Status | Lib Tests | Description |
 |-----------|--------|-----------|-------------|
@@ -17,9 +17,12 @@
 | M4 | Partially complete | -- | Frontend exists, mint page mostly simulated |
 | M5 | Partially complete | 5 | Some security tests; live TN12 deploys real; formal verification missing |
 
-**Total lib tests: 96** (verified via `cargo test --lib`)
-**On-chain TN12 transactions: 14+** (3 transfers + 2 funding + 7 contract deployments + 2 covenant execution)
-**SilverScript contracts: 7 written, 7 deployed on TN12**
+**Total lib tests: 115** (verified via `cargo test --lib`)
+**On-chain TN12 transactions: 18** (3 transfers + 2 funding + 7 contract deployments + 2 covenant deploy + 2 covenant spend + 1 staking timelock + 1 clawback covenant)
+**Deployed contracts: 8** (7 SilverScript + 1 clawback covenant)
+**Proven covenant executions: 3** (CHECKSIG, compliance, clawback)
+**Commits on main: 13**
+**GitHub Actions CI: 3 parallel jobs** (build, test, lint)
 
 ---
 
@@ -66,7 +69,7 @@ Note: This is NOT a port using `polymesh-api` crate. That crate is never importe
 - [x] Multi-jurisdiction compliance profiles (Reg D, Reg S, MiCA, MAS, Rule 144)
 - [x] W3C Verifiable Credentials (`POST /vc/issue`, `POST /vc/verify`)
 - [x] On-chain audit trail (`POST /audit/commit`)
-- [x] 33 unit tests passing
+- [x] 42 unit tests passing
 
 ## M3: ASTM Token + Oracle + Sync
 
@@ -91,8 +94,8 @@ Note: This is NOT a port using `polymesh-api` crate. That crate is never importe
 
 ### State Sync
 - [x] `sync/src/state_sync.rs` -- State transition state machine
-- [x] `check_and_transition()` -- correctly detects DKG/oracle/compliance changes
-- [ ] `run()` loop -- empty. Logs "Polling DKG..." and sleeps. No HTTP request made. (lines 215-226)
+- [x] `check_and_transition()` -- correctly detects oracle/compliance changes
+- [ ] `run()` loop -- empty. Logs "Polling..." and sleeps. No HTTP request made. (lines 215-226)
 - [x] `run_polling()` -- genuinely functional compliance sync loop (lines 233-298). Polls `/merkle-root` via `reqwest::Client`, detects root changes, triggers `check_and_transition()`. Handles API errors with retry.
 - [x] `run_polling()` IS wired into application startup -- `main.rs` spawns `svc.run_polling(&compliance_url)` via `tokio::spawn`
 - [x] 9 unit tests passing, including `test_merkle_root_polling_transition` and `test_no_state_set_errors`
@@ -106,7 +109,7 @@ Note: This is NOT a port using `polymesh-api` crate. That crate is never importe
 - [x] No Hedera/EVM dependencies
 - [x] Transfer page calls real compliance API (`api.evaluateTransfer()`, `api.complianceTransfer()`)
 - [~] Transfer page has mock fallback when API is offline (line 59: mock result returned)
-- [~] Mint page: Step 2 (DKG) simulated, Step 3 (ZK) real API call, Step 4 (Covenant) shows pre-deployed contracts, Step 5 (KRC-20) preview only
+- [~] Mint page: Step 2 (metadata) simulated, Step 3 (ZK) real API call, Step 4 (Covenant) shows pre-deployed contracts, Step 5 (KRC-20) preview only
 - [x] E2E integration test (`tests/e2e_cycle.rs`) -- 1 test, 8-step cycle
 
 ## M5: Security + Verification + Live Deployment + Docs
@@ -118,7 +121,7 @@ Note: This is NOT a port using `polymesh-api` crate. That crate is never importe
 - [~] Formal verification -- property specs for all 7 contracts (`security/formal-specs/covenant-properties.md`, 18KB) + STRIDE threat model with 12 concrete threats (`security/audit-reports/security-audit.md`, 17KB) exist with real code line references. Not TLA+/Coq/model checking.
 
 ### Live Deployment
-- [x] Real on-chain TN12 transactions: 12 confirmed (3 transfers + 2 wallet funding + 7 contract deploys)
+- [x] Real on-chain TN12 transactions: 18 confirmed (3 transfers + 2 wallet funding + 7 contract deploys + 2 covenant deploy + 2 covenant spend + 1 staking timelock + 1 clawback covenant)
 - [x] All 7 SilverScript contracts deployed on TN12 with TX hashes
 - [x] Mempool-aware UTXO selection (filters mempool-spent outpoints)
 - [x] Storage mass limit protection (MAX_INPUTS=84)
@@ -207,6 +210,6 @@ ASSETMINT/
 ├── infrastructure/dkg-node/sovereign-metadata/
 │   ├── server.js        # Sovereign metadata service (replaces OriginTrail DKG)
 │   └── Dockerfile       # node:22-alpine, port 8900
-├── FUNCTIONALITY-REPORT.md   # Honest assessment (7.9/10)
+├── FUNCTIONALITY-REPORT.md   # Honest assessment (~8.2/10)
 └── ROLLS-ROYCE-RUBRIC.md     # This file
 ```

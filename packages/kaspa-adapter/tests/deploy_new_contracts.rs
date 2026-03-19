@@ -15,9 +15,19 @@ async fn test_deploy_htlc() {
     let wallet = Wallet::from_hex(ISSUER_KEY).unwrap();
     let addr = wallet.address_string();
     let contract = load_contract_json("../../contracts/silverscript/htlc.json").unwrap();
-    println!("[K-RWA] Deploying {} ({} bytes)", contract.contract_name, contract.redeem_script.len());
-    let tx_id = client.deploy_contract(&addr, &contract, 1_000_000, wallet.keypair()).await.unwrap();
-    println!("[K-RWA] HTLC DEPLOYED! TX: {} P2SH: {}", tx_id, contract.p2sh_address);
+    println!(
+        "[K-RWA] Deploying {} ({} bytes)",
+        contract.contract_name,
+        contract.redeem_script.len()
+    );
+    let tx_id = client
+        .deploy_contract(&addr, &contract, 1_000_000, wallet.keypair())
+        .await
+        .unwrap();
+    println!(
+        "[K-RWA] HTLC DEPLOYED! TX: {} P2SH: {}",
+        tx_id, contract.p2sh_address
+    );
     client.disconnect().await.ok();
 }
 
@@ -28,8 +38,18 @@ async fn test_deploy_dividend() {
     let wallet = Wallet::from_hex(ISSUER_KEY).unwrap();
     let addr = wallet.address_string();
     let contract = load_contract_json("../../contracts/silverscript/dividend.json").unwrap();
-    println!("[K-RWA] Deploying {} ({} bytes)", contract.contract_name, contract.redeem_script.len());
-    let tx_id = client.deploy_contract(&addr, &contract, 1_001_000, wallet.keypair()).await.unwrap();
-    println!("[K-RWA] Dividend DEPLOYED! TX: {} P2SH: {}", tx_id, contract.p2sh_address);
+    println!(
+        "[K-RWA] Deploying {} ({} bytes)",
+        contract.contract_name,
+        contract.redeem_script.len()
+    );
+    let tx_id = client
+        .deploy_contract(&addr, &contract, 1_001_000, wallet.keypair())
+        .await
+        .unwrap();
+    println!(
+        "[K-RWA] Dividend DEPLOYED! TX: {} P2SH: {}",
+        tx_id, contract.p2sh_address
+    );
     client.disconnect().await.ok();
 }

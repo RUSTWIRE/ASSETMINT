@@ -154,7 +154,10 @@ mod tests {
             &daa_score.to_le_bytes(),
             "bytes 36..44 should be LE DAA score"
         );
-        assert_eq!(script[44], OP_CHECKLOCKTIMEVERIFY, "byte 44 should be OP_CLTV");
+        assert_eq!(
+            script[44], OP_CHECKLOCKTIMEVERIFY,
+            "byte 44 should be OP_CLTV"
+        );
         assert_eq!(script[45], OP_DROP, "byte 45 should be OP_DROP");
         assert_eq!(script[46], OP_TRUE, "byte 46 should be OP_TRUE");
     }
@@ -192,7 +195,10 @@ mod tests {
         let script_a = OnChainStake::build_covenant(&pubkey_a, daa_score);
         let script_b = OnChainStake::build_covenant(&pubkey_b, daa_score);
 
-        assert_ne!(script_a, script_b, "different pubkeys must produce different scripts");
+        assert_ne!(
+            script_a, script_b,
+            "different pubkeys must produce different scripts"
+        );
     }
 
     #[test]

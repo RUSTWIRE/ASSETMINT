@@ -71,10 +71,15 @@ pub fn load_contract_json(path: &str) -> Result<CompiledContract, ScriptError> {
     let json_str = std::fs::read_to_string(path)
         .map_err(|e| ScriptError::LoadFailed(format!("{}: {}", path, e)))?;
 
-    let output: SilvercOutput = serde_json::from_str(&json_str)
-        .map_err(|e| ScriptError::ParseError(format!("{}", e)))?;
+    let output: SilvercOutput =
+        serde_json::from_str(&json_str).map_err(|e| ScriptError::ParseError(format!("{}", e)))?;
 
-    load_from_bytes(&output.contract_name, output.script, output.abi, output.without_selector)
+    load_from_bytes(
+        &output.contract_name,
+        output.script,
+        output.abi,
+        output.without_selector,
+    )
 }
 
 /// Load a contract from raw bytecode (for programmatic use)

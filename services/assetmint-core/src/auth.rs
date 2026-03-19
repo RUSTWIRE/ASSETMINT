@@ -46,6 +46,9 @@ mod tests {
     fn test_api_key_skipped_when_not_set() {
         // When API_KEY env is not set, auth should be skipped
         // This is implicitly tested by existing tests that don't set API_KEY
-        assert!(std::env::var("API_KEY").is_err(), "API_KEY should not be set in test env");
+        assert!(
+            std::env::var("API_KEY").is_err(),
+            "API_KEY should not be set in test env"
+        );
     }
 }

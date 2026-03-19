@@ -5,7 +5,7 @@
 //! 2-of-3 testnet oracle keys sign price data for on-chain consumption.
 //! Uses Ed25519 signatures for oracle key signing.
 
-use ed25519_dalek::{Signer, SigningKey, VerifyingKey, Verifier};
+use ed25519_dalek::{Signer, SigningKey, Verifier, VerifyingKey};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use thiserror::Error;
@@ -101,11 +101,7 @@ pub fn create_attestation(
 
     info!(
         "{} Creating {}-of-{} multisig attestation for {} @ ${:.2}",
-        LOG_PREFIX,
-        ATTESTATION_THRESHOLD,
-        TOTAL_SIGNERS,
-        price.asset_id,
-        price.price_usd
+        LOG_PREFIX, ATTESTATION_THRESHOLD, TOTAL_SIGNERS, price.asset_id, price.price_usd
     );
 
     let data = build_attestation_data(&price);
@@ -194,17 +190,17 @@ pub fn verify_attestation(attestation: &Attestation) -> Result<bool, Attestation
         match vk.verify(&data, &signature) {
             Ok(()) => valid_count += 1,
             Err(e) => {
-                info!(
-                    "{} Signature {} invalid: {}",
-                    LOG_PREFIX, i, e
-                );
+                info!("{} Signature {} invalid: {}", LOG_PREFIX, i, e);
             }
         }
     }
 
     info!(
         "{} Attestation verification: {}/{} valid, threshold={}",
-        LOG_PREFIX, valid_count, attestation.signatures.len(), attestation.threshold
+        LOG_PREFIX,
+        valid_count,
+        attestation.signatures.len(),
+        attestation.threshold
     );
 
     Ok(valid_count >= attestation.threshold)

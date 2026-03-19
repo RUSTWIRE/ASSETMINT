@@ -97,7 +97,10 @@ async fn test_deploy_staking_covenant() {
         Err(e) => {
             println!("[K-RWA] Deploy failed: {}", e);
             println!("[K-RWA] This may be due to UTXO fragmentation.");
-            println!("[K-RWA] The staking covenant was built correctly ({} bytes)", redeem_script.len());
+            println!(
+                "[K-RWA] The staking covenant was built correctly ({} bytes)",
+                redeem_script.len()
+            );
         }
     }
 

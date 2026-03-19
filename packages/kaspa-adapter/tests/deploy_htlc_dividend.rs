@@ -37,7 +37,11 @@ async fn test_deploy_htlc_fresh_wallet() {
 
     // Deploy HTLC from fresh wallet (1 clean UTXO, no mass issues)
     let htlc = load_contract_json("../../contracts/silverscript/htlc.json").unwrap();
-    println!("[K-RWA] Deploying {} ({} bytes)", htlc.contract_name, htlc.redeem_script.len());
+    println!(
+        "[K-RWA] Deploying {} ({} bytes)",
+        htlc.contract_name,
+        htlc.redeem_script.len()
+    );
     let htlc_tx = client
         .deploy_contract(&fresh_addr, &htlc, 50_000_000, fresh.keypair())
         .await
@@ -52,7 +56,11 @@ async fn test_deploy_htlc_fresh_wallet() {
     tokio::time::sleep(std::time::Duration::from_secs(3)).await;
 
     let div = load_contract_json("../../contracts/silverscript/dividend.json").unwrap();
-    println!("[K-RWA] Deploying {} ({} bytes)", div.contract_name, div.redeem_script.len());
+    println!(
+        "[K-RWA] Deploying {} ({} bytes)",
+        div.contract_name,
+        div.redeem_script.len()
+    );
     let div_tx = client
         .deploy_contract(&fresh_addr, &div, 50_000_000, fresh.keypair())
         .await

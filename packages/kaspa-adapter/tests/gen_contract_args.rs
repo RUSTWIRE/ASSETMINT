@@ -9,9 +9,9 @@
 //!
 //! Run: cargo test -p kaspa-adapter --test gen_contract_args -- --nocapture
 
-use kaspa_adapter::wallet::Wallet;
 use blake2b_simd::Params;
-use secp256k1::{Secp256k1, SecretKey, Keypair};
+use kaspa_adapter::wallet::Wallet;
+use secp256k1::{Keypair, Secp256k1, SecretKey};
 use std::io::Write;
 
 const ALICE_KEY: &str = "ab08984d79824336161553b77e366abde831ebde78d78f0440e6833b2f2e2f92";
@@ -95,7 +95,7 @@ fn generate_contract_args() {
 
     // For initial merkle roots / attestation hashes / DKG UAL hashes, use sha256("AssetMint-init-<field>")
     // as a deterministic placeholder that is non-zero.
-    use sha2::{Sha256, Digest};
+    use sha2::{Digest, Sha256};
 
     let init_merkle_root = {
         let mut h = Sha256::new();
@@ -129,13 +129,18 @@ fn generate_contract_args() {
     };
 
     let args_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
-        .parent().unwrap()
-        .parent().unwrap()
+        .parent()
+        .unwrap()
+        .parent()
+        .unwrap()
         .join("contracts/silverscript/args");
 
     // 1. rwa-core-args.json
     //    RwaCore(byte[32] initMerkleRoot, byte[32] initZkVerifierKeyHash, byte[32] initIssuerKeyHash)
-    let rwa_core = build_args_json(&[init_merkle_root, init_zk_verifier_key_hash, issuer_keyhash], &[]);
+    let rwa_core = build_args_json(
+        &[init_merkle_root, init_zk_verifier_key_hash, issuer_keyhash],
+        &[],
+    );
     write_json(&args_dir.join("rwa-core-args.json"), &rwa_core);
     println!("\nWrote rwa-core-args.json");
 
@@ -156,7 +161,10 @@ fn generate_contract_args() {
 
     // 4. zkkyc-verifier-args.json
     //    ZkKycVerifier(byte[32] initVerifierKeyHash, byte[32] initApprovedMerkleRoot, byte[32] initAdminKeyHash)
-    let zkkyc = build_args_json(&[init_zk_verifier_key_hash, init_merkle_root, issuer_keyhash], &[]);
+    let zkkyc = build_args_json(
+        &[init_zk_verifier_key_hash, init_merkle_root, issuer_keyhash],
+        &[],
+    );
     write_json(&args_dir.join("zkkyc-verifier-args.json"), &zkkyc);
     println!("Wrote zkkyc-verifier-args.json");
 
@@ -164,7 +172,12 @@ fn generate_contract_args() {
     //    StateVerity(byte[32] initDkgUalHash, byte[32] initOracleAttestationHash,
     //                byte[32] initComplianceMerkleRoot, byte[32] initStateManagerKeyHash)
     let state_verity = build_args_json(
-        &[init_dkg_ual_hash, init_oracle_attestation_hash, init_compliance_merkle_root, issuer_keyhash],
+        &[
+            init_dkg_ual_hash,
+            init_oracle_attestation_hash,
+            init_compliance_merkle_root,
+            issuer_keyhash,
+        ],
         &[],
     );
     write_json(&args_dir.join("state-verity-args.json"), &state_verity);

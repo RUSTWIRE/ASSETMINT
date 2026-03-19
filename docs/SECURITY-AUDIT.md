@@ -1,3 +1,6 @@
+<!-- DISCLAIMER: Technical demo code — legal wrappers required in production -->
+<!-- SPDX-License-Identifier: MIT -->
+
 # AssetMint Security Audit Report
 
 > **DISCLAIMER**: This security audit is performed on the AssetMint Testnet-12
@@ -45,7 +48,7 @@ The following critical and high-severity issues identified in this audit have be
 | No TLS/HTTPS | High | Open — use reverse proxy |
 | Recursive ZK boolean witness | Medium | Open — documented limitation |
 | XOR threshold (not MuSig2) | Medium | Gated but not replaced |
-| No audit log persistence | Low | Open — stdout only |
+| No audit log persistence | Low | **FIXED** — file-based audit logging via `AUDIT_LOG_PATH` |
 
 ---
 
@@ -71,7 +74,7 @@ The following critical and high-severity issues identified in this audit have be
 
 This audit covers the full AssetMint stack as of Milestone 0:
 
-- **5 SilverScript contracts**: `rwa-core.sil`, `clawback.sil`, `state-verity.sil`, `zkkyc-verifier.sil`, `reserves.sil`
+- **7 SilverScript contracts**: `rwa-core.sil`, `clawback.sil`, `state-verity.sil`, `zkkyc-verifier.sil`, `reserves.sil`, `htlc.sil`, `dividend.sil` (+ 1 clawback covenant via builder)
 - **ZK-KYC circuit**: Groth16 over BN254 with simplified MiMC-like hash (`zk-circuits/`)
 - **Compliance engine**: Identity registry, claims issuance, transfer rules (`services/assetmint-core/`)
 - **Oracle pool**: Centralized 2-of-3 multisig price attestation (`services/oracle-pool/`)
@@ -143,8 +146,8 @@ This audit covers the full AssetMint stack as of Milestone 0:
  +============|======================================================+
  |            v          TRUST BOUNDARY 3                             |
  |   +-------------------+       +----------------------------+      |
- |   | Kaspa Testnet-12  |       |   DKG Edge Node            |      |
- |   | - UTXO covenants  |       |   (Knowledge Assets)       |      |
+ |   | Kaspa Testnet-12  |       |   Sovereign Metadata       |      |
+ |   | - UTXO covenants  |       |   (SHA-256 integrity)      |      |
  |   | - KRC-20 inscript.|       +----------------------------+      |
  |   | - State chain     |                                           |
  |   +-------------------+         ON-CHAIN / EXTERNAL ZONE          |
@@ -163,7 +166,7 @@ This audit covers the full AssetMint stack as of Milestone 0:
 
 5. **Oracle Attestation**: Simulated price sources (in-process) -> median aggregation with outlier rejection -> 2-of-3 Ed25519 multisig -> attestation hash committed to `state-verity.sil`.
 
-6. **State Sync**: Polls DKG endpoint -> compares assertion IDs -> creates state transition -> spends previous state UTXO via `state-verity.sil` covenant.
+6. **State Sync**: Polls compliance API `/merkle-root` endpoint -> detects root changes -> creates state transition via `check_and_transition()`. Wired to startup in `main.rs`.
 
 ### Attack Surface Mapping
 
@@ -176,7 +179,7 @@ This audit covers the full AssetMint stack as of Milestone 0:
 | Oracle signer keys     | In-memory         | Critical|
 | KRC-20 inscriptions    | Kaspa Testnet     | Medium  |
 | Frontend dashboard     | Browser           | Low     |
-| DKG Edge Node polling  | HTTP              | Medium  |
+| Sovereign Metadata     | HTTP              | Medium  |
 
 ---
 
@@ -597,15 +600,15 @@ The wallet (`wallet.ts`) is a simulated testnet wallet that returns a hardcoded 
 | Prover RNG | Deterministic `StdRng::seed_from_u64(0xCAFE_BABE)` | `OsRng` or `ThreadRng` for per-proof randomness | Proof linkability and correlation |
 | Oracle | Centralized 2-of-3 with in-process keys | Decentralized oracle or miner-attested data | Single point of failure |
 | Oracle keys | Hardcoded seeds `[1u8; 32]`, `[2u8; 32]`, `[3u8; 32]` | HSM-stored keys with rotation | Trivial key recovery |
-| Claim issuer key | Hardcoded `[42u8; 32]` in `create_default_state()` | Environment variable or Vault/HSM | Anyone can forge claims |
+| Claim issuer key | `CLAIM_ISSUER_KEY` env var (falls back to `[42u8; 32]` with WARNING) | HSM or Vault | Demo uses env var; production needs HSM |
 | Wallet | Simulated testnet (hardcoded address) | `kaspa-wasm` + hardware wallet support | No real transaction signing |
 | Key storage | In-memory / SQLite file | HSM (AWS CloudHSM, HashiCorp Vault) | Key theft from memory dump |
 | TLS | None (plain HTTP on all services) | mTLS between services, TLS 1.3 for external | Traffic interception |
-| API auth | None (open endpoints) | JWT/OAuth 2.0 with RBAC | Unauthorized access |
-| Rate limiting | None | Token bucket with per-IP and per-user limits | Denial of service |
-| Logging | `tracing::info` to stdout | Structured logging to SIEM with PII redaction | Insufficient audit trail |
-| CORS | Not configured | Strict origin allowlist | Cross-origin API abuse |
-| Input validation | Minimal (Serde deserialization) | Schema validation + length limits on all fields | Injection / DoS via large payloads |
+| API auth | API key on write endpoints (`X-API-Key` header) | JWT/OAuth 2.0 with RBAC | Demo uses API key; production needs full RBAC |
+| Rate limiting | 100 req/min per IP via middleware | Token bucket with per-user limits | Per-IP limiting active; per-user not yet |
+| Logging | File-based audit log (`AUDIT_LOG_PATH`) + `tracing::info` to stdout | Structured logging to SIEM with PII redaction | File logging active; SIEM integration pending |
+| CORS | Restricted to `CORS_ORIGIN` (default `localhost:3000`) | Strict origin allowlist | Configurable origin restriction active |
+| Input validation | DID regex + hex key validation + 1MB body limit | Schema validation + length limits on all fields | Basic validation active; comprehensive schema pending |
 
 ---
 

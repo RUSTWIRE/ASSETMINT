@@ -274,10 +274,7 @@ impl StateSyncService {
                                             // Root matched current state, not an error
                                         }
                                         Err(e) => {
-                                            info!(
-                                                "{} State transition failed: {}",
-                                                LOG_PREFIX, e
-                                            );
+                                            info!("{} State transition failed: {}", LOG_PREFIX, e);
                                         }
                                     }
                                     last_merkle_root = Some(new_root);

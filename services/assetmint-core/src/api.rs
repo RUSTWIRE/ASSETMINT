@@ -5,6 +5,7 @@
 //! Endpoints: identity registration, claim issuance, transfer evaluation,
 //! ZK proof generation, Merkle root queries.
 
+use axum::http::Request;
 use axum::{
     extract::{Path, Query, State},
     http::StatusCode,
@@ -13,21 +14,20 @@ use axum::{
     routing::{get, post},
     Json, Router,
 };
-use axum::http::Request;
 use serde::{Deserialize, Serialize};
 use std::fs::OpenOptions;
 use std::io::Write;
 use std::sync::{Arc, Mutex};
 use tracing::info;
 
-use crate::claims::{ClaimIssuer, ClaimType, VerifiableCredential, verify_vc_proof};
+use crate::auth::api_key_middleware;
+use crate::claims::{verify_vc_proof, ClaimIssuer, ClaimType, VerifiableCredential};
 use crate::identity::IdentityRegistry;
 use crate::merkle::MerkleTree;
+use crate::rate_limit::{rate_limit_middleware, RateLimiter};
 use crate::rules::{ComplianceEngine, ComplianceResult};
 use crate::zk_prover::{ZkProof, ZkProver, ZkWitness};
 use crate::zk_verifier::ZkVerifier;
-use crate::auth::api_key_middleware;
-use crate::rate_limit::{RateLimiter, rate_limit_middleware};
 use crate::LOG_PREFIX;
 use kaspa_adapter::client::KaspaClient;
 use kaspa_adapter::wallet::Wallet;
@@ -178,15 +178,23 @@ pub struct ZkProofResponse {
 // ── Audit Trail ───────────────────────────────────────────────────────
 
 /// Compute a deterministic audit hash from a compliance decision.
-fn compute_audit_hash(result: &ComplianceResult, sender_did: &str, receiver_did: &str, tx_id: &str) -> [u8; 32] {
-    use sha2::{Sha256, Digest};
+fn compute_audit_hash(
+    result: &ComplianceResult,
+    sender_did: &str,
+    receiver_did: &str,
+    tx_id: &str,
+) -> [u8; 32] {
+    use sha2::{Digest, Sha256};
     let mut hasher = Sha256::new();
     hasher.update(sender_did.as_bytes());
     hasher.update(receiver_did.as_bytes());
     hasher.update(tx_id.as_bytes());
     hasher.update(if result.allowed { "ALLOWED" } else { "DENIED" }.as_bytes());
     hasher.update(result.rules_evaluated.to_le_bytes());
-    let now = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_secs();
+    let now = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_secs();
     hasher.update(now.to_le_bytes());
     hasher.finalize().into()
 }
@@ -369,7 +377,7 @@ async fn health(State(state): State<Arc<AppState>>) -> Json<HealthResponse> {
 
     Json(HealthResponse {
         status: "ok".into(),
-        service: "compliance-rust".into(),
+        service: "assetmint-core".into(),
         kaspa_connected,
     })
 }
@@ -382,22 +390,32 @@ async fn health(State(state): State<Arc<AppState>>) -> Json<HealthResponse> {
 async fn oracle_attestation(
     Query(params): Query<std::collections::HashMap<String, String>>,
 ) -> Result<Json<OracleAttestationResponse>, (StatusCode, Json<ApiError>)> {
-    let asset_id = params
-        .get("asset_id")
-        .map(|s| s.as_str())
-        .unwrap_or("KAS");
+    let asset_id = params.get("asset_id").map(|s| s.as_str()).unwrap_or("KAS");
 
-    info!("{} API: GET /oracle/attestation asset_id={}", LOG_PREFIX, asset_id);
+    info!(
+        "{} API: GET /oracle/attestation asset_id={}",
+        LOG_PREFIX, asset_id
+    );
 
     let price = oracle_pool::oracle::get_live_aggregated_price(asset_id)
         .await
-        .map_err(|e| error_response(StatusCode::BAD_GATEWAY, format!("Price fetch failed: {}", e)))?;
+        .map_err(|e| {
+            error_response(
+                StatusCode::BAD_GATEWAY,
+                format!("Price fetch failed: {}", e),
+            )
+        })?;
 
     let signers = oracle_pool::attestation::create_testnet_signers();
     let signer_refs: Vec<&_> = signers.iter().take(2).collect();
 
-    let attestation = oracle_pool::attestation::create_attestation(price, &signer_refs)
-        .map_err(|e| error_response(StatusCode::INTERNAL_SERVER_ERROR, format!("Attestation failed: {}", e)))?;
+    let attestation =
+        oracle_pool::attestation::create_attestation(price, &signer_refs).map_err(|e| {
+            error_response(
+                StatusCode::INTERNAL_SERVER_ERROR,
+                format!("Attestation failed: {}", e),
+            )
+        })?;
 
     Ok(Json(OracleAttestationResponse {
         asset_id: attestation.price.asset_id,
@@ -417,10 +435,12 @@ async fn network_info(
 ) -> Result<Json<NetworkInfoResponse>, (StatusCode, Json<ApiError>)> {
     info!("{} API: GET /network", LOG_PREFIX);
 
-    let client = state
-        .kaspa_client
-        .as_ref()
-        .ok_or_else(|| error_response(StatusCode::SERVICE_UNAVAILABLE, "Kaspa client not connected"))?;
+    let client = state.kaspa_client.as_ref().ok_or_else(|| {
+        error_response(
+            StatusCode::SERVICE_UNAVAILABLE,
+            "Kaspa client not connected",
+        )
+    })?;
 
     let info = client
         .get_server_info()
@@ -453,10 +473,12 @@ async fn get_balance(
 
     info!("{} API: GET /balance address={}", LOG_PREFIX, address);
 
-    let client = state
-        .kaspa_client
-        .as_ref()
-        .ok_or_else(|| error_response(StatusCode::SERVICE_UNAVAILABLE, "Kaspa client not connected"))?;
+    let client = state.kaspa_client.as_ref().ok_or_else(|| {
+        error_response(
+            StatusCode::SERVICE_UNAVAILABLE,
+            "Kaspa client not connected",
+        )
+    })?;
 
     let balance = client
         .get_balance(address)
@@ -523,8 +545,12 @@ async fn compliance_transfer(
     // 2b. Verify ZK proof — mandatory gate
     {
         // Decode proof from hex
-        let proof_bytes = hex::decode(&req.zk_proof)
-            .map_err(|e| error_response(StatusCode::BAD_REQUEST, format!("Invalid zk_proof hex: {}", e)))?;
+        let proof_bytes = hex::decode(&req.zk_proof).map_err(|e| {
+            error_response(
+                StatusCode::BAD_REQUEST,
+                format!("Invalid zk_proof hex: {}", e),
+            )
+        })?;
 
         if req.zk_public_inputs.len() != 2 {
             return Err(error_response(
@@ -539,7 +565,10 @@ async fn compliance_transfer(
             .enumerate()
             .map(|(i, h)| {
                 hex::decode(h).map_err(|e| {
-                    error_response(StatusCode::BAD_REQUEST, format!("Invalid zk_public_inputs[{}] hex: {}", i, e))
+                    error_response(
+                        StatusCode::BAD_REQUEST,
+                        format!("Invalid zk_public_inputs[{}] hex: {}", i, e),
+                    )
                 })
             })
             .collect::<Result<Vec<_>, _>>()?;
@@ -557,7 +586,10 @@ async fn compliance_transfer(
             .map_err(|e| error_response(StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
 
         let valid = verifier.verify(&zk_proof).map_err(|e| {
-            error_response(StatusCode::BAD_REQUEST, format!("ZK proof verification error: {}", e))
+            error_response(
+                StatusCode::BAD_REQUEST,
+                format!("ZK proof verification error: {}", e),
+            )
         })?;
 
         if !valid {
@@ -577,8 +609,12 @@ async fn compliance_transfer(
         .as_ref()
         .ok_or_else(|| error_response(StatusCode::SERVICE_UNAVAILABLE, "Kaspa not connected"))?;
 
-    let wallet = Wallet::from_hex(&state.operator_private_key)
-        .map_err(|e| error_response(StatusCode::INTERNAL_SERVER_ERROR, format!("Invalid operator key: {}", e)))?;
+    let wallet = Wallet::from_hex(&state.operator_private_key).map_err(|e| {
+        error_response(
+            StatusCode::INTERNAL_SERVER_ERROR,
+            format!("Invalid operator key: {}", e),
+        )
+    })?;
     let sender_addr = wallet.address_string();
 
     let tx_id = client
@@ -592,24 +628,38 @@ async fn compliance_transfer(
         .await
         .map_err(|e| error_response(StatusCode::BAD_GATEWAY, format!("Broadcast failed: {}", e)))?;
 
-    info!("{} Compliance-gated transfer complete: TX {}", LOG_PREFIX, tx_id);
+    info!(
+        "{} Compliance-gated transfer complete: TX {}",
+        LOG_PREFIX, tx_id
+    );
 
     // Fire-and-forget: commit audit hash to DAG
-    let audit_hash = compute_audit_hash(&result, &req.sender_did, &req.receiver_did, &tx_id.to_string());
+    let audit_hash = compute_audit_hash(
+        &result,
+        &req.sender_did,
+        &req.receiver_did,
+        &tx_id.to_string(),
+    );
     if state.kaspa_client.is_some() {
         let audit_from = sender_addr.clone();
         let audit_kp = *wallet.keypair();
         let audit_client_endpoint = state.kaspa_client.as_ref().map(|_| ());
         let _ = audit_client_endpoint; // we already have the client reference above
-        // Spawn audit commit as a background task — do not block the response
+                                       // Spawn audit commit as a background task — do not block the response
         let audit_hash_hex = hex::encode(audit_hash);
-        info!("{} Spawning audit hash commit (hash={})", LOG_PREFIX, audit_hash_hex);
+        info!(
+            "{} Spawning audit hash commit (hash={})",
+            LOG_PREFIX, audit_hash_hex
+        );
         // We clone the needed data; the client is behind Arc in AppState
         let state_clone = state.clone();
         let audit_from_clone = audit_from.clone();
         tokio::spawn(async move {
             if let Some(client) = state_clone.kaspa_client.as_ref() {
-                match client.commit_audit_hash(&audit_from_clone, audit_hash, &audit_kp).await {
+                match client
+                    .commit_audit_hash(&audit_from_clone, audit_hash, &audit_kp)
+                    .await
+                {
                     Ok(atx) => info!("[K-RWA] Audit hash committed: TX {}", atx),
                     Err(e) => info!("[K-RWA] Audit hash commit failed (non-fatal): {}", e),
                 }
@@ -679,8 +729,14 @@ async fn generate_zk_proof(
     let secret_hash: [u8; 32] = Sha256::digest(address.as_bytes()).into();
     let secret = ark_bn254::Fr::from_le_bytes_mod_order(&secret_hash);
     let mut secret_bytes = Vec::new();
-    ark_serialize::CanonicalSerialize::serialize_compressed(&secret, &mut secret_bytes)
-        .map_err(|e| error_response(StatusCode::INTERNAL_SERVER_ERROR, format!("secret serialization: {}", e)))?;
+    ark_serialize::CanonicalSerialize::serialize_compressed(&secret, &mut secret_bytes).map_err(
+        |e| {
+            error_response(
+                StatusCode::INTERNAL_SERVER_ERROR,
+                format!("secret serialization: {}", e),
+            )
+        },
+    )?;
 
     let witness = ZkWitness {
         secret_key: secret_bytes,
@@ -696,7 +752,10 @@ async fn generate_zk_proof(
             .map_err(|e| error_response(StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
 
         prover.generate_proof(&witness).map_err(|e| {
-            error_response(StatusCode::INTERNAL_SERVER_ERROR, format!("Proof generation failed: {}", e))
+            error_response(
+                StatusCode::INTERNAL_SERVER_ERROR,
+                format!("Proof generation failed: {}", e),
+            )
         })?
     };
 
@@ -720,7 +779,10 @@ async fn vc_issue(
     State(state): State<Arc<AppState>>,
     Json(req): Json<VcIssueRequest>,
 ) -> Result<(StatusCode, Json<VcIssueResponse>), (StatusCode, Json<ApiError>)> {
-    info!("{} API: POST /vc/issue subject={} type={}", LOG_PREFIX, req.subject_did, req.claim_type);
+    info!(
+        "{} API: POST /vc/issue subject={} type={}",
+        LOG_PREFIX, req.subject_did, req.claim_type
+    );
 
     // Verify identity exists
     state
@@ -731,7 +793,9 @@ async fn vc_issue(
     let claim_type = parse_claim_type(&req.claim_type, req.jurisdiction.as_deref())
         .map_err(|e| error_response(StatusCode::BAD_REQUEST, e))?;
 
-    let claim = state.claim_issuer.issue_claim(&req.subject_did, claim_type, req.expiry);
+    let claim = state
+        .claim_issuer
+        .issue_claim(&req.subject_did, claim_type, req.expiry);
 
     // Store claim in registry
     state
@@ -742,9 +806,12 @@ async fn vc_issue(
     // Convert to W3C VC
     let vc = claim.to_verifiable_credential();
 
-    Ok((StatusCode::CREATED, Json(VcIssueResponse {
-        verifiable_credential: vc,
-    })))
+    Ok((
+        StatusCode::CREATED,
+        Json(VcIssueResponse {
+            verifiable_credential: vc,
+        }),
+    ))
 }
 
 /// POST /vc/verify — verify a W3C Verifiable Credential proof
@@ -752,12 +819,19 @@ async fn vc_verify(
     State(state): State<Arc<AppState>>,
     Json(req): Json<VcVerifyRequest>,
 ) -> Result<Json<VcVerifyResponse>, (StatusCode, Json<ApiError>)> {
-    info!("{} API: POST /vc/verify subject={}", LOG_PREFIX, req.verifiable_credential.credential_subject.id);
+    info!(
+        "{} API: POST /vc/verify subject={}",
+        LOG_PREFIX, req.verifiable_credential.credential_subject.id
+    );
 
     let vc = &req.verifiable_credential;
 
-    let valid = verify_vc_proof(vc, &state.claim_issuer.verifying_key)
-        .map_err(|e| error_response(StatusCode::BAD_REQUEST, format!("VC verification failed: {}", e)))?;
+    let valid = verify_vc_proof(vc, &state.claim_issuer.verifying_key).map_err(|e| {
+        error_response(
+            StatusCode::BAD_REQUEST,
+            format!("VC verification failed: {}", e),
+        )
+    })?;
 
     Ok(Json(VcVerifyResponse {
         valid,
@@ -772,25 +846,39 @@ async fn commit_audit(
     State(state): State<Arc<AppState>>,
     Json(req): Json<AuditCommitRequest>,
 ) -> Result<Json<AuditCommitResponse>, (StatusCode, Json<ApiError>)> {
-    info!("{} API: POST /audit/commit hash={}", LOG_PREFIX, req.decision_hash);
+    info!(
+        "{} API: POST /audit/commit hash={}",
+        LOG_PREFIX, req.decision_hash
+    );
 
-    let client = state
-        .kaspa_client
-        .as_ref()
-        .ok_or_else(|| error_response(StatusCode::SERVICE_UNAVAILABLE, "Kaspa client not connected"))?;
+    let client = state.kaspa_client.as_ref().ok_or_else(|| {
+        error_response(
+            StatusCode::SERVICE_UNAVAILABLE,
+            "Kaspa client not connected",
+        )
+    })?;
 
     let audit_bytes: [u8; 32] = hex::decode(&req.decision_hash)
         .map_err(|e| error_response(StatusCode::BAD_REQUEST, format!("Invalid hex hash: {}", e)))?
         .try_into()
         .map_err(|_| error_response(StatusCode::BAD_REQUEST, "Hash must be exactly 32 bytes"))?;
 
-    let wallet = Wallet::from_hex(&state.operator_private_key)
-        .map_err(|e| error_response(StatusCode::INTERNAL_SERVER_ERROR, format!("Invalid operator key: {}", e)))?;
+    let wallet = Wallet::from_hex(&state.operator_private_key).map_err(|e| {
+        error_response(
+            StatusCode::INTERNAL_SERVER_ERROR,
+            format!("Invalid operator key: {}", e),
+        )
+    })?;
 
     let tx_id = client
         .commit_audit_hash(&req.from_address, audit_bytes, wallet.keypair())
         .await
-        .map_err(|e| error_response(StatusCode::BAD_GATEWAY, format!("Audit commit failed: {}", e)))?;
+        .map_err(|e| {
+            error_response(
+                StatusCode::BAD_GATEWAY,
+                format!("Audit commit failed: {}", e),
+            )
+        })?;
 
     let now = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
@@ -975,10 +1063,7 @@ fn parse_claim_type(type_str: &str, jurisdiction: Option<&str>) -> Result<ClaimT
 
 /// Audit logging middleware — logs all requests with method, path, and status.
 /// Writes structured JSON lines to a file (configured via AUDIT_LOG_PATH env var).
-async fn audit_log_middleware(
-    request: Request<axum::body::Body>,
-    next: Next,
-) -> Response {
+async fn audit_log_middleware(request: Request<axum::body::Body>, next: Next) -> Response {
     let method = request.method().clone();
     let path = request.uri().path().to_string();
     let ip = request
@@ -1000,9 +1085,13 @@ async fn audit_log_middleware(
     );
 
     // File log (JSON lines)
-    let audit_path = std::env::var("AUDIT_LOG_PATH")
-        .unwrap_or_else(|_| "/tmp/assetmint_audit.log".to_string());
-    if let Ok(mut file) = OpenOptions::new().create(true).append(true).open(&audit_path) {
+    let audit_path =
+        std::env::var("AUDIT_LOG_PATH").unwrap_or_else(|_| "/tmp/assetmint_audit.log".to_string());
+    if let Ok(mut file) = OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(&audit_path)
+    {
         let timestamp = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
             .unwrap_or_default()
@@ -1010,7 +1099,12 @@ async fn audit_log_middleware(
         let _ = writeln!(
             file,
             r#"{{"timestamp":{},"method":"{}","path":"{}","ip":"{}","status":{},"duration_ms":{}}}"#,
-            timestamp, method, path, ip, status, duration.as_millis()
+            timestamp,
+            method,
+            path,
+            ip,
+            status,
+            duration.as_millis()
         );
     }
 
@@ -1021,10 +1115,11 @@ async fn audit_log_middleware(
 
 /// Build the Axum router with all compliance + Kaspa endpoints
 pub fn build_router(state: Arc<AppState>) -> Router {
-    use tower_http::cors::{Any, CorsLayer};
     use axum::http::HeaderValue;
+    use tower_http::cors::{Any, CorsLayer};
 
-    let cors_origin = std::env::var("CORS_ORIGIN").unwrap_or_else(|_| "http://localhost:3000".to_string());
+    let cors_origin =
+        std::env::var("CORS_ORIGIN").unwrap_or_else(|_| "http://localhost:3000".to_string());
     let cors = CorsLayer::new()
         .allow_origin(cors_origin.parse::<HeaderValue>().unwrap_or_else(|_| {
             eprintln!("[K-RWA] WARNING: Invalid CORS_ORIGIN, falling back to localhost:3000");
@@ -1035,7 +1130,6 @@ pub fn build_router(state: Arc<AppState>) -> Router {
 
     // 100 requests per minute per IP
     let rate_limiter = RateLimiter::new(100, 60);
-
 
     // Read endpoints (no auth required)
     let read_routes = Router::new()
@@ -1055,7 +1149,10 @@ pub fn build_router(state: Arc<AppState>) -> Router {
         .route("/audit/commit", post(commit_audit))
         .route("/vc/issue", post(vc_issue))
         .route("/vc/verify", post(vc_verify))
-        .route("/metadata/publish-and-commit", post(metadata_publish_and_commit))
+        .route(
+            "/metadata/publish-and-commit",
+            post(metadata_publish_and_commit),
+        )
         .layer(middleware::from_fn(api_key_middleware));
 
     Router::new()
@@ -1074,14 +1171,18 @@ pub fn build_router(state: Arc<AppState>) -> Router {
 /// Runs a trusted setup for the ZK circuit so that proof generation
 /// and verification work out of the box in tests and demos.
 pub fn create_default_state() -> Result<Arc<AppState>, Box<dyn std::error::Error>> {
-    let registry = IdentityRegistry::in_memory()
-        .map_err(|e| format!("Failed to create registry: {}", e))?;
+    let registry =
+        IdentityRegistry::in_memory().map_err(|e| format!("Failed to create registry: {}", e))?;
     let compliance = ComplianceEngine::new();
     // Load claim issuer key from environment (or use test default with warning)
     let issuer_key: [u8; 32] = match std::env::var("CLAIM_ISSUER_KEY") {
         Ok(hex_key) => {
             let bytes = hex::decode(&hex_key).expect("[K-RWA] CLAIM_ISSUER_KEY must be valid hex");
-            assert_eq!(bytes.len(), 32, "[K-RWA] CLAIM_ISSUER_KEY must be exactly 32 bytes (64 hex chars)");
+            assert_eq!(
+                bytes.len(),
+                32,
+                "[K-RWA] CLAIM_ISSUER_KEY must be exactly 32 bytes (64 hex chars)"
+            );
             let mut arr = [0u8; 32];
             arr.copy_from_slice(&bytes);
             println!("[K-RWA] Claim issuer key loaded from CLAIM_ISSUER_KEY environment variable");
@@ -1096,7 +1197,9 @@ pub fn create_default_state() -> Result<Arc<AppState>, Box<dyn std::error::Error
 
     // Load operator private key from environment
     let operator_private_key = std::env::var("OPERATOR_PRIVATE_KEY").unwrap_or_else(|_| {
-        eprintln!("[K-RWA] WARNING: OPERATOR_PRIVATE_KEY not set — using default test key. NOT SECURE.");
+        eprintln!(
+            "[K-RWA] WARNING: OPERATOR_PRIVATE_KEY not set — using default test key. NOT SECURE."
+        );
         // Default test key (Alice's key from integration tests)
         "ab08984d79824336161553b77e366abde831ebde78d78f0440e6833b2f2e2f92".to_string()
     });
@@ -1136,11 +1239,13 @@ pub async fn create_live_state(
     let compliance = ComplianceEngine::new();
 
     // Read issuer key from env, fall back to testnet issuer key
-    let issuer_key_hex = std::env::var("ISSUER_PRIVATE_KEY")
-        .unwrap_or_else(|_| {
-            info!("{} ISSUER_PRIVATE_KEY not set, using testnet default", LOG_PREFIX);
-            "91149facb865c1f35b4cdec412caef7cd41191372024cd37cf9fd4a9b6bf686d".to_string()
-        });
+    let issuer_key_hex = std::env::var("ISSUER_PRIVATE_KEY").unwrap_or_else(|_| {
+        info!(
+            "{} ISSUER_PRIVATE_KEY not set, using testnet default",
+            LOG_PREFIX
+        );
+        "91149facb865c1f35b4cdec412caef7cd41191372024cd37cf9fd4a9b6bf686d".to_string()
+    });
     let issuer_key_bytes = hex::decode(&issuer_key_hex)
         .map_err(|e| format!("Invalid ISSUER_PRIVATE_KEY hex: {}", e))?;
     let issuer_key: [u8; 32] = issuer_key_bytes
@@ -1150,13 +1255,15 @@ pub async fn create_live_state(
 
     // Load operator private key from environment
     let operator_private_key = std::env::var("OPERATOR_PRIVATE_KEY").unwrap_or_else(|_| {
-        eprintln!("[K-RWA] WARNING: OPERATOR_PRIVATE_KEY not set — using default test key. NOT SECURE.");
+        eprintln!(
+            "[K-RWA] WARNING: OPERATOR_PRIVATE_KEY not set — using default test key. NOT SECURE."
+        );
         "ab08984d79824336161553b77e366abde831ebde78d78f0440e6833b2f2e2f92".to_string()
     });
 
     info!("{} Connecting to Kaspa at {}", LOG_PREFIX, kaspa_endpoint);
-    let client = KaspaClient::new(kaspa_endpoint)
-        .map_err(|e| format!("Kaspa client init: {}", e))?;
+    let client =
+        KaspaClient::new(kaspa_endpoint).map_err(|e| format!("Kaspa client init: {}", e))?;
     client
         .connect()
         .await
@@ -1168,7 +1275,10 @@ pub async fn create_live_state(
         .map_err(|e| format!("Kaspa server info: {}", e))?;
     info!(
         "{} Connected to kaspad {} (synced={}, daa={})",
-        LOG_PREFIX, server_info.server_version, server_info.is_synced, server_info.virtual_daa_score
+        LOG_PREFIX,
+        server_info.server_version,
+        server_info.is_synced,
+        server_info.virtual_daa_score
     );
 
     // Run trusted setup for ZK prover/verifier
@@ -1223,7 +1333,9 @@ mod tests {
     use tower::ServiceExt;
 
     fn hex64(byte: u8) -> String {
-        std::iter::repeat(format!("{:02x}", byte)).take(32).collect::<String>()
+        std::iter::repeat(format!("{:02x}", byte))
+            .take(32)
+            .collect::<String>()
     }
 
     fn test_app() -> Router {
@@ -1255,9 +1367,10 @@ mod tests {
                     .method("POST")
                     .uri("/identity")
                     .header("content-type", "application/json")
-                    .body(Body::from(
-                        format!(r#"{{"did":"did:kaspa:alice","primary_key":"{}"}}"#, hex64(0xab)),
-                    ))
+                    .body(Body::from(format!(
+                        r#"{{"did":"did:kaspa:alice","primary_key":"{}"}}"#,
+                        hex64(0xab)
+                    )))
                     .unwrap(),
             )
             .await
@@ -1271,8 +1384,14 @@ mod tests {
         let app = build_router(state.clone());
 
         // Register two identities
-        let _ = state.registry.register("did:kaspa:alice", &hex64(0x0a)).unwrap();
-        let _ = state.registry.register("did:kaspa:bob", &hex64(0x0b)).unwrap();
+        let _ = state
+            .registry
+            .register("did:kaspa:alice", &hex64(0x0a))
+            .unwrap();
+        let _ = state
+            .registry
+            .register("did:kaspa:bob", &hex64(0x0b))
+            .unwrap();
 
         // Issue KYC claims via API
         let resp = app
@@ -1363,8 +1482,14 @@ mod tests {
         let state = create_default_state().unwrap();
         let app = build_router(state.clone());
 
-        state.registry.register("did:kaspa:a", &hex64(0x0a)).unwrap();
-        state.registry.register("did:kaspa:b", &hex64(0x0b)).unwrap();
+        state
+            .registry
+            .register("did:kaspa:a", &hex64(0x0a))
+            .unwrap();
+        state
+            .registry
+            .register("did:kaspa:b", &hex64(0x0b))
+            .unwrap();
 
         let resp = app
             .oneshot(
@@ -1384,7 +1509,10 @@ mod tests {
         let app = build_router(state.clone());
 
         // Register identity first
-        state.registry.register("did:kaspa:vc-alice", &hex64(0xab)).unwrap();
+        state
+            .registry
+            .register("did:kaspa:vc-alice", &hex64(0xab))
+            .unwrap();
 
         let resp = app
             .oneshot(
@@ -1401,11 +1529,22 @@ mod tests {
             .unwrap();
         assert_eq!(resp.status(), StatusCode::CREATED);
 
-        let body = axum::body::to_bytes(resp.into_body(), 1024 * 64).await.unwrap();
+        let body = axum::body::to_bytes(resp.into_body(), 1024 * 64)
+            .await
+            .unwrap();
         let vc_resp: VcIssueResponse = serde_json::from_slice(&body).unwrap();
-        assert_eq!(vc_resp.verifiable_credential.credential_subject.id, "did:kaspa:vc-alice");
-        assert_eq!(vc_resp.verifiable_credential.credential_subject.claim_type, "KycVerified");
-        assert_eq!(vc_resp.verifiable_credential.vc_type[0], "VerifiableCredential");
+        assert_eq!(
+            vc_resp.verifiable_credential.credential_subject.id,
+            "did:kaspa:vc-alice"
+        );
+        assert_eq!(
+            vc_resp.verifiable_credential.credential_subject.claim_type,
+            "KycVerified"
+        );
+        assert_eq!(
+            vc_resp.verifiable_credential.vc_type[0],
+            "VerifiableCredential"
+        );
     }
 
     #[tokio::test]
@@ -1413,7 +1552,10 @@ mod tests {
         let state = create_default_state().unwrap();
         let app = build_router(state.clone());
 
-        state.registry.register("did:kaspa:vc-bob", &hex64(0xde)).unwrap();
+        state
+            .registry
+            .register("did:kaspa:vc-bob", &hex64(0xde))
+            .unwrap();
 
         // Issue VC
         let issue_resp = app
@@ -1432,7 +1574,9 @@ mod tests {
             .unwrap();
         assert_eq!(issue_resp.status(), StatusCode::CREATED);
 
-        let body = axum::body::to_bytes(issue_resp.into_body(), 1024 * 64).await.unwrap();
+        let body = axum::body::to_bytes(issue_resp.into_body(), 1024 * 64)
+            .await
+            .unwrap();
         let vc_resp: VcIssueResponse = serde_json::from_slice(&body).unwrap();
 
         // Verify VC via API
@@ -1454,7 +1598,9 @@ mod tests {
             .unwrap();
         assert_eq!(verify_resp.status(), StatusCode::OK);
 
-        let body = axum::body::to_bytes(verify_resp.into_body(), 1024 * 64).await.unwrap();
+        let body = axum::body::to_bytes(verify_resp.into_body(), 1024 * 64)
+            .await
+            .unwrap();
         let vr: VcVerifyResponse = serde_json::from_slice(&body).unwrap();
         assert!(vr.valid);
         assert_eq!(vr.subject_did, "did:kaspa:vc-bob");

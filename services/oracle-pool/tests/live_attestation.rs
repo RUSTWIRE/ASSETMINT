@@ -5,9 +5,7 @@
 //! create a 2-of-3 Ed25519 multisig attestation, verify it, and print
 //! the attestation hash that would be committed on-chain.
 
-use oracle_pool::attestation::{
-    create_attestation, create_testnet_signers, verify_attestation,
-};
+use oracle_pool::attestation::{create_attestation, create_testnet_signers, verify_attestation};
 use oracle_pool::oracle::{get_aggregated_price, get_simulated_price};
 
 /// Synchronous path: use simulated price sources, create & verify attestation.

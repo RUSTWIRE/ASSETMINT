@@ -203,8 +203,7 @@ mod tests {
 
     #[test]
     fn test_can_unstake_expired() {
-        let mut pos =
-            create_stake("kaspatest:addr1", MIN_STAKE_AMOUNT, MIN_LOCK_PERIOD).unwrap();
+        let mut pos = create_stake("kaspatest:addr1", MIN_STAKE_AMOUNT, MIN_LOCK_PERIOD).unwrap();
         // Set lock_until to the past
         pos.lock_until = 1000;
         assert!(can_unstake(&pos).is_ok());

@@ -4,7 +4,7 @@
 //! Merkle tree of approved addresses for on-chain ZK/Merkle verification.
 //! SHA-256 hashing consistent with SilverScript's OP_SHA256.
 
-use sha2::{Sha256, Digest};
+use sha2::{Digest, Sha256};
 use thiserror::Error;
 use tracing::info;
 
@@ -38,7 +38,11 @@ pub struct MerkleTree {
 impl MerkleTree {
     /// Build a Merkle tree from a list of approved addresses
     pub fn build(addresses: &[String]) -> Result<Self, MerkleError> {
-        info!("{} Building Merkle tree with {} leaves", LOG_PREFIX, addresses.len());
+        info!(
+            "{} Building Merkle tree with {} leaves",
+            LOG_PREFIX,
+            addresses.len()
+        );
 
         if addresses.is_empty() {
             return Err(MerkleError::EmptyTree);
@@ -81,7 +85,11 @@ impl MerkleTree {
             current = next;
         }
 
-        info!("{} Merkle tree built: root={}", LOG_PREFIX, hex::encode(current[0]));
+        info!(
+            "{} Merkle tree built: root={}",
+            LOG_PREFIX,
+            hex::encode(current[0])
+        );
 
         Ok(Self { leaves, tree })
     }

@@ -173,11 +173,7 @@ fn build_client() -> Client {
 fn handle_response(resp: reqwest::blocking::Response) {
     let status = resp.status();
     let body: Value = resp.json().unwrap_or_else(|e| {
-        eprintln!(
-            "{} Failed to parse response body: {}",
-            "[ERROR]".red(),
-            e
-        );
+        eprintln!("{} Failed to parse response body: {}", "[ERROR]".red(), e);
         process::exit(1);
     });
 
@@ -239,12 +235,12 @@ fn main() {
 
         Commands::Identity { action } => match action {
             IdentityAction::Register { did, key } => {
-                let mut req = client.post(format!("{}/identity", base)).json(
-                    &serde_json::json!({
+                let mut req = client
+                    .post(format!("{}/identity", base))
+                    .json(&serde_json::json!({
                         "did": did,
                         "primary_key": key,
-                    }),
-                );
+                    }));
                 if let Some(ref api_key) = cli.api_key {
                     req = req.header("X-API-Key", api_key);
                 }

@@ -53,9 +53,9 @@ fn simulated_sources(asset_id: &str) -> Vec<PricePoint> {
 
     // Simulate 3 price feeds with slight variance
     let base_price = match asset_id {
-        "KPROP-NYC-TEST" => 250_000.0,  // $250k property token
-        "KAS" => 0.15,                   // KAS price
-        _ => 100.0,                      // Default
+        "KPROP-NYC-TEST" => 250_000.0, // $250k property token
+        "KAS" => 0.15,                 // KAS price
+        _ => 100.0,                    // Default
     };
 
     vec![
@@ -142,34 +142,45 @@ pub async fn fetch_coingecko_price(asset_id: &str) -> Result<PricePoint, OracleE
         coingecko_id
     );
 
-    info!("{} Fetching live price from CoinGecko for {}", LOG_PREFIX, asset_id);
+    info!(
+        "{} Fetching live price from CoinGecko for {}",
+        LOG_PREFIX, asset_id
+    );
 
     match reqwest::get(&url).await {
-        Ok(response) => {
-            match response.json::<serde_json::Value>().await {
-                Ok(data) => {
-                    if let Some(price) = data[coingecko_id]["usd"].as_f64() {
-                        let now = std::time::SystemTime::now()
-                            .duration_since(std::time::UNIX_EPOCH)
-                            .unwrap_or_default()
-                            .as_secs();
-                        info!("{} CoinGecko price for {}: ${:.4}", LOG_PREFIX, asset_id, price);
-                        Ok(PricePoint {
-                            source: "coingecko".to_string(),
-                            price_usd: if asset_id == "KAS" { price } else { price * 250000.0 / 0.15 },
-                            timestamp: now,
-                        })
-                    } else {
-                        info!("{} CoinGecko returned no price, falling back to simulated", LOG_PREFIX);
-                        Ok(get_simulated_price(asset_id))
-                    }
-                }
-                Err(e) => {
-                    info!("{} CoinGecko parse error: {}, falling back", LOG_PREFIX, e);
+        Ok(response) => match response.json::<serde_json::Value>().await {
+            Ok(data) => {
+                if let Some(price) = data[coingecko_id]["usd"].as_f64() {
+                    let now = std::time::SystemTime::now()
+                        .duration_since(std::time::UNIX_EPOCH)
+                        .unwrap_or_default()
+                        .as_secs();
+                    info!(
+                        "{} CoinGecko price for {}: ${:.4}",
+                        LOG_PREFIX, asset_id, price
+                    );
+                    Ok(PricePoint {
+                        source: "coingecko".to_string(),
+                        price_usd: if asset_id == "KAS" {
+                            price
+                        } else {
+                            price * 250000.0 / 0.15
+                        },
+                        timestamp: now,
+                    })
+                } else {
+                    info!(
+                        "{} CoinGecko returned no price, falling back to simulated",
+                        LOG_PREFIX
+                    );
                     Ok(get_simulated_price(asset_id))
                 }
             }
-        }
+            Err(e) => {
+                info!("{} CoinGecko parse error: {}, falling back", LOG_PREFIX, e);
+                Ok(get_simulated_price(asset_id))
+            }
+        },
         Err(e) => {
             info!("{} CoinGecko unreachable: {}, falling back", LOG_PREFIX, e);
             Ok(get_simulated_price(asset_id))
@@ -222,9 +233,7 @@ pub fn get_aggregated_price(asset_id: &str) -> Result<AggregatedPrice, OracleErr
     let median = sorted[sorted.len() / 2];
     let used = sources
         .iter()
-        .filter(|p| {
-            ((p.price_usd - median) / median * 100.0).abs() <= OUTLIER_THRESHOLD_PCT
-        })
+        .filter(|p| ((p.price_usd - median) / median * 100.0).abs() <= OUTLIER_THRESHOLD_PCT)
         .count();
 
     let now = std::time::SystemTime::now()

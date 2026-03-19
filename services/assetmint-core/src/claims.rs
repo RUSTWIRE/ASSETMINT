@@ -172,12 +172,26 @@ fn timestamp_to_iso(ts: u64) -> String {
 }
 
 /// Verify a VC proof against the issuer's verifying key
-pub fn verify_vc_proof(vc: &VerifiableCredential, issuer_vk: &VerifyingKey) -> Result<bool, ClaimError> {
-    info!("{} Verifying VC proof for subject {}", LOG_PREFIX, vc.credential_subject.id);
+pub fn verify_vc_proof(
+    vc: &VerifiableCredential,
+    issuer_vk: &VerifyingKey,
+) -> Result<bool, ClaimError> {
+    info!(
+        "{} Verifying VC proof for subject {}",
+        LOG_PREFIX, vc.credential_subject.id
+    );
 
     // Parse the claim type back from VC format
-    let claim_type = if vc.credential_subject.claim_type.starts_with("JurisdictionAllowed:") {
-        let j = vc.credential_subject.claim_type.strip_prefix("JurisdictionAllowed:").unwrap_or("");
+    let claim_type = if vc
+        .credential_subject
+        .claim_type
+        .starts_with("JurisdictionAllowed:")
+    {
+        let j = vc
+            .credential_subject
+            .claim_type
+            .strip_prefix("JurisdictionAllowed:")
+            .unwrap_or("");
         ClaimType::JurisdictionAllowed(j.to_string())
     } else {
         match vc.credential_subject.claim_type.as_str() {
@@ -185,7 +199,12 @@ pub fn verify_vc_proof(vc: &VerifiableCredential, issuer_vk: &VerifyingKey) -> R
             "AccreditedInvestor" => ClaimType::AccreditedInvestor,
             "AmlClear" => ClaimType::AmlClear,
             "ExemptedEntity" => ClaimType::ExemptedEntity,
-            other => return Err(ClaimError::VerificationFailed(format!("Unknown claim type: {}", other))),
+            other => {
+                return Err(ClaimError::VerificationFailed(format!(
+                    "Unknown claim type: {}",
+                    other
+                )))
+            }
         }
     };
 
@@ -210,12 +229,7 @@ pub fn verify_vc_proof(vc: &VerifiableCredential, issuer_vk: &VerifyingKey) -> R
     }
 
     // Rebuild claim data and verify signature
-    let claim_data = build_claim_data(
-        &vc.credential_subject.id,
-        &claim_type,
-        expiry,
-        issued_at,
-    );
+    let claim_data = build_claim_data(&vc.credential_subject.id, &claim_type, expiry, issued_at);
 
     let sig_bytes = hex::decode(&vc.proof.proof_value)
         .map_err(|e| ClaimError::InvalidSignature(format!("hex decode: {}", e)))?;
@@ -239,13 +253,21 @@ pub fn verify_vc_proof(vc: &VerifiableCredential, issuer_vk: &VerifyingKey) -> R
 fn iso_to_timestamp(iso: &str) -> Option<u64> {
     // Expected format: YYYY-MM-DDTHH:MM:SSZ
     let parts: Vec<&str> = iso.split('T').collect();
-    if parts.len() != 2 { return None; }
+    if parts.len() != 2 {
+        return None;
+    }
     let date_parts: Vec<u64> = parts[0].split('-').filter_map(|s| s.parse().ok()).collect();
     let time_str = parts[1].trim_end_matches('Z');
     let time_parts: Vec<u64> = time_str.split(':').filter_map(|s| s.parse().ok()).collect();
-    if date_parts.len() != 3 || time_parts.len() != 3 { return None; }
+    if date_parts.len() != 3 || time_parts.len() != 3 {
+        return None;
+    }
 
-    let (y, m, d) = (date_parts[0] as i64, date_parts[1] as u64, date_parts[2] as u64);
+    let (y, m, d) = (
+        date_parts[0] as i64,
+        date_parts[1] as u64,
+        date_parts[2] as u64,
+    );
     let (h, min, s) = (time_parts[0], time_parts[1], time_parts[2]);
 
     // civil_to_days algorithm (inverse of civil_from_days)
@@ -294,12 +316,7 @@ impl ClaimIssuer {
     }
 
     /// Issue a signed claim
-    pub fn issue_claim(
-        &self,
-        subject_did: &str,
-        claim_type: ClaimType,
-        expiry: u64,
-    ) -> Claim {
+    pub fn issue_claim(&self, subject_did: &str, claim_type: ClaimType, expiry: u64) -> Claim {
         info!(
             "{} Issuing claim {:?} from {} to {}",
             LOG_PREFIX, claim_type, self.did, subject_did
@@ -329,10 +346,19 @@ impl ClaimIssuer {
 }
 
 /// Build the canonical byte representation of claim data for signing/verification
-fn build_claim_data(subject_did: &str, claim_type: &ClaimType, expiry: u64, issued_at: u64) -> Vec<u8> {
+fn build_claim_data(
+    subject_did: &str,
+    claim_type: &ClaimType,
+    expiry: u64,
+    issued_at: u64,
+) -> Vec<u8> {
     let mut hasher = Sha256::new();
     hasher.update(subject_did.as_bytes());
-    hasher.update(serde_json::to_string(claim_type).unwrap_or_default().as_bytes());
+    hasher.update(
+        serde_json::to_string(claim_type)
+            .unwrap_or_default()
+            .as_bytes(),
+    );
     hasher.update(expiry.to_le_bytes());
     hasher.update(issued_at.to_le_bytes());
     hasher.finalize().to_vec()

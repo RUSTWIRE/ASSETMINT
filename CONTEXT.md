@@ -1,8 +1,11 @@
+<!-- DISCLAIMER: Technical demo code — legal wrappers required in production -->
+<!-- SPDX-License-Identifier: MIT -->
+
 # AssetMint Development Context
 
 > This file preserves critical context across sessions. DO NOT DELETE.
 
-## Project Status: ALL MILESTONES COMPLETE — 105 TESTS, 12 TN12 TXs
+## Project Status: ALL MILESTONES COMPLETE -- 115 TESTS, 18 TN12 TXs, 13 COMMITS
 
 ### Completed
 - **M0**: Full scaffold, 9 vendor repos cloned, Rust workspace (6 crates) compiles, SilverScript compiler built, git branches created
@@ -10,8 +13,8 @@
 - **M2**: Full Rust Polymesh compliance reimplementation — identity registry, Ed25519 claims, composable rules engine, Axum REST API. 33 tests.
 - **M3**: ASTM token, staking with timelock covenants, governance, fee model, simulated multisig oracle with Ed25519 attestations. 35 tokenomics tests.
 - **M4**: Next.js 15 dashboard (8 pages), Kaspa wallet/API layer, E2E integration test. 7 ZK tests.
-- **M5**: Sovereign metadata service (port 8900), covenant builder with 3 TN12-proven patterns, on-chain staking module, metadata-to-DAG commit endpoint. **105 tests pass**.
-- **LIVE KASPA**: kaspa-adapter wired to real rusty-kaspa RPC (kaspa-wrpc-client @ c6819f3). 17 confirmed TN12 transactions. Mempool-aware UTXO selection. Covenant execution proven (TX 27385b04).
+- **M5**: Sovereign metadata service (port 8900), covenant builder with 3 TN12-proven patterns (CHECKSIG, compliance, clawback), on-chain staking module, metadata-to-DAG commit endpoint. **115 tests pass**.
+- **LIVE KASPA**: kaspa-adapter wired to real rusty-kaspa RPC (kaspa-wrpc-client @ c6819f3). 18 confirmed TN12 transactions. Mempool-aware UTXO selection. 3 covenant executions proven. GitHub Actions CI with 3 parallel jobs.
 
 ### Running the Stack
 ```bash
@@ -56,14 +59,15 @@ cd /Users/rory/ASSETMINT/apps/dashboard-fe && npm run dev
 | merkle_tree_build | `benches/compliance_bench.rs` |
 | merkle_proof_verify | `benches/compliance_bench.rs` |
 
-### Total Workspace Tests: 83
-| Crate | Unit | Integration | Proptest |
-|-------|------|-------------|---------|
-| assetmint-core | 23 | 1 (E2E) | 8 |
-| zk-circuits | 4 | — | — |
-| tokenomics | 30 | — | — |
-| oracle-pool | 10 | — | — |
-| sync | 7 | — | — |
+### Total Workspace Lib Tests: 115
+| Crate | Lib Tests | Integration | Proptest |
+|-------|-----------|-------------|---------|
+| assetmint-core | 42 | 1 (E2E) | 8 |
+| kaspa-adapter | 10 | — | — |
+| dkg-bridge | 12 | — | — |
+| zk-circuits | 7 | — | — |
+| tokenomics | 35 | — | — |
+| sync | 9 | — | — |
 
 ## M1 Deliverables
 
@@ -73,7 +77,7 @@ cd /Users/rory/ASSETMINT/apps/dashboard-fe && npm run dev
 |----------|------|------------|-------------|---------|
 | RwaCore | `contracts/silverscript/rwa-core.sil` | zkTransfer, adminUpdate | 395 bytes | ZK-KYC transfer guard + covenant preservation |
 | Clawback | `contracts/silverscript/clawback.sil` | ownerSpend, issuerClawback | 161 bytes | Issuer clawback with OP_RETURN reason |
-| StateVerity | `contracts/silverscript/state-verity.sil` | updateState, managerReclaim | 316 bytes | Oracle attestation + DKG state transition |
+| StateVerity | `contracts/silverscript/state-verity.sil` | updateState, managerReclaim | 316 bytes | Oracle attestation + sovereign metadata state transition |
 | ZkKycVerifier | `contracts/silverscript/zkkyc-verifier.sil` | verifyProof, updateVerifierKey | 396 bytes | On-chain ZK proof verification stub |
 | Reserves | `contracts/silverscript/reserves.sil` | withdraw, deposit, custodianReclaim | 372 bytes | Proof-of-reserves with oracle attestation |
 
@@ -157,12 +161,12 @@ Key implementation details:
 
 | Module | File | Tests | Description |
 |--------|------|-------|-------------|
-| State Sync | `services/sync/src/state_sync.rs` | 7 pass | DKG poll + state transitions (DKG/oracle/compliance changes), OP_RETURN encoding |
+| State Sync | `services/sync/src/state_sync.rs` | 9 pass | Merkle root polling + state transitions (oracle/compliance changes), OP_RETURN encoding |
 
 Key implementation details:
 - Oracle attestations use real Ed25519 signatures (not placeholders) — testnet seeds `[1u8;32]`, `[2u8;32]`, `[3u8;32]`
 - Tampered attestations correctly fail verification
-- State transitions track `ChangeType` (DKG, Oracle, Compliance, Combined)
+- State transitions track `ChangeType` (Oracle, Compliance, Combined)
 - KRC-20 inscriptions enforce per-mint limit (1000 ASTM max)
 - Fee model: flat 50k sompis + 1 bps proportional, capped at 100k sompis (0.001 KAS)
 - Staking rewards: 500 bps (5% APY), min 100 ASTM stake, min 7-day lock
@@ -174,10 +178,10 @@ Key implementation details:
 | Page | Route | Description |
 |------|-------|-------------|
 | Dashboard | `/` | Portfolio overview: KAS/ASTM balances, recent transactions, compliance health, staking stats |
-| Mint Wizard | `/mint` | 5-step flow: asset details → DKG publish → ZK-KYC proof → covenant deploy → KRC-20 mint |
+| Mint Wizard | `/mint` | 5-step flow: asset details -> metadata publish -> ZK-KYC proof -> covenant deploy -> KRC-20 mint |
 | Transfer | `/transfer` | ZK-KYC gated transfer with compliance evaluation (calls `/compliance/evaluate`) |
 | Clawback | `/clawback` | Issuer admin panel: target address, OP_RETURN reason, history |
-| Asset Detail | `/assets` | KPROP-NYC-TEST: DKG metadata, UTXO info, compliance, oracle price |
+| Asset Detail | `/assets` | KPROP-NYC-TEST: sovereign metadata, UTXO info, compliance, oracle price |
 | Reserves | `/reserves` | Proof-of-reserves: collateral ratio charts, oracle attestation, reserve breakdown |
 | ASTM Token | `/astm` | Staking panel, governance proposals with voting, fee model info |
 | Settings | `/settings` | API endpoints, wallet info, network (Testnet-12) |
@@ -197,16 +201,16 @@ No Hedera/EVM deps. Pure Kaspa-native frontend.
 |------|------|-------|-------------|
 | Full RWA Cycle | `services/assetmint-core/tests/e2e_cycle.rs` | 8 steps | Register → KYC → transfer (allow/deny) → MaxAmount → Merkle → ZK proof → revoke |
 
-### Total Workspace Tests: 75
+### Total Workspace Lib Tests: 115
 
-| Crate | Tests |
-|-------|-------|
-| assetmint-core (unit) | 23 |
-| assetmint-core (E2E) | 1 |
-| zk-circuits | 4 |
-| tokenomics | 30 |
-| oracle-pool | 10 |
-| sync | 7 |
+| Crate | Lib Tests |
+|-------|-----------|
+| assetmint-core | 42 |
+| kaspa-adapter | 10 |
+| dkg-bridge | 12 |
+| zk-circuits | 7 |
+| tokenomics | 35 |
+| sync | 9 |
 
 ## Architecture Quick Reference
 
@@ -221,7 +225,7 @@ No Hedera/EVM deps. Pure Kaspa-native frontend.
 | Tokenomics | `tokenomics/` | Rust | ✅ M3 complete (30 tests) |
 | ZK circuits | `zk-circuits/` | Rust | ✅ M1 complete |
 | Frontend | `apps/dashboard-fe/` | Next.js/TS | ✅ M4 complete (8 pages) |
-| DKG Edge Node | `infrastructure/dkg-node/` | Docker | Config done |
+| Sovereign Metadata | `infrastructure/dkg-node/sovereign-metadata/` | Node.js/Docker | Running on :8900 |
 
 ## Key Paths
 
@@ -288,7 +292,7 @@ vendor/silverscript/target/release/silverc contract.sil --constructor-args args.
 - M1 work not yet committed
 
 ## Milestone Plan
-- **M0** ✅ Scaffold + DKG + Rust init (Week 1)
+- **M0** Scaffold + sovereign metadata + Rust init (Week 1)
 - **M1** ✅ SilverScript contracts + Groth16 ZK prover (Weeks 2-3)
 - **M2** ✅ Full Rust Polymesh compliance port (Weeks 4-5)
 - **M3** ✅ ASTM token + simulated oracle + state-verity sync (Weeks 6-7)

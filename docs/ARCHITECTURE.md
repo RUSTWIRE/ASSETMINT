@@ -55,14 +55,14 @@ AssetMint demonstrates RWA tokenization on Kaspa's UTXO model. It combines Silve
 │  assetmint-core [REAL]  │  oracle-pool [PARTIAL]  │  sync [POLLING WIRED] │
 │  tokenomics [FORMAT ONLY]│  kaspa-adapter [REAL]   │  zk-circuits [REAL] │
 ├──────────────────────────────────────────────────────────────────────────┤
-│               SilverScript Contracts (5 deployed)                        │
+│               SilverScript Contracts (8 deployed)                        │
 │                                                                          │
-│  rwa-core  │  clawback  │  state-verity  │  zkkyc  │  reserves          │
-│  DEPLOYED but never INVOKED on-chain                                     │
+│  rwa-core │ clawback │ state-verity │ zkkyc │ reserves │ htlc │ dividend │
+│  + clawback covenant  •  3 covenant executions proven on TN12            │
 ├──────────────────────────────────────────────────────────────────────────┤
 │          Kaspa Testnet-12 (wRPC: ws://127.0.0.1:17210)                  │
 │          PHANTOM/GHOSTDAG  •  10 BPS  •  Blake2b                        │
-│          12+ confirmed TXs (3 transfers + 2 funding + 7 contract deploys)│
+│          18 confirmed TXs (3 transfers + 2 funding + 7 deploys + 6 more) │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -77,7 +77,7 @@ AssetMint demonstrates RWA tokenization on Kaspa's UTXO model. It combines Silve
 | Compliance API -> ZK Prover | REAL | `ZkProver::generate_proof()` called from API |
 | Oracle -> CoinGecko | REAL | `fetch_coingecko_price()` in `oracle.rs` line 134 |
 | Oracle -> Kaspa TN12 | NOT CONNECTED | No attestation committed via `state-verity.sil` |
-| Sync -> DKG | NOT CONNECTED | `run()` is empty loop (`state_sync.rs` line 215-226) |
+| Sync -> Sovereign Metadata | NOT CONNECTED | `run()` is empty loop (`state_sync.rs` line 215-226) |
 | Sync -> Compliance API | REAL | `run_polling()` polls `/merkle-root` via `reqwest::Client`, wired to startup in `main.rs` |
 | Tokenomics -> Kaspa TN12 | NOT CONNECTED | In-memory state machine only |
 
@@ -89,7 +89,7 @@ AssetMint demonstrates RWA tokenization on Kaspa's UTXO model. It combines Silve
 zk-circuits [REAL - 7 tests]
     └── ark-groth16, ark-bn254, ark-r1cs-std, ark-snark, ark-crypto-primitives
 
-assetmint-core [REAL - 33 tests]
+assetmint-core [REAL - 42 tests]
     ├── zk-circuits (Groth16 proof generation + verification)
     ├── kaspa-adapter (wRPC client for on-chain operations)
     ├── axum 0.8 (REST API)
@@ -97,7 +97,7 @@ assetmint-core [REAL - 33 tests]
     ├── ed25519-dalek 2 (claim signing)
     └── sha2, hex (hashing, encoding)
 
-oracle-pool [PARTIAL - 12 tests]
+oracle-pool [PARTIAL]
     ├── axum 0.8 (REST API)
     ├── reqwest 0.12 (CoinGecko HTTP request)
     ├── ed25519-dalek 2 (multisig attestation)
@@ -108,11 +108,11 @@ sync [PARTIAL - 9 tests]
     └── reqwest 0.12 (used by run_polling() to poll /merkle-root)
     NOTE: check_and_transition() state machine works; run_polling() wired to startup in main.rs; run() is empty
 
-tokenomics [IN-MEMORY ONLY - 30 tests]
+tokenomics [IN-MEMORY ONLY - 35 tests]
     └── workspace deps only (serde, sha2, ed25519-dalek, thiserror, tracing)
     NOTE: No dependency on kaspa-adapter; no on-chain connection
 
-kaspa-adapter [REAL - 5 lib tests]
+kaspa-adapter [REAL - 10 lib tests]
     └── kaspa-wrpc-client (git rev c6819f3), kaspa-consensus-core, sha2, hex
     NOTE: threshold wallet tests use XOR aggregation, not real MuSig2
 ```
@@ -194,15 +194,16 @@ No covenant entrypoint has ever been invoked on-chain. The contracts are deploye
 
 ### Contract Inventory
 
-| Contract | File | Size | Deployed TX | Entrypoints Ever Invoked? |
-|----------|------|------|-------------|--------------------------|
-| RwaCore | `rwa-core.sil` | 395 B | `d7ed4958...` | No |
-| Clawback | `clawback.sil` | 161 B | `6080b477...` | No |
-| StateVerity | `state-verity.sil` | 316 B | `94c50753...` | No |
-| ZkKycVerifier | `zkkyc-verifier.sil` | 396 B | `c29499ad...` | No |
-| Reserves | `reserves.sil` | 372 B | `346fdbd3...` | No |
-| HTLC | `htlc.sil` | -- | Not deployed | No |
-| Dividend | `dividend.sil` | -- | Not deployed | No |
+| Contract | File | Size | Deployed TX | Status |
+|----------|------|------|-------------|--------|
+| RwaCore | `rwa-core.sil` | 395 B | `d7ed4958...` | Deployed |
+| Clawback | `clawback.sil` | 161 B | `6080b477...` | Deployed |
+| StateVerity | `state-verity.sil` | 316 B | `94c50753...` | Deployed |
+| ZkKycVerifier | `zkkyc-verifier.sil` | 396 B | `c29499ad...` | Deployed |
+| Reserves | `reserves.sil` | 372 B | `346fdbd3...` | Deployed |
+| HTLC | `htlc.sil` | 195 B | `1347b397...` | Deployed |
+| Dividend | `dividend.sil` | 406 B | `6ec163e1...` | Deployed |
+| Clawback Covenant | `covenant_builder.rs` | -- | `f64733cc...` | Deployed (builder) |
 
 ### UTXO Model Advantages (Design Rationale)
 
@@ -354,8 +355,42 @@ None of these are connected to Kaspa. No covenant UTXOs for staking, no OP_RETUR
 - Rust workspace with 6 crates (`cargo build` from repo root)
 - SilverScript compiler at `vendor/silverscript/target/release/silverc`
 - Next.js 15 dashboard at `apps/dashboard-fe/`
-- Docker Compose for DKG Edge Node (config only, never started)
-- 96 lib tests across all crates (`cargo test --lib`)
+- Docker Compose for sovereign metadata service
+- 115 lib tests across 6 crates (`cargo test --lib`)
+- GitHub Actions CI with 3 parallel jobs (build, test, lint)
+- 13 commits on main branch
+
+---
+
+## 11. CI/CD Pipeline
+
+GitHub Actions runs on every push to `main` and on every pull request.
+
+### Pipeline Structure
+
+```
+GitHub Actions
+├── Build Job
+│   └── cargo build --workspace
+├── Test Job
+│   └── cargo test --workspace --lib (115 tests)
+└── Lint Job
+    ├── cargo clippy --workspace -- -D warnings
+    └── cargo fmt --check
+```
+
+All three jobs run in parallel. A failure in any job blocks the merge.
+
+### Test Coverage by Crate
+
+| Crate | Tests | Coverage Area |
+|-------|-------|---------------|
+| assetmint-core | 42 | Identity, claims, rules, merkle, ZK, API, audit, VCs |
+| kaspa-adapter | 10 | Wallet, covenant builder, tx construction |
+| dkg-bridge | 12 | Sovereign metadata bridge |
+| sync | 9 | State machine, Merkle root polling |
+| tokenomics | 35 | Token format, staking, governance, fees |
+| zk-circuits | 7 | KYC circuit, recursive circuit, trusted setup |
 
 ---
 
@@ -368,7 +403,7 @@ ASSETMINT/
 │       └── src/app/transfer/      # Real API calls
 │       └── src/app/mint/          # Partially simulated
 ├── contracts/
-│   └── silverscript/              # 7 SilverScript covenants
+│   └── silverscript/              # 7 SilverScript covenants + 1 clawback covenant
 │       ├── *.sil                  # Source contracts
 │       ├── *.json                 # Compiled artifacts (5 of 7)
 │       └── *-args.json            # Constructor argument files
@@ -381,7 +416,7 @@ ASSETMINT/
 │   ├── kaspa-adapter/             # Kaspa node client (REAL)
 │   │   ├── src/wallet.rs          # Threshold Schnorr (XOR demo)
 │   │   └── src/tx_builder.rs      # UTXO construction (REAL)
-│   └── dkg-bridge/                # DKG TypeScript bridge (STUB)
+│   └── dkg-bridge/                # Sovereign metadata bridge (TypeScript)
 ├── services/
 │   ├── assetmint-core/            # Compliance engine + REST API (REAL)
 │   │   ├── src/                   # identity, claims, rules, api, zk_prover, zk_verifier, merkle
@@ -394,7 +429,7 @@ ASSETMINT/
 ├── zk-circuits/                   # Groth16 KYC circuit (REAL) + recursive (DEMO)
 ├── Cargo.toml                     # Workspace root
 ├── docker-compose.yml             # Infrastructure services
-├── FUNCTIONALITY-REPORT.md        # Honest assessment (7.9/10)
+├── FUNCTIONALITY-REPORT.md        # Honest assessment (~8.2/10)
 ├── ROLLS-ROYCE-RUBRIC.md          # Honest rubric with [x]/[~]/[ ] markers
 └── CONTEXT.md                     # Development context
 ```

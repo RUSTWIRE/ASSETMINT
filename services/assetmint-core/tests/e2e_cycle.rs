@@ -48,8 +48,14 @@ fn test_full_e2e_rwa_cycle() {
 
     registry.add_claim(&alice_kyc).expect("store alice KYC");
     registry.add_claim(&bob_kyc).expect("store bob KYC");
-    println!("[K-RWA]   KYC issued: alice (sig={}...)", &alice_kyc.signature[..16]);
-    println!("[K-RWA]   KYC issued: bob (sig={}...)", &bob_kyc.signature[..16]);
+    println!(
+        "[K-RWA]   KYC issued: alice (sig={}...)",
+        &alice_kyc.signature[..16]
+    );
+    println!(
+        "[K-RWA]   KYC issued: bob (sig={}...)",
+        &bob_kyc.signature[..16]
+    );
     println!("[K-RWA]   Mallory: NO KYC (should be denied)");
 
     // Verify claims
@@ -80,13 +86,8 @@ fn test_full_e2e_rwa_cycle() {
     println!("\n[K-RWA] Step 4: Evaluate non-compliant transfer (mallory → bob)");
     let mallory_loaded = registry.get("did:kaspa:mallory").expect("get mallory");
 
-    let result = engine.evaluate_transfer(
-        &mallory_loaded,
-        &bob_loaded,
-        "KPROP-NYC-TEST",
-        1_000_000,
-        0,
-    );
+    let result =
+        engine.evaluate_transfer(&mallory_loaded, &bob_loaded, "KPROP-NYC-TEST", 1_000_000, 0);
     assert!(!result.allowed, "Mallory→Bob transfer should be DENIED");
     assert!(!result.violations.is_empty());
     println!(
@@ -109,7 +110,10 @@ fn test_full_e2e_rwa_cycle() {
         1_000_000, // Exceeds 500k limit
         0,
     );
-    assert!(!big_transfer.allowed, "Over-limit transfer should be DENIED");
+    assert!(
+        !big_transfer.allowed,
+        "Over-limit transfer should be DENIED"
+    );
     println!("[K-RWA]   1M sompis transfer: DENIED (limit 500k)");
 
     let small_transfer = custom_engine.evaluate_transfer(
@@ -119,7 +123,10 @@ fn test_full_e2e_rwa_cycle() {
         200_000, // Under limit
         0,
     );
-    assert!(small_transfer.allowed, "Under-limit transfer should be ALLOWED");
+    assert!(
+        small_transfer.allowed,
+        "Under-limit transfer should be ALLOWED"
+    );
     println!("[K-RWA]   200k sompis transfer: ALLOWED");
 
     // ─── Step 6: Build Merkle tree of approved addresses ────
@@ -210,7 +217,9 @@ fn test_full_e2e_rwa_cycle() {
 
     // ─── Step 8: Revoke identity and verify denial ──────────
     println!("\n[K-RWA] Step 8: Revoke identity (mallory) and verify");
-    registry.revoke("did:kaspa:mallory").expect("revoke mallory");
+    registry
+        .revoke("did:kaspa:mallory")
+        .expect("revoke mallory");
     let approved_after = registry
         .get_approved_addresses()
         .expect("get approved after revoke");
@@ -234,7 +243,13 @@ fn test_full_e2e_rwa_cycle() {
     println!("[K-RWA]   - Compliant transfer: ALLOWED");
     println!("[K-RWA]   - Non-compliant transfer: DENIED (missing KYC)");
     println!("[K-RWA]   - MaxTransferAmount: enforced correctly");
-    println!("[K-RWA]   - Merkle tree: {} proofs verified", approved.len());
-    println!("[K-RWA]   - ZK proof: gen={:?}, verify={:?}", prove_time, verify_time);
+    println!(
+        "[K-RWA]   - Merkle tree: {} proofs verified",
+        approved.len()
+    );
+    println!(
+        "[K-RWA]   - ZK proof: gen={:?}, verify={:?}",
+        prove_time, verify_time
+    );
     println!("[K-RWA]   - Identity revocation: approved count updated");
 }

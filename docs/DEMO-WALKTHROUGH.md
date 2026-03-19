@@ -1,3 +1,6 @@
+<!-- DISCLAIMER: Technical demo code — legal wrappers required in production -->
+<!-- SPDX-License-Identifier: MIT -->
+
 # AssetMint Demo Walkthrough
 
 > Step-by-step guide to seeing AssetMint's compliance-gated RWA platform in action
@@ -532,7 +535,7 @@ An honest breakdown of what is live on-chain versus simulated in this demo.
 | Component | What's real |
 |-----------|-------------|
 | **Kaspa TN12 connection** | Live gRPC to `kaspad`, real `block_count`, `daa_score`, `difficulty` |
-| **Deployed contracts** | 7 SilverScript covenants at real P2SH addresses with verifiable deployment TXs |
+| **Deployed contracts** | 8 contracts (7 SilverScript + 1 clawback covenant) at real P2SH addresses with verifiable deployment TXs |
 | **Balance queries** | Live UTXO lookups against the Kaspa node |
 | **ZK proofs** | Real Groth16 proofs via `ark-groth16` over BN254; real Merkle tree construction |
 | **Ed25519 signatures** | Claim and VC signatures use real Ed25519 key pairs |
@@ -551,7 +554,7 @@ An honest breakdown of what is live on-chain versus simulated in this demo.
 | **Transfer amounts** | Asset IDs like `KPROP-NYC-TEST` are demo identifiers; no real tokenized property exists |
 | **AML screening** | The `AmlClear` claim type exists but there is no integration with an AML data provider |
 | **ZK trusted setup** | Uses a fresh ceremony on every startup (`/tmp/assetmint_compliance_keys`); a production deployment requires a multi-party ceremony |
-| **Private keys in API** | The `POST /transfer` endpoint accepts raw private keys in the request body; production would use a secure enclave or hardware wallet |
+| **Server-side signing** | The `POST /transfer` endpoint uses a server-side operator key (`OPERATOR_PRIVATE_KEY` env var); production would use a secure enclave or hardware wallet |
 
 ### Partially Real
 

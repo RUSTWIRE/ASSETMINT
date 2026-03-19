@@ -15,7 +15,10 @@ const NUM_EVALUATIONS: usize = 10_000;
 
 #[test]
 fn test_load_10k_compliance_evaluations() {
-    println!("[K-RWA] === LOAD TEST: {} compliance evaluations ===", NUM_EVALUATIONS);
+    println!(
+        "[K-RWA] === LOAD TEST: {} compliance evaluations ===",
+        NUM_EVALUATIONS
+    );
 
     // 1. Setup: register identities with KYC claims
     let registry = IdentityRegistry::in_memory().unwrap();
@@ -34,7 +37,10 @@ fn test_load_10k_compliance_evaluations() {
         }
     }
 
-    println!("[K-RWA] Registered {} identities with KYC claims", NUM_IDENTITIES);
+    println!(
+        "[K-RWA] Registered {} identities with KYC claims",
+        NUM_IDENTITIES
+    );
 
     // 2. Configure compliance engine with realistic rules
     let mut engine = ComplianceEngine::new();
@@ -86,15 +92,25 @@ fn test_load_10k_compliance_evaluations() {
     println!("[K-RWA]  Evaluations: {}", NUM_EVALUATIONS);
     println!("[K-RWA]  Allowed:     {}", allowed);
     println!("[K-RWA]  Denied:      {}", denied);
-    println!("[K-RWA]  Duration:    {:.3}ms", elapsed.as_secs_f64() * 1000.0);
+    println!(
+        "[K-RWA]  Duration:    {:.3}ms",
+        elapsed.as_secs_f64() * 1000.0
+    );
     println!("[K-RWA]  Throughput:  {:.0} evals/sec", throughput);
-    println!("[K-RWA]  Avg latency: {:.0}ns per eval", elapsed.as_nanos() as f64 / NUM_EVALUATIONS as f64);
+    println!(
+        "[K-RWA]  Avg latency: {:.0}ns per eval",
+        elapsed.as_nanos() as f64 / NUM_EVALUATIONS as f64
+    );
     println!("[K-RWA] ========================================");
 
     // Assertions
     // Note: In debug mode, SQLite claim lookups limit throughput to ~23k/sec.
     // In release mode with in-memory cache, this exceeds 1M/sec (see benchmarks).
-    assert!(throughput > 10_000.0, "Throughput must exceed 10k evals/sec (debug mode), got {:.0}", throughput);
+    assert!(
+        throughput > 10_000.0,
+        "Throughput must exceed 10k evals/sec (debug mode), got {:.0}",
+        throughput
+    );
     assert!(allowed > 0, "Some transfers should be allowed");
     assert!(denied > 0, "Some transfers should be denied (max amount)");
 }
@@ -113,7 +129,11 @@ fn test_load_merkle_tree_10k_leaves() {
     let build_time = start.elapsed();
 
     println!("[K-RWA] Tree built: root={}", hex::encode(root));
-    println!("[K-RWA] Build time: {:.3}ms for {} leaves", build_time.as_secs_f64() * 1000.0, addresses.len());
+    println!(
+        "[K-RWA] Build time: {:.3}ms for {} leaves",
+        build_time.as_secs_f64() * 1000.0,
+        addresses.len()
+    );
 
     // Verify 1000 proofs
     let start = Instant::now();
@@ -126,9 +146,12 @@ fn test_load_merkle_tree_10k_leaves() {
     }
     let verify_time = start.elapsed();
 
-    println!("[K-RWA] Verified {} proofs in {:.3}ms ({:.0} proofs/sec)",
-        verified, verify_time.as_secs_f64() * 1000.0,
-        1000.0 / verify_time.as_secs_f64());
+    println!(
+        "[K-RWA] Verified {} proofs in {:.3}ms ({:.0} proofs/sec)",
+        verified,
+        verify_time.as_secs_f64() * 1000.0,
+        1000.0 / verify_time.as_secs_f64()
+    );
 
     assert_eq!(verified, 1000);
     assert!(build_time.as_millis() < 5000, "Tree build should be <5s");

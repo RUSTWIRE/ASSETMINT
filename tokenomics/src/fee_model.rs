@@ -160,10 +160,7 @@ mod tests {
     #[test]
     fn test_default_distribution_sums_to_100() {
         let dist = default_distribution();
-        assert_eq!(
-            dist.burn_pct + dist.staker_pct + dist.treasury_pct,
-            100
-        );
+        assert_eq!(dist.burn_pct + dist.staker_pct + dist.treasury_pct, 100);
     }
 
     #[test]

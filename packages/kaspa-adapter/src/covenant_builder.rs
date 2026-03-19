@@ -21,8 +21,8 @@ pub mod op {
     pub const BLAKE2B: u8 = 0xaa;
     // KIP-10 introspection
     pub const INPUTINDEX: u8 = 0xb9;
-    pub const INPUTVALUE: u8 = 0xbe;   // was 0xc4
-    pub const INPUTSCRIPT: u8 = 0xbf;  // was 0xc5
+    pub const INPUTVALUE: u8 = 0xbe; // was 0xc4
+    pub const INPUTSCRIPT: u8 = 0xbf; // was 0xc5
     pub const OUTPUTVALUE: u8 = 0xc2;
     pub const OUTPUTSCRIPT: u8 = 0xc3;
     pub const LESSTHANOREQUAL: u8 = 0xa1;
@@ -126,9 +126,9 @@ mod tests {
         let script = build_checksig_covenant(&pubkey);
         // Expected: 0x20 + 32 bytes pubkey + 0xac = 34 bytes
         assert_eq!(script.len(), 34);
-        assert_eq!(script[0], 0x20);           // push 32
-        assert_eq!(&script[1..33], &pubkey);   // pubkey
-        assert_eq!(script[33], op::CHECKSIG);  // OP_CHECKSIG
+        assert_eq!(script[0], 0x20); // push 32
+        assert_eq!(&script[1..33], &pubkey); // pubkey
+        assert_eq!(script[33], op::CHECKSIG); // OP_CHECKSIG
     }
 
     #[test]
@@ -143,7 +143,7 @@ mod tests {
         assert_eq!(script[33], op::CHECKSIG);
         assert_eq!(script[34], op::VERIFY);
         // Verify the KIP-10 introspection suffix
-        assert_eq!(script[35], 0x00);                   // output index 0
+        assert_eq!(script[35], 0x00); // output index 0
         assert_eq!(script[36], op::OUTPUTVALUE);
         assert_eq!(script[37], op::INPUTINDEX);
         assert_eq!(script[38], op::INPUTVALUE);
@@ -162,7 +162,7 @@ mod tests {
         // 1(push32) + 32(pubkey) + 15(opcodes) = 48
         assert_eq!(script.len(), 48);
         // Check self-propagation section starts after CHECKSIG VERIFY
-        assert_eq!(script[35], 0x00);                   // output index 0
+        assert_eq!(script[35], 0x00); // output index 0
         assert_eq!(script[36], op::OUTPUTSCRIPT);
         assert_eq!(script[37], op::INPUTINDEX);
         assert_eq!(script[38], op::INPUTSCRIPT);

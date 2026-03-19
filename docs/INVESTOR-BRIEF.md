@@ -52,13 +52,13 @@ The platform's native token captures fees from every RWA transfer, distributes s
 │               Rust Workspace (6 crates)                          │
 │  compliance  │  oracle  │  sync  │  tokenomics  │  zk-circuits   │
 ├──────────────────────────────────────────────────────────────────┤
-│          SilverScript Covenants (7 contracts)                    │
+│          SilverScript Covenants (8 contracts)                    │
 ├──────────────────────────────────────────────────────────────────┤
 │       Kaspa Testnet-12  •  10 BPS  •  PHANTOM/GHOSTDAG          │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
-The full system comprises 7 deployed SilverScript contracts, 6 Rust crates, a sovereign metadata service, 2 REST APIs, a Next.js dashboard with 8 pages, and 105 passing tests across the workspace.
+The full system comprises 8 deployed contracts (7 SilverScript + 1 clawback covenant), 6 Rust crates, a sovereign metadata service, 2 REST APIs, a CLI with 9 commands, a Next.js dashboard with 8 pages, 115 passing tests, and GitHub Actions CI with 3 parallel jobs.
 
 ---
 
@@ -118,14 +118,14 @@ ASTM stakers vote on protocol proposals with weight proportional to their staked
 
 | Phase | Status | Description |
 |-------|--------|-------------|
-| M0 | Done | Project scaffold, Rust workspace, DKG config, vendor repos |
-| M1 | Done | 5 SilverScript contracts, Groth16 ZK-KYC circuit, trusted setup |
-| M2 | Done | Polymesh compliance port, identity registry, rules engine, REST API |
+| M0 | Done | Project scaffold, Rust workspace, sovereign metadata config, vendor repos |
+| M1 | Done | 7 SilverScript contracts, Groth16 ZK-KYC circuit, trusted setup |
+| M2 | Done | Polymesh compliance reimplementation, identity registry, rules engine, REST API |
 | M3 | Done | ASTM token (KRC-20), staking, governance, oracle with Ed25519 attestations |
-| M4 | Done | Next.js 15 dashboard (8 pages), E2E integration test, 105 tests passing |
-| M5 | Done | Sovereign metadata, covenant builder, on-chain staking, 17 TN12 transactions |
-| M6 | In progress | Security audit, formal verification, investor whitepaper |
-| M6 | Planned | Mainnet preparation, deployment tooling, launch readiness |
+| M4 | Done | Next.js 15 dashboard (8 pages), E2E integration test, CLI with 9 commands |
+| M5 | Done | Sovereign metadata, covenant builder, on-chain staking, 18 TN12 transactions, 115 tests, CI pipeline |
+| M6 | In progress | Security hardening, formal verification, investor whitepaper |
+| M7 | Planned | Mainnet preparation, deployment tooling, launch readiness |
 
 ---
 

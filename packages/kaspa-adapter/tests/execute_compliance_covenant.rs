@@ -99,8 +99,7 @@ async fn test_compliance_covenant_deploy_and_spend() {
     // Build output: 99_990_000 sompis (minus 10_000 fee)
     let recipient_addr: Address = recipient.address_string().as_str().try_into().unwrap();
     let dest_script = kaspa_txscript::pay_to_address_script(&recipient_addr);
-    let output =
-        kaspa_consensus_core::tx::TransactionOutput::new(99_990_000, dest_script);
+    let output = kaspa_consensus_core::tx::TransactionOutput::new(99_990_000, dest_script);
 
     match client
         .spend_p2sh(
@@ -202,8 +201,7 @@ async fn test_checksig_covenant_baseline() {
     let utxo = &utxos[0];
     let recipient_addr: Address = recipient.address_string().as_str().try_into().unwrap();
     let dest_script = kaspa_txscript::pay_to_address_script(&recipient_addr);
-    let output =
-        kaspa_consensus_core::tx::TransactionOutput::new(99_990_000, dest_script);
+    let output = kaspa_consensus_core::tx::TransactionOutput::new(99_990_000, dest_script);
 
     match client
         .spend_p2sh(

@@ -10,7 +10,7 @@ pragma silverscript ^0.1.0;
 // the prover commits the proof off-chain and the on-chain script verifies the
 // hash binding between the proof, the verification key, and the public inputs.
 //
-// The full Groth16 verification (pairing checks) happens in the compliance-rust
+// The full Groth16 verification (pairing checks) happens in the assetmint-core
 // service. This contract ensures the proof was generated for the correct circuit
 // and public inputs, preventing proof substitution attacks.
 //

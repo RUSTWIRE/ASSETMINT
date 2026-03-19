@@ -13,8 +13,7 @@ use kaspa_adapter::client::KaspaClient;
 async fn test_live_server_info() {
     println!("[K-RWA] === LIVE TN12 TEST: Server Info ===\n");
 
-    let client = KaspaClient::new("ws://127.0.0.1:17210")
-        .expect("create client");
+    let client = KaspaClient::new("ws://127.0.0.1:17210").expect("create client");
 
     client.connect().await.expect("connect to kaspad");
     assert!(client.is_connected(), "Should be connected");
@@ -29,10 +28,8 @@ async fn test_live_server_info() {
     assert!(info.is_synced, "Node should be synced");
 
     // Query DAG info
-    let (block_count, daa_score, difficulty) = client
-        .get_block_dag_info()
-        .await
-        .expect("get dag info");
+    let (block_count, daa_score, difficulty) =
+        client.get_block_dag_info().await.expect("get dag info");
     println!("[K-RWA] Block count: {}", block_count);
     println!("[K-RWA] DAA score: {}", daa_score);
     println!("[K-RWA] Difficulty: {:.2}", difficulty);
@@ -57,12 +54,15 @@ async fn test_live_wallet_balance() {
     assert!(addr.starts_with("kaspatest:"), "Should be testnet address");
 
     // Connect and query balance (will be 0 for fresh wallet)
-    let client = KaspaClient::new("ws://127.0.0.1:17210")
-        .expect("create client");
+    let client = KaspaClient::new("ws://127.0.0.1:17210").expect("create client");
     client.connect().await.expect("connect");
 
     let balance = client.get_balance(&addr).await.expect("get balance");
-    println!("[K-RWA] Balance: {} sompis ({:.4} KAS)", balance, balance as f64 / 1e8);
+    println!(
+        "[K-RWA] Balance: {} sompis ({:.4} KAS)",
+        balance,
+        balance as f64 / 1e8
+    );
 
     let utxos = client.get_utxos(&addr).await.expect("get utxos");
     println!("[K-RWA] UTXOs: {}", utxos.len());

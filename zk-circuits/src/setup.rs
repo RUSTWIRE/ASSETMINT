@@ -55,8 +55,9 @@ pub fn run_trusted_setup(tree_depth: usize, keys_dir: &str) -> Result<SetupKeys,
     let start = std::time::Instant::now();
 
     let (pk, vk): (ProvingKey<Bn254>, VerifyingKey<Bn254>) =
-        Groth16::<Bn254>::circuit_specific_setup(circuit, &mut rng)
-            .map_err(|e: ark_relations::r1cs::SynthesisError| SetupError::SetupFailed(e.to_string()))?;
+        Groth16::<Bn254>::circuit_specific_setup(circuit, &mut rng).map_err(
+            |e: ark_relations::r1cs::SynthesisError| SetupError::SetupFailed(e.to_string()),
+        )?;
 
     let elapsed = start.elapsed();
     info!("{} Setup complete in {:?}", LOG_PREFIX, elapsed);
@@ -67,8 +68,9 @@ pub fn run_trusted_setup(tree_depth: usize, keys_dir: &str) -> Result<SetupKeys,
     // Serialize proving key
     let pk_path = format!("{}/kyc_proving.key", keys_dir);
     let mut pk_bytes: Vec<u8> = Vec::new();
-    CanonicalSerialize::serialize_compressed(&pk, &mut pk_bytes)
-        .map_err(|e: ark_serialize::SerializationError| SetupError::SerializationFailed(e.to_string()))?;
+    CanonicalSerialize::serialize_compressed(&pk, &mut pk_bytes).map_err(
+        |e: ark_serialize::SerializationError| SetupError::SerializationFailed(e.to_string()),
+    )?;
     std::fs::write(&pk_path, &pk_bytes)?;
     info!(
         "{} Proving key saved: {} ({} bytes)",
@@ -80,8 +82,9 @@ pub fn run_trusted_setup(tree_depth: usize, keys_dir: &str) -> Result<SetupKeys,
     // Serialize verification key
     let vk_path = format!("{}/kyc_verification.key", keys_dir);
     let mut vk_bytes: Vec<u8> = Vec::new();
-    CanonicalSerialize::serialize_compressed(&vk, &mut vk_bytes)
-        .map_err(|e: ark_serialize::SerializationError| SetupError::SerializationFailed(e.to_string()))?;
+    CanonicalSerialize::serialize_compressed(&vk, &mut vk_bytes).map_err(
+        |e: ark_serialize::SerializationError| SetupError::SerializationFailed(e.to_string()),
+    )?;
     std::fs::write(&vk_path, &vk_bytes)?;
     info!(
         "{} Verification key saved: {} ({} bytes)",
@@ -100,7 +103,10 @@ pub fn run_trusted_setup(tree_depth: usize, keys_dir: &str) -> Result<SetupKeys,
 ///
 /// Same pattern as `run_trusted_setup` but uses `RecursiveKycCircuit::new_empty`.
 /// Saves keys as `recursive_kyc_proving.key` and `recursive_kyc_verification.key`.
-pub fn run_recursive_trusted_setup(tree_depth: usize, keys_dir: &str) -> Result<SetupKeys, SetupError> {
+pub fn run_recursive_trusted_setup(
+    tree_depth: usize,
+    keys_dir: &str,
+) -> Result<SetupKeys, SetupError> {
     info!(
         "{} Running recursive Groth16 trusted setup (tree_depth={}, output={})",
         LOG_PREFIX, tree_depth, keys_dir
@@ -115,8 +121,9 @@ pub fn run_recursive_trusted_setup(tree_depth: usize, keys_dir: &str) -> Result<
     let start = std::time::Instant::now();
 
     let (pk, vk): (ProvingKey<Bn254>, VerifyingKey<Bn254>) =
-        Groth16::<Bn254>::circuit_specific_setup(circuit, &mut rng)
-            .map_err(|e: ark_relations::r1cs::SynthesisError| SetupError::SetupFailed(e.to_string()))?;
+        Groth16::<Bn254>::circuit_specific_setup(circuit, &mut rng).map_err(
+            |e: ark_relations::r1cs::SynthesisError| SetupError::SetupFailed(e.to_string()),
+        )?;
 
     let elapsed = start.elapsed();
     info!("{} Recursive setup complete in {:?}", LOG_PREFIX, elapsed);
@@ -127,8 +134,9 @@ pub fn run_recursive_trusted_setup(tree_depth: usize, keys_dir: &str) -> Result<
     // Serialize proving key
     let pk_path = format!("{}/recursive_kyc_proving.key", keys_dir);
     let mut pk_bytes: Vec<u8> = Vec::new();
-    CanonicalSerialize::serialize_compressed(&pk, &mut pk_bytes)
-        .map_err(|e: ark_serialize::SerializationError| SetupError::SerializationFailed(e.to_string()))?;
+    CanonicalSerialize::serialize_compressed(&pk, &mut pk_bytes).map_err(
+        |e: ark_serialize::SerializationError| SetupError::SerializationFailed(e.to_string()),
+    )?;
     std::fs::write(&pk_path, &pk_bytes)?;
     info!(
         "{} Recursive proving key saved: {} ({} bytes)",
@@ -140,8 +148,9 @@ pub fn run_recursive_trusted_setup(tree_depth: usize, keys_dir: &str) -> Result<
     // Serialize verification key
     let vk_path = format!("{}/recursive_kyc_verification.key", keys_dir);
     let mut vk_bytes: Vec<u8> = Vec::new();
-    CanonicalSerialize::serialize_compressed(&vk, &mut vk_bytes)
-        .map_err(|e: ark_serialize::SerializationError| SetupError::SerializationFailed(e.to_string()))?;
+    CanonicalSerialize::serialize_compressed(&vk, &mut vk_bytes).map_err(
+        |e: ark_serialize::SerializationError| SetupError::SerializationFailed(e.to_string()),
+    )?;
     std::fs::write(&vk_path, &vk_bytes)?;
     info!(
         "{} Recursive verification key saved: {} ({} bytes)",

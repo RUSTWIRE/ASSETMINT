@@ -33,13 +33,7 @@ fn compliance_evaluation(c: &mut Criterion) {
 
     c.bench_function("evaluate_transfer (default KYC rules)", |b| {
         b.iter(|| {
-            let result = engine.evaluate_transfer(
-                &sender,
-                &receiver,
-                "KPROP-NYC-BENCH",
-                10_000,
-                0,
-            );
+            let result = engine.evaluate_transfer(&sender, &receiver, "KPROP-NYC-BENCH", 10_000, 0);
             assert!(result.allowed);
         });
     });

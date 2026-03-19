@@ -27,7 +27,13 @@ async fn test_execute_simple_spend_covenant() {
     let deployer = Wallet::generate().unwrap();
     println!("[K-RWA] Funding deployer from Bob (2 KAS)...");
     let fund_tx = client
-        .send_kas(&owner_addr, &deployer.address_string(), 200_000_000, alice.keypair(), None)
+        .send_kas(
+            &owner_addr,
+            &deployer.address_string(),
+            200_000_000,
+            alice.keypair(),
+            None,
+        )
         .await
         .unwrap();
     println!("[K-RWA] Funded deployer: TX {}", fund_tx);
@@ -35,10 +41,18 @@ async fn test_execute_simple_spend_covenant() {
 
     // Step 3: Deploy simple-spend covenant (compiled with Bob's blake2b key hash)
     let contract = load_contract_json("../../contracts/silverscript/simple-spend.json").unwrap();
-    println!("[K-RWA] Deploying SimpleSpend ({} bytes)...", contract.redeem_script.len());
+    println!(
+        "[K-RWA] Deploying SimpleSpend ({} bytes)...",
+        contract.redeem_script.len()
+    );
 
     let deploy_tx = client
-        .deploy_contract(&deployer.address_string(), &contract, 100_000_000, deployer.keypair())
+        .deploy_contract(
+            &deployer.address_string(),
+            &contract,
+            100_000_000,
+            deployer.keypair(),
+        )
         .await
         .unwrap();
     println!("[K-RWA] SimpleSpend DEPLOYED: TX {}", deploy_tx);
@@ -55,13 +69,16 @@ async fn test_execute_simple_spend_covenant() {
 
     let (owner_xonly, _) = owner.keypair().x_only_public_key();
     let recipient = Wallet::generate().unwrap();
-    println!("[K-RWA] Invoking spend() → recipient {}", recipient.address_string());
+    println!(
+        "[K-RWA] Invoking spend() → recipient {}",
+        recipient.address_string()
+    );
 
     // Try with selector 0 + sig placeholder + pubkey
     let witness = vec![
-        vec![0x00],                              // selector 0 = spend
-        vec![],                                   // sig placeholder
-        owner_xonly.serialize().to_vec(),          // ownerPk (32 bytes)
+        vec![0x00],                       // selector 0 = spend
+        vec![],                           // sig placeholder
+        owner_xonly.serialize().to_vec(), // ownerPk (32 bytes)
     ];
 
     match client
@@ -89,9 +106,9 @@ async fn test_execute_simple_spend_covenant() {
             if err.contains("Number too big") || err.contains("signature") {
                 println!("[K-RWA] Trying reversed witness order...");
                 let witness2 = vec![
-                    vec![0x00],                              // selector
-                    owner_xonly.serialize().to_vec(),          // ownerPk first
-                    vec![],                                   // sig placeholder second
+                    vec![0x00],                       // selector
+                    owner_xonly.serialize().to_vec(), // ownerPk first
+                    vec![],                           // sig placeholder second
                 ];
                 match client
                     .spend_contract(
@@ -116,8 +133,8 @@ async fn test_execute_simple_spend_covenant() {
                         // Try without selector (without_selector might be true for simple contracts)
                         println!("[K-RWA] Trying without selector...");
                         let witness3 = vec![
-                            vec![],                                   // sig placeholder
-                            owner_xonly.serialize().to_vec(),          // ownerPk
+                            vec![],                           // sig placeholder
+                            owner_xonly.serialize().to_vec(), // ownerPk
                         ];
                         match client
                             .spend_contract(

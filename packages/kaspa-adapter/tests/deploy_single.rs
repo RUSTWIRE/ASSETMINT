@@ -29,8 +29,12 @@ async fn deploy_one(contract_path: &str, private_key: &str, amount_offset: u64) 
     let contract = load_contract_json(contract_path)
         .unwrap_or_else(|e| panic!("Failed to load {}: {}", contract_path, e));
 
-    println!("[K-RWA] Deploying {} ({} bytes) from {}",
-        contract.contract_name, contract.redeem_script.len(), addr);
+    println!(
+        "[K-RWA] Deploying {} ({} bytes) from {}",
+        contract.contract_name,
+        contract.redeem_script.len(),
+        addr
+    );
     println!("[K-RWA] P2SH address: {}", contract.p2sh_address);
 
     // Use slightly different amounts to avoid duplicate TX IDs
@@ -56,7 +60,10 @@ async fn deploy_one(contract_path: &str, private_key: &str, amount_offset: u64) 
             Err(e) => {
                 last_err = format!("{}", e);
                 if last_err.contains("already spent") || last_err.contains("mempool") {
-                    println!("[K-RWA]  Attempt {}/10 — UTXO conflict, waiting 3s...", attempt + 1);
+                    println!(
+                        "[K-RWA]  Attempt {}/10 — UTXO conflict, waiting 3s...",
+                        attempt + 1
+                    );
                     tokio::time::sleep(std::time::Duration::from_secs(3)).await;
                     continue;
                 } else if last_err.contains("already in the mempool") {
@@ -71,7 +78,10 @@ async fn deploy_one(contract_path: &str, private_key: &str, amount_offset: u64) 
     }
 
     client.disconnect().await.ok();
-    panic!("Deploy {} failed after retries: {}", contract.contract_name, last_err);
+    panic!(
+        "Deploy {} failed after retries: {}",
+        contract.contract_name, last_err
+    );
 }
 
 #[tokio::test]
@@ -81,12 +91,22 @@ async fn test_deploy_rwa_core() {
 
 #[tokio::test]
 async fn test_deploy_state_verity() {
-    deploy_one("../../contracts/silverscript/state-verity.json", BOB_KEY, 1000).await;
+    deploy_one(
+        "../../contracts/silverscript/state-verity.json",
+        BOB_KEY,
+        1000,
+    )
+    .await;
 }
 
 #[tokio::test]
 async fn test_deploy_zkkyc_verifier() {
-    deploy_one("../../contracts/silverscript/zkkyc-verifier.json", BOB_KEY, 2000).await;
+    deploy_one(
+        "../../contracts/silverscript/zkkyc-verifier.json",
+        BOB_KEY,
+        2000,
+    )
+    .await;
 }
 
 #[tokio::test]

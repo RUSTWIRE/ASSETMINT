@@ -1,9 +1,9 @@
 <!-- DISCLAIMER: Technical demo code -->
 <!-- SPDX-License-Identifier: MIT -->
 
-# Deployed SilverScript Covenant Contracts
+# Deployed Covenant Contracts
 
-All seven contracts are deployed on **Kaspa Testnet-12** as P2SH scripts compiled from SilverScript (`.sil`) source files. Each contract uses KIP-10 introspection opcodes for covenant enforcement.
+Eight contracts are deployed on **Kaspa Testnet-12**: 7 SilverScript contracts compiled from `.sil` source files, plus 1 clawback covenant built via `covenant_builder.rs`. Three covenant executions have been proven on TN12 (CHECKSIG, compliance, clawback).
 
 Source: [`apps/dashboard-fe/src/lib/contracts.ts`](../apps/dashboard-fe/src/lib/contracts.ts)
 
@@ -39,7 +39,7 @@ The primary transfer guard for RWA tokens. Transfers require a valid ZK-KYC proo
 
 ## 3. StateVerity
 
-Manages on-chain state for an RWA asset. Holds references to the DKG Universal Asset Locator (UAL), the current oracle price attestation hash, and the compliance Merkle root. State transitions must be oracle-attested and signed by the state manager.
+Manages on-chain state for an RWA asset. Holds references to the sovereign metadata UAL, the current oracle price attestation hash, and the compliance Merkle root. State transitions must be oracle-attested and signed by the state manager.
 
 | Field | Value |
 |-------|-------|
@@ -104,3 +104,36 @@ Proportional dividend distribution via Merkle holder tree. The issuer funds the 
 | P2SH Address | `kaspatest:prrf9w05fgvpq8k40t24pdcst0r99504fq50uma0q233a2fh8kln2gxllvp6p` |
 | Entrypoints | `claimDividend`, `issuerTopUp`, `issuerReclaim` |
 | Source | [`contracts/silverscript/dividend.sil`](../contracts/silverscript/dividend.sil) |
+
+---
+
+## 8. Clawback Covenant (Covenant Builder)
+
+A clawback covenant deployed via `covenant_builder.rs` rather than SilverScript. This is a direct P2SH covenant that enforces issuer-controlled asset recovery. Distinct from the SilverScript `clawback.sil` contract above -- this uses the Rust covenant builder patterns.
+
+| Field | Value |
+|-------|-------|
+| Deploy TX | `f64733cc75743e341ee0d3ddc52c44f62161061bd8d5d71ff4e9c46c457612be` |
+| Builder | `packages/kaspa-adapter/src/covenant_builder.rs` |
+| Pattern | Clawback covenant with CHECKSIG |
+
+---
+
+## Proven Covenant Executions
+
+Three covenant patterns have been deployed AND spent on TN12, proving that covenant enforcement works end-to-end:
+
+| Pattern | Deploy TX | Spend TX | Description |
+|---------|-----------|----------|-------------|
+| CHECKSIG | `5139f1fd` | `ccfdab27` | Basic P2SH with Schnorr signature verification |
+| Compliance | `6c1fee2b` | `d0bcf48c` | CHECKSIG + KIP-10 value conservation (42-byte script) |
+| Clawback | `f64733cc` | -- | Issuer-controlled clawback covenant |
+
+### Staking Timelock Covenant
+
+| Field | Value |
+|-------|-------|
+| TX | `7554b507d7bc0a2f83c5691a5224922f884c08987bdbeb9e5309054ad48604a4` |
+| P2SH | `kaspatest:ppc5nvww9rhd58fkll53x5g7npdjv4vnp3s4cadv08st3yy93hpgvstmm6z2k` |
+| Script | 47 bytes (CHECKSIG + CHECKLOCKTIMEVERIFY, 1-hour timelock) |
+| Source | `tokenomics/src/on_chain.rs` |

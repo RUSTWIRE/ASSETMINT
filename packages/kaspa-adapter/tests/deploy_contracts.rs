@@ -32,11 +32,18 @@ async fn test_deploy_clawback_contract() {
     let contract = load_contract_json("../../contracts/silverscript/clawback.json")
         .expect("Failed to load clawback contract");
     println!("[K-RWA] Contract: {}", contract.contract_name);
-    println!("[K-RWA] Redeem script: {} bytes", contract.redeem_script.len());
+    println!(
+        "[K-RWA] Redeem script: {} bytes",
+        contract.redeem_script.len()
+    );
     println!("[K-RWA] P2SH address: {}", contract.p2sh_address);
     println!("[K-RWA] Entrypoints:");
     for f in &contract.abi {
-        let params: Vec<String> = f.inputs.iter().map(|i| format!("{}: {}", i.name, i.type_name)).collect();
+        let params: Vec<String> = f
+            .inputs
+            .iter()
+            .map(|i| format!("{}: {}", i.name, i.type_name))
+            .collect();
         println!("[K-RWA]   - {}({})", f.name, params.join(", "));
     }
 
@@ -50,7 +57,11 @@ async fn test_deploy_clawback_contract() {
     println!("[K-RWA]  CLAWBACK CONTRACT DEPLOYED!");
     println!("[K-RWA]  TX ID:   {}", tx_id);
     println!("[K-RWA]  P2SH:    {}", contract.p2sh_address);
-    println!("[K-RWA]  Funding: {} sompis ({:.4} KAS)", DEPLOY_AMOUNT, DEPLOY_AMOUNT as f64 / 1e8);
+    println!(
+        "[K-RWA]  Funding: {} sompis ({:.4} KAS)",
+        DEPLOY_AMOUNT,
+        DEPLOY_AMOUNT as f64 / 1e8
+    );
     println!("[K-RWA] ========================================");
 
     client.disconnect().await.expect("Failed to disconnect");
@@ -68,8 +79,12 @@ async fn test_deploy_rwa_core_contract() {
 
     let contract = load_contract_json("../../contracts/silverscript/rwa-core.json")
         .expect("Failed to load rwa-core contract");
-    println!("[K-RWA] Contract: {} ({} bytes, {} entrypoints)",
-        contract.contract_name, contract.redeem_script.len(), contract.abi.len());
+    println!(
+        "[K-RWA] Contract: {} ({} bytes, {} entrypoints)",
+        contract.contract_name,
+        contract.redeem_script.len(),
+        contract.abi.len()
+    );
     println!("[K-RWA] P2SH: {}", contract.p2sh_address);
 
     let tx_id = client
@@ -96,9 +111,15 @@ async fn test_deploy_all_contracts() {
     let issuer = Wallet::from_hex(ISSUER_KEY).expect("Failed to load issuer wallet");
     let issuer_addr = issuer.address_string();
 
-    let balance = client.get_balance(&issuer_addr).await.expect("Balance query failed");
+    let balance = client
+        .get_balance(&issuer_addr)
+        .await
+        .expect("Balance query failed");
     println!("[K-RWA] Issuer balance: {:.4} KAS", balance as f64 / 1e8);
-    assert!(balance > 5 * DEPLOY_AMOUNT + 500_000, "Need at least 0.055 KAS for 5 deployments");
+    assert!(
+        balance > 5 * DEPLOY_AMOUNT + 500_000,
+        "Need at least 0.055 KAS for 5 deployments"
+    );
 
     let contracts = [
         "../../contracts/silverscript/clawback.json",
@@ -110,8 +131,8 @@ async fn test_deploy_all_contracts() {
 
     println!("[K-RWA] ========================================");
     for (i, path) in contracts.iter().enumerate() {
-        let contract = load_contract_json(path)
-            .unwrap_or_else(|e| panic!("Failed to load {}: {}", path, e));
+        let contract =
+            load_contract_json(path).unwrap_or_else(|e| panic!("Failed to load {}: {}", path, e));
 
         // Use slightly different amounts to avoid duplicate TX IDs
         let amount = DEPLOY_AMOUNT + (i as u64 * 1000);
@@ -131,15 +152,27 @@ async fn test_deploy_all_contracts() {
                 Err(e) => {
                     let err_str = format!("{}", e);
                     if err_str.contains("already in the mempool") {
-                        println!("[K-RWA]  {} — already in mempool (previously deployed)", contract.contract_name);
+                        println!(
+                            "[K-RWA]  {} — already in mempool (previously deployed)",
+                            contract.contract_name
+                        );
                         tx_id = "(already deployed)".to_string();
                         break;
                     } else if err_str.contains("already spent") && attempt < 4 {
-                        println!("[K-RWA]  {} — UTXO conflict, waiting 5s (attempt {}/5)...", contract.contract_name, attempt + 1);
+                        println!(
+                            "[K-RWA]  {} — UTXO conflict, waiting 5s (attempt {}/5)...",
+                            contract.contract_name,
+                            attempt + 1
+                        );
                         tokio::time::sleep(std::time::Duration::from_secs(5)).await;
                         continue;
                     } else {
-                        panic!("Deploy {} failed after {} attempts: {}", contract.contract_name, attempt + 1, e);
+                        panic!(
+                            "Deploy {} failed after {} attempts: {}",
+                            contract.contract_name,
+                            attempt + 1,
+                            e
+                        );
                     }
                 }
             }

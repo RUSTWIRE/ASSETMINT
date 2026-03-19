@@ -16,15 +16,15 @@
 //! - `zk_verifier` — Groth16 proof verification
 //! - `api` — Axum REST API endpoints
 
-pub mod identity;
-pub mod claims;
-pub mod rules;
-pub mod merkle;
-pub mod zk_prover;
-pub mod zk_verifier;
 pub mod api;
 pub mod auth;
+pub mod claims;
+pub mod identity;
+pub mod merkle;
 pub mod rate_limit;
+pub mod rules;
+pub mod zk_prover;
+pub mod zk_verifier;
 
 /// Log prefix for all AssetMint compliance operations
 pub const LOG_PREFIX: &str = "[K-RWA]";

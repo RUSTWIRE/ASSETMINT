@@ -9,10 +9,8 @@
 //! Public inputs: merkle_root, nullifier_hash
 //! Private inputs: secret_key, merkle_path, path_indices
 
+use ark_bn254::Fr;
 use ark_ff::PrimeField;
-use ark_relations::r1cs::{
-    ConstraintSynthesizer, ConstraintSystemRef, SynthesisError,
-};
 use ark_r1cs_std::{
     alloc::AllocVar,
     boolean::Boolean,
@@ -20,7 +18,7 @@ use ark_r1cs_std::{
     fields::{fp::FpVar, FieldVar},
     select::CondSelectGadget,
 };
-use ark_bn254::Fr;
+use ark_relations::r1cs::{ConstraintSynthesizer, ConstraintSystemRef, SynthesisError};
 use tracing::info;
 
 use crate::LOG_PREFIX;
@@ -52,7 +50,10 @@ pub struct KycCircuit<F: PrimeField> {
 impl<F: PrimeField> KycCircuit<F> {
     /// Create a new empty KYC circuit for setup (no witness values)
     pub fn new_empty(tree_depth: usize) -> Self {
-        info!("{} Creating empty KYC circuit (depth={})", LOG_PREFIX, tree_depth);
+        info!(
+            "{} Creating empty KYC circuit (depth={})",
+            LOG_PREFIX, tree_depth
+        );
         Self {
             merkle_root: None,
             nullifier_hash: None,
@@ -74,7 +75,10 @@ impl<F: PrimeField> KycCircuit<F> {
     ) -> Self {
         assert_eq!(merkle_path.len(), tree_depth);
         assert_eq!(path_indices.len(), tree_depth);
-        info!("{} Creating KYC circuit with witness (depth={})", LOG_PREFIX, tree_depth);
+        info!(
+            "{} Creating KYC circuit with witness (depth={})",
+            LOG_PREFIX, tree_depth
+        );
         Self {
             merkle_root: Some(merkle_root),
             nullifier_hash: Some(nullifier_hash),
@@ -92,7 +96,7 @@ const MIMC_ROUNDS: usize = 80;
 /// MiMC round constants derived from SHA-256("assetmint_mimc_round_X") — NUMS construction.
 /// Nothing-up-my-sleeve: anyone can recompute these from the domain string.
 fn mimc_round_constants<F: PrimeField>() -> Vec<F> {
-    use sha2::{Sha256, Digest};
+    use sha2::{Digest, Sha256};
     (0..MIMC_ROUNDS)
         .map(|i| {
             let mut hasher = Sha256::new();
@@ -156,7 +160,10 @@ fn compute_nullifier<F: PrimeField>(
 
 impl ConstraintSynthesizer<Fr> for KycCircuit<Fr> {
     fn generate_constraints(self, cs: ConstraintSystemRef<Fr>) -> Result<(), SynthesisError> {
-        info!("{} Generating R1CS constraints for KYC circuit (depth={})", LOG_PREFIX, self.tree_depth);
+        info!(
+            "{} Generating R1CS constraints for KYC circuit (depth={})",
+            LOG_PREFIX, self.tree_depth
+        );
 
         // 1. Allocate public inputs
         let root_var = FpVar::new_input(cs.clone(), || {
@@ -246,7 +253,10 @@ pub struct RecursiveKycCircuit<F: PrimeField> {
 impl<F: PrimeField> RecursiveKycCircuit<F> {
     /// Create a new empty recursive KYC circuit for setup (all None)
     pub fn new_empty(tree_depth: usize) -> Self {
-        info!("{} Creating empty recursive KYC circuit (depth={})", LOG_PREFIX, tree_depth);
+        info!(
+            "{} Creating empty recursive KYC circuit (depth={})",
+            LOG_PREFIX, tree_depth
+        );
         Self {
             merkle_root: None,
             nullifier_hash: None,
@@ -271,7 +281,10 @@ impl<F: PrimeField> RecursiveKycCircuit<F> {
     ) -> Self {
         assert_eq!(merkle_path.len(), tree_depth);
         assert_eq!(path_indices.len(), tree_depth);
-        info!("{} Creating first recursive KYC proof (depth={})", LOG_PREFIX, tree_depth);
+        info!(
+            "{} Creating first recursive KYC proof (depth={})",
+            LOG_PREFIX, tree_depth
+        );
         Self {
             merkle_root: Some(merkle_root),
             nullifier_hash: Some(nullifier_hash),
@@ -338,7 +351,8 @@ impl ConstraintSynthesizer<Fr> for RecursiveKycCircuit<Fr> {
 
         // 3. Allocate public input: previous_merkle_root
         let _previous_root_var = FpVar::new_input(cs.clone(), || {
-            self.previous_merkle_root.ok_or(SynthesisError::AssignmentMissing)
+            self.previous_merkle_root
+                .ok_or(SynthesisError::AssignmentMissing)
         })?;
 
         // 4. Allocate public input: chain_depth
@@ -369,7 +383,8 @@ impl ConstraintSynthesizer<Fr> for RecursiveKycCircuit<Fr> {
         }
 
         let previous_valid_var = Boolean::new_witness(cs.clone(), || {
-            self.previous_proof_valid.ok_or(SynthesisError::AssignmentMissing)
+            self.previous_proof_valid
+                .ok_or(SynthesisError::AssignmentMissing)
         })?;
 
         // === Merkle path constraints (same as KycCircuit) ===
@@ -497,23 +512,13 @@ mod tests {
         let leaf = native_leaf_hash(secret);
         let nullifier = native_nullifier(secret);
 
-        let leaves = vec![
-            Fr::from(100u64),
-            leaf,
-            Fr::from(200u64),
-            Fr::from(300u64),
-        ];
+        let leaves = vec![Fr::from(100u64), leaf, Fr::from(200u64), Fr::from(300u64)];
         let target_index = 1;
 
         let (root, path, indices) = build_merkle_tree(&leaves, target_index);
 
         let circuit = KycCircuit::new_with_witness(
-            root,
-            nullifier,
-            secret,
-            path,
-            indices,
-            2, // depth = log2(4) = 2
+            root, nullifier, secret, path, indices, 2, // depth = log2(4) = 2
         );
 
         let cs = ConstraintSystem::<Fr>::new_ref();
@@ -535,26 +540,30 @@ mod tests {
         let leaves = vec![leaf, Fr::from(100u64), Fr::from(200u64), Fr::from(300u64)];
         let (root, path, indices) = build_merkle_tree(&leaves, 0);
 
-        let circuit = KycCircuit::new_with_witness(
-            root,
-            nullifier,
-            wrong_secret,
-            path,
-            indices,
-            2,
-        );
+        let circuit = KycCircuit::new_with_witness(root, nullifier, wrong_secret, path, indices, 2);
 
         let cs = ConstraintSystem::<Fr>::new_ref();
         circuit.generate_constraints(cs.clone()).unwrap();
-        assert!(!cs.is_satisfied().unwrap(), "Circuit should NOT be satisfied with wrong secret");
+        assert!(
+            !cs.is_satisfied().unwrap(),
+            "Circuit should NOT be satisfied with wrong secret"
+        );
     }
 
     #[test]
     fn test_native_merkle_tree() {
-        let leaves = vec![Fr::from(1u64), Fr::from(2u64), Fr::from(3u64), Fr::from(4u64)];
+        let leaves = vec![
+            Fr::from(1u64),
+            Fr::from(2u64),
+            Fr::from(3u64),
+            Fr::from(4u64),
+        ];
         let (root1, _, _) = build_merkle_tree(&leaves, 0);
         let (root2, _, _) = build_merkle_tree(&leaves, 1);
-        assert_eq!(root1, root2, "Same tree should give same root regardless of target");
+        assert_eq!(
+            root1, root2,
+            "Same tree should give same root regardless of target"
+        );
     }
 
     // --- Recursive circuit tests ---
@@ -564,12 +573,7 @@ mod tests {
         let secret = Fr::from(42u64);
         let leaf = native_leaf_hash(secret);
         let nullifier = native_nullifier(secret);
-        let leaves = vec![
-            Fr::from(100u64),
-            leaf,
-            Fr::from(200u64),
-            Fr::from(300u64),
-        ];
+        let leaves = vec![Fr::from(100u64), leaf, Fr::from(200u64), Fr::from(300u64)];
         let (root, path, indices) = build_merkle_tree(&leaves, 1);
         (root, nullifier, secret, path, indices, root)
     }
@@ -579,9 +583,8 @@ mod tests {
         // chain_depth=0, no previous proof required — should be satisfiable
         let (root, nullifier, secret, path, indices, _) = build_recursive_test_witness();
 
-        let circuit = RecursiveKycCircuit::new_first_proof(
-            root, nullifier, secret, path, indices, 2,
-        );
+        let circuit =
+            RecursiveKycCircuit::new_first_proof(root, nullifier, secret, path, indices, 2);
 
         let cs = ConstraintSystem::<Fr>::new_ref();
         circuit.generate_constraints(cs.clone()).unwrap();
@@ -608,7 +611,7 @@ mod tests {
             path,
             indices,
             2,
-            true,           // previous proof was valid
+            true, // previous proof was valid
             previous_root,
             Fr::from(1u64), // chain_depth = 1
         );
@@ -638,7 +641,7 @@ mod tests {
             path,
             indices,
             2,
-            false,          // previous proof was INVALID
+            false, // previous proof was INVALID
             previous_root,
             Fr::from(1u64), // chain_depth = 1
         );

@@ -195,8 +195,7 @@ impl ComplianceEngine {
     /// Add a single rule as an AND requirement
     pub fn add_rule(&mut self, rule: ComplianceRule) {
         info!("{} Adding compliance rule: {:?}", LOG_PREFIX, rule);
-        self.requirements
-            .push(RequirementGroup::All(vec![rule]));
+        self.requirements.push(RequirementGroup::All(vec![rule]));
     }
 
     /// Evaluate whether a transfer is allowed.
@@ -227,7 +226,9 @@ impl ComplianceEngine {
                 RequirementGroup::All(rules) => {
                     for rule in rules {
                         rules_count += 1;
-                        if let Some(v) = evaluate_rule(rule, sender, receiver, amount, mint_timestamp, now) {
+                        if let Some(v) =
+                            evaluate_rule(rule, sender, receiver, amount, mint_timestamp, now)
+                        {
                             violations.push(v);
                         }
                     }
@@ -272,9 +273,10 @@ fn evaluate_rule(
 ) -> Option<String> {
     match rule {
         ComplianceRule::SenderMustHaveClaim(claim_type) => {
-            let has = sender.claims.iter().any(|c| {
-                c.claim_type == *claim_type && (c.expiry == 0 || c.expiry > now)
-            });
+            let has = sender
+                .claims
+                .iter()
+                .any(|c| c.claim_type == *claim_type && (c.expiry == 0 || c.expiry > now));
             if !has {
                 Some(format!(
                     "Sender {} missing required claim: {:?}",
@@ -285,9 +287,10 @@ fn evaluate_rule(
             }
         }
         ComplianceRule::ReceiverMustHaveClaim(claim_type) => {
-            let has = receiver.claims.iter().any(|c| {
-                c.claim_type == *claim_type && (c.expiry == 0 || c.expiry > now)
-            });
+            let has = receiver
+                .claims
+                .iter()
+                .any(|c| c.claim_type == *claim_type && (c.expiry == 0 || c.expiry > now));
             if !has {
                 Some(format!(
                     "Receiver {} missing required claim: {:?}",
@@ -311,10 +314,7 @@ fn evaluate_rule(
             for claim in &receiver.claims {
                 if let ClaimType::JurisdictionAllowed(jurisdiction) = &claim.claim_type {
                     if blocked.contains(jurisdiction) {
-                        return Some(format!(
-                            "Receiver jurisdiction {} is blocked",
-                            jurisdiction
-                        ));
+                        return Some(format!("Receiver jurisdiction {} is blocked", jurisdiction));
                     }
                 }
             }
@@ -375,9 +375,7 @@ fn evaluate_rule(
                 c.claim_type == ClaimType::ExemptedEntity && (c.expiry == 0 || c.expiry > now)
             });
             if !sender_exempted {
-                Some(
-                    "MiCA: Sender must be an exempted entity (prospectus filed)".to_string(),
-                )
+                Some("MiCA: Sender must be an exempted entity (prospectus filed)".to_string())
             } else {
                 None
             }
@@ -516,13 +514,8 @@ mod tests {
         assert!(!result.allowed);
 
         // Minted 2 days ago — hold period met
-        let result = engine.evaluate_transfer(
-            &sender,
-            &receiver,
-            "KPROP-NYC-TEST",
-            1000,
-            now - 172800,
-        );
+        let result =
+            engine.evaluate_transfer(&sender, &receiver, "KPROP-NYC-TEST", 1000, now - 172800);
         assert!(result.allowed);
     }
 
@@ -582,14 +575,8 @@ mod tests {
         engine.add_rule(ComplianceRule::RegDAccreditedOnly);
 
         // Both accredited → pass
-        let sender = make_identity(
-            "did:kaspa:alice",
-            vec![accredited_claim("did:kaspa:alice")],
-        );
-        let receiver = make_identity(
-            "did:kaspa:bob",
-            vec![accredited_claim("did:kaspa:bob")],
-        );
+        let sender = make_identity("did:kaspa:alice", vec![accredited_claim("did:kaspa:alice")]);
+        let receiver = make_identity("did:kaspa:bob", vec![accredited_claim("did:kaspa:bob")]);
         let result = engine.evaluate_transfer(&sender, &receiver, "KPROP-NYC-TEST", 1000, 0);
         assert!(result.allowed);
 
@@ -665,10 +652,7 @@ mod tests {
         let receiver = make_identity("did:kaspa:bob", vec![]);
 
         // Exempted entity sender → pass
-        let sender_ok = make_identity(
-            "did:kaspa:issuer",
-            vec![exempted_claim("did:kaspa:issuer")],
-        );
+        let sender_ok = make_identity("did:kaspa:issuer", vec![exempted_claim("did:kaspa:issuer")]);
         let result = engine.evaluate_transfer(&sender_ok, &receiver, "KPROP-NYC-TEST", 1000, 0);
         assert!(result.allowed);
 
@@ -698,12 +682,9 @@ mod tests {
         assert!(result.allowed);
 
         // Accredited but not SG → fail
-        let receiver_no_sg = make_identity(
-            "did:kaspa:bob",
-            vec![accredited_claim("did:kaspa:bob")],
-        );
-        let result =
-            engine.evaluate_transfer(&sender, &receiver_no_sg, "KPROP-NYC-TEST", 1000, 0);
+        let receiver_no_sg =
+            make_identity("did:kaspa:bob", vec![accredited_claim("did:kaspa:bob")]);
+        let result = engine.evaluate_transfer(&sender, &receiver_no_sg, "KPROP-NYC-TEST", 1000, 0);
         assert!(!result.allowed);
 
         // SG but not accredited → fail
@@ -711,8 +692,7 @@ mod tests {
             "did:kaspa:bob",
             vec![jurisdiction_claim("did:kaspa:bob", "SG")],
         );
-        let result =
-            engine.evaluate_transfer(&sender, &receiver_no_acc, "KPROP-NYC-TEST", 1000, 0);
+        let result = engine.evaluate_transfer(&sender, &receiver_no_acc, "KPROP-NYC-TEST", 1000, 0);
         assert!(!result.allowed);
         assert!(result.violations[0].contains("MAS"));
     }
@@ -775,13 +755,8 @@ mod tests {
 
         // Minted too recently → fail (Rule 144 12-month hold)
         let two_months_ago = now - (2 * 30 * 86400);
-        let result = engine.evaluate_transfer(
-            &sender,
-            &receiver,
-            "KPROP-NYC-TEST",
-            1000,
-            two_months_ago,
-        );
+        let result =
+            engine.evaluate_transfer(&sender, &receiver, "KPROP-NYC-TEST", 1000, two_months_ago);
         assert!(!result.allowed);
     }
 }

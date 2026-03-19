@@ -208,7 +208,7 @@ Generate a Groth16 ZK-KYC proof that the given address is in the approved KYC se
 
 ## 9. POST /transfer
 
-Compliance-gated on-chain transfer. Evaluates rules, verifies ZK proof, then builds and broadcasts a Kaspa transaction.
+Compliance-gated on-chain transfer. Evaluates rules, verifies ZK proof, then builds and broadcasts a Kaspa transaction. Uses server-side operator key (`OPERATOR_PRIVATE_KEY` env var) -- no private keys in API requests.
 
 **Request body:**
 
@@ -216,7 +216,6 @@ Compliance-gated on-chain transfer. Evaluates rules, verifies ZK proof, then bui
 {
   "sender_did": "did:kaspa:alice",
   "receiver_did": "did:kaspa:bob",
-  "sender_private_key": "hex-encoded-32-bytes",
   "receiver_address": "kaspatest:qq...",
   "amount_sompis": 100000000,
   "asset_id": "KPROP-NYC-TEST",
@@ -337,7 +336,87 @@ All endpoints return errors in a consistent format:
 }
 ```
 
-Common HTTP status codes: 400 (bad request), 404 (identity not found), 409 (duplicate identity), 412 (precondition failed), 502 (kaspad unreachable), 503 (Kaspa client not connected).
+Common HTTP status codes: 400 (bad request), 401 (unauthorized -- missing or invalid API key), 404 (identity not found), 409 (duplicate identity), 412 (precondition failed), 429 (rate limit exceeded), 502 (kaspad unreachable), 503 (Kaspa client not connected).
+
+## Authentication
+
+Write endpoints (`POST /identity`, `POST /claim`, `POST /transfer`, `POST /audit/commit`, `POST /vc/issue`) require an API key when `API_KEY` is set.
+
+Pass the key via the `X-API-Key` header:
+
+```bash
+curl -X POST http://localhost:3001/identity \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: your-api-key" \
+  -d '{"did": "did:kaspa:alice", "primary_key": "0xabc123"}'
+```
+
+Read endpoints (`GET /health`, `GET /network`, `GET /balance`, etc.) do not require authentication.
+
+## Rate Limiting
+
+All endpoints are rate-limited to 100 requests per minute per IP address. Exceeding this limit returns HTTP 429.
+
+## Request Size Limits
+
+Request bodies are limited to 1MB.
+
+---
+
+# CLI Reference
+
+The `assetmint` CLI binary provides a command-line interface to the Compliance API. It communicates with the running Axum HTTP server.
+
+Source: [`services/assetmint-core/src/bin/cli.rs`](../services/assetmint-core/src/bin/cli.rs)
+
+## Running the CLI
+
+```bash
+# Via make
+make cli ARGS="<command>"
+
+# Via cargo
+cargo run -p assetmint-core --bin assetmint -- <command>
+```
+
+## Commands
+
+| Command | Description |
+|---------|-------------|
+| `health` | Check API health status |
+| `network` | Display Kaspa network information |
+| `identity register --did <DID> --key <HEX>` | Register a new DID identity |
+| `identity get --did <DID>` | Look up an identity by DID |
+| `claim issue --subject <DID> --type <TYPE> --expiry <UNIX>` | Issue a signed compliance claim |
+| `compliance check --sender <DID> --receiver <DID> --asset <ID> --amount <N>` | Evaluate transfer compliance |
+| `balance --address <ADDR>` | Query address balance on Kaspa |
+| `transfer --sender-did <DID> --receiver-did <DID> --receiver-address <ADDR> --amount <N> --asset <ID>` | Execute a compliant transfer |
+| `merkle-root` | Query current Merkle root |
+
+## Global Flags
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `--api-url <URL>` | Base URL of the AssetMint API server | `http://localhost:3001` |
+| `--api-key <KEY>` | API key for authenticated write endpoints | None |
+
+## Example: Full Compliance Cycle
+
+```bash
+# Register two identities
+assetmint identity register --did did:kaspa:alice --key 0xabc123
+assetmint identity register --did did:kaspa:bob --key 0xdef456
+
+# Issue KYC claims
+assetmint --api-key YOUR_KEY claim issue --subject did:kaspa:alice --type KycVerified --expiry 0
+assetmint --api-key YOUR_KEY claim issue --subject did:kaspa:bob --type KycVerified --expiry 0
+
+# Check compliance
+assetmint compliance check --sender did:kaspa:alice --receiver did:kaspa:bob --asset KPROP-NYC-TEST --amount 1000
+
+# Query Merkle root
+assetmint merkle-root
+```
 
 ---
 

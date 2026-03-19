@@ -11,8 +11,8 @@
 //! 2. Replace CentralizedOracle with DecentralizedOracle in services/oracle-pool/
 //! 3. Update min_signers() to reflect miner attestation threshold
 
-use async_trait::async_trait;
 use crate::attestation::Attestation;
+use async_trait::async_trait;
 
 /// Oracle pool interface — upgrade stub for future miner-attested oracle.
 ///
@@ -21,10 +21,16 @@ use crate::attestation::Attestation;
 #[async_trait]
 pub trait IOraclePool: Send + Sync {
     /// Get a signed price attestation for an asset
-    async fn get_attestation(&self, asset_id: &str) -> Result<Attestation, Box<dyn std::error::Error>>;
+    async fn get_attestation(
+        &self,
+        asset_id: &str,
+    ) -> Result<Attestation, Box<dyn std::error::Error>>;
 
     /// Verify an attestation has sufficient valid signatures
-    async fn verify_attestation(&self, attestation: &Attestation) -> Result<bool, Box<dyn std::error::Error>>;
+    async fn verify_attestation(
+        &self,
+        attestation: &Attestation,
+    ) -> Result<bool, Box<dyn std::error::Error>>;
 
     /// Minimum required signers
     /// Current: 2 (of 3 oracle keys)

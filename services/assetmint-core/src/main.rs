@@ -29,7 +29,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     tokio::spawn(async move {
         // Wait for the API server to start before polling it
         tokio::time::sleep(std::time::Duration::from_secs(5)).await;
-        info!("[K-RWA] Starting state-verity sync polling against {}", compliance_url);
+        info!(
+            "[K-RWA] Starting state-verity sync polling against {}",
+            compliance_url
+        );
         let mut svc = sync::state_sync::StateSyncService::new("http://localhost:8900", 30);
         let initial_state = sync::state_sync::AssetState {
             dkg_ual: "did:dkg:otp/0x1234/init".into(),

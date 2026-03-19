@@ -49,9 +49,12 @@ pub struct IdentityRegistry {
 impl IdentityRegistry {
     /// Create a new identity registry with SQLite storage
     pub fn new(db_path: &str) -> Result<Self, IdentityError> {
-        info!("{} Initializing identity registry (db={})", LOG_PREFIX, db_path);
-        let conn = Connection::open(db_path)
-            .map_err(|e| IdentityError::StorageError(e.to_string()))?;
+        info!(
+            "{} Initializing identity registry (db={})",
+            LOG_PREFIX, db_path
+        );
+        let conn =
+            Connection::open(db_path).map_err(|e| IdentityError::StorageError(e.to_string()))?;
 
         conn.execute_batch(
             "CREATE TABLE IF NOT EXISTS identities (
@@ -112,7 +115,10 @@ impl IdentityRegistry {
         }
 
         info!("{} Registering identity: {}", LOG_PREFIX, did);
-        let db = self.db.lock().map_err(|e| IdentityError::StorageError(e.to_string()))?;
+        let db = self
+            .db
+            .lock()
+            .map_err(|e| IdentityError::StorageError(e.to_string()))?;
 
         let now = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
@@ -143,7 +149,10 @@ impl IdentityRegistry {
 
     /// Get an identity by DID, including all active claims
     pub fn get(&self, did: &str) -> Result<Identity, IdentityError> {
-        let db = self.db.lock().map_err(|e| IdentityError::StorageError(e.to_string()))?;
+        let db = self
+            .db
+            .lock()
+            .map_err(|e| IdentityError::StorageError(e.to_string()))?;
 
         let mut stmt = db
             .prepare("SELECT did, primary_key, revoked, created_at FROM identities WHERE did = ?1")
@@ -194,10 +203,16 @@ impl IdentityRegistry {
     /// Revoke an identity
     pub fn revoke(&self, did: &str) -> Result<(), IdentityError> {
         info!("{} Revoking identity: {}", LOG_PREFIX, did);
-        let db = self.db.lock().map_err(|e| IdentityError::StorageError(e.to_string()))?;
+        let db = self
+            .db
+            .lock()
+            .map_err(|e| IdentityError::StorageError(e.to_string()))?;
 
         let affected = db
-            .execute("UPDATE identities SET revoked = 1 WHERE did = ?1", params![did])
+            .execute(
+                "UPDATE identities SET revoked = 1 WHERE did = ?1",
+                params![did],
+            )
             .map_err(|e| IdentityError::StorageError(e.to_string()))?;
 
         if affected == 0 {
@@ -212,7 +227,10 @@ impl IdentityRegistry {
             "{} Storing claim {:?} for {}",
             LOG_PREFIX, claim.claim_type, claim.subject_did
         );
-        let db = self.db.lock().map_err(|e| IdentityError::StorageError(e.to_string()))?;
+        let db = self
+            .db
+            .lock()
+            .map_err(|e| IdentityError::StorageError(e.to_string()))?;
 
         let (type_str, data_str) = serialize_claim_type(&claim.claim_type);
 
@@ -236,7 +254,10 @@ impl IdentityRegistry {
 
     /// Get all registered (non-revoked) addresses for Merkle tree construction
     pub fn get_approved_addresses(&self) -> Result<Vec<String>, IdentityError> {
-        let db = self.db.lock().map_err(|e| IdentityError::StorageError(e.to_string()))?;
+        let db = self
+            .db
+            .lock()
+            .map_err(|e| IdentityError::StorageError(e.to_string()))?;
 
         let mut stmt = db
             .prepare("SELECT primary_key FROM identities WHERE revoked = 0")
@@ -285,7 +306,12 @@ mod tests {
     use super::*;
 
     fn hex64(byte: u8) -> String {
-        format!("{}", std::iter::repeat(format!("{:02x}", byte)).take(32).collect::<String>())
+        format!(
+            "{}",
+            std::iter::repeat(format!("{:02x}", byte))
+                .take(32)
+                .collect::<String>()
+        )
     }
 
     #[test]
@@ -382,7 +408,9 @@ mod tests {
         // Create and register
         {
             let registry = IdentityRegistry::from_file(path).unwrap();
-            registry.register("did:kaspa:persist-test", &"aa".repeat(32)).unwrap();
+            registry
+                .register("did:kaspa:persist-test", &"aa".repeat(32))
+                .unwrap();
         }
 
         // Reopen and verify

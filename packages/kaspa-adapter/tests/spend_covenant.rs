@@ -54,7 +54,10 @@ async fn test_clawback_owner_spend() {
 
     // Check that the P2SH address has UTXOs
     let p2sh_addr = contract.p2sh_address.to_string();
-    let utxos = client.get_utxos(&p2sh_addr).await.expect("Failed to query UTXOs");
+    let utxos = client
+        .get_utxos(&p2sh_addr)
+        .await
+        .expect("Failed to query UTXOs");
     if utxos.is_empty() {
         println!("[K-RWA] No UTXOs at P2SH address — contract not deployed or already spent");
         println!("[K-RWA] Deploy first with: cargo test -p kaspa-adapter --test deploy_single test_deploy_clawback");
@@ -75,12 +78,17 @@ async fn test_clawback_owner_spend() {
     println!("[K-RWA] Owner address: {}", owner_addr);
 
     // Recipient = owner (send back to ourselves for testing)
-    let recipient_addr: kaspa_addresses::Address = owner_addr.as_str().try_into()
+    let recipient_addr: kaspa_addresses::Address = owner_addr
+        .as_str()
+        .try_into()
         .expect("Failed to parse recipient address");
     let (recipient_xonly, _) = owner_wallet.keypair().x_only_public_key();
     let recipient_pk_bytes = recipient_xonly.serialize().to_vec();
 
-    println!("[K-RWA] Recipient pubkey: {}", hex::encode(&recipient_pk_bytes));
+    println!(
+        "[K-RWA] Recipient pubkey: {}",
+        hex::encode(&recipient_pk_bytes)
+    );
 
     // Build the output that satisfies the covenant:
     //   tx.outputs[0].scriptPubKey == P2PK(recipientPk)
@@ -93,27 +101,30 @@ async fn test_clawback_owner_spend() {
     //   - ownerSig: empty vec = placeholder, will be replaced with computed Schnorr sig
     //   - recipientPk: 32-byte x-only public key
     let witness_params = vec![
-        vec![],               // Placeholder for ownerSig (computed by spend_p2sh)
-        recipient_pk_bytes,   // recipientPk
+        vec![],             // Placeholder for ownerSig (computed by spend_p2sh)
+        recipient_pk_bytes, // recipientPk
     ];
 
     // Parse the UTXO txid
-    let txid: kaspa_consensus_core::tx::TransactionId = utxo.txid.parse()
-        .expect("Failed to parse UTXO txid");
+    let txid: kaspa_consensus_core::tx::TransactionId =
+        utxo.txid.parse().expect("Failed to parse UTXO txid");
 
     // Invoke the covenant!
     // sig_op_count = 1 (one checkSig in ownerSpend)
-    match client.spend_p2sh(
-        txid,
-        utxo.index,
-        utxo.amount,
-        contract.script_public_key.clone(),
-        &contract.redeem_script,
-        witness_params,
-        outputs,
-        1, // sig_op_count
-        owner_wallet.keypair(),
-    ).await {
+    match client
+        .spend_p2sh(
+            txid,
+            utxo.index,
+            utxo.amount,
+            contract.script_public_key.clone(),
+            &contract.redeem_script,
+            witness_params,
+            outputs,
+            1, // sig_op_count
+            owner_wallet.keypair(),
+        )
+        .await
+    {
         Ok(tx_id) => {
             println!("[K-RWA] ========================================");
             println!("[K-RWA]  COVENANT SPEND SUCCEEDED!");
@@ -121,13 +132,18 @@ async fn test_clawback_owner_spend() {
             println!("[K-RWA]  Contract: {}", contract.contract_name);
             println!("[K-RWA]  Entrypoint: ownerSpend");
             println!("[K-RWA]  Input: {} sompis", input_amount);
-            println!("[K-RWA]  Output: {} sompis to {}", output_amount, owner_addr);
+            println!(
+                "[K-RWA]  Output: {} sompis to {}",
+                output_amount, owner_addr
+            );
             println!("[K-RWA] ========================================");
         }
         Err(e) => {
             println!("[K-RWA] Covenant spend failed: {}", e);
             println!("[K-RWA] This may indicate:");
-            println!("[K-RWA]   - Owner pubkey mismatch (contract was compiled with different owner)");
+            println!(
+                "[K-RWA]   - Owner pubkey mismatch (contract was compiled with different owner)"
+            );
             println!("[K-RWA]   - UTXO already spent");
             println!("[K-RWA]   - Script execution error (check witness format)");
             client.disconnect().await.ok();
@@ -150,7 +166,10 @@ async fn test_clawback_owner_spend_helper() {
         .expect("Failed to load clawback.json");
 
     let p2sh_addr = contract.p2sh_address.to_string();
-    let utxos = client.get_utxos(&p2sh_addr).await.expect("Failed to query UTXOs");
+    let utxos = client
+        .get_utxos(&p2sh_addr)
+        .await
+        .expect("Failed to query UTXOs");
     if utxos.is_empty() {
         println!("[K-RWA] No UTXOs — skipping (deploy first)");
         client.disconnect().await.ok();
@@ -167,18 +186,21 @@ async fn test_clawback_owner_spend_helper() {
 
     // witness_params: [sig_placeholder, recipientPk]
     let witness_params = vec![
-        vec![],               // ownerSig placeholder
-        recipient_pk_bytes,   // recipientPk
+        vec![],             // ownerSig placeholder
+        recipient_pk_bytes, // recipientPk
     ];
 
-    match client.spend_contract(
-        &contract,
-        witness_params,
-        &owner_addr,
-        output_amount,
-        1,
-        owner_wallet.keypair(),
-    ).await {
+    match client
+        .spend_contract(
+            &contract,
+            witness_params,
+            &owner_addr,
+            output_amount,
+            1,
+            owner_wallet.keypair(),
+        )
+        .await
+    {
         Ok(tx_id) => {
             println!("[K-RWA] spend_contract() succeeded: TX {}", tx_id);
         }

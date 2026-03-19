@@ -65,11 +65,7 @@ impl Wallet {
         let (xonly, _) = keypair.x_only_public_key();
 
         // Derive Kaspa testnet address from x-only public key
-        let address = Address::new(
-            Prefix::Testnet,
-            Version::PubKey,
-            &xonly.serialize(),
-        );
+        let address = Address::new(Prefix::Testnet, Version::PubKey, &xonly.serialize());
 
         info!("{} Wallet address: {}", LOG_PREFIX, address);
         Ok(Self { keypair, address })
@@ -96,7 +92,10 @@ impl Wallet {
     }
 
     /// Sign a signable transaction using Schnorr
-    pub fn sign_transaction(&self, tx: SignableTransaction) -> Result<SignableTransaction, WalletError> {
+    pub fn sign_transaction(
+        &self,
+        tx: SignableTransaction,
+    ) -> Result<SignableTransaction, WalletError> {
         info!("{} Signing transaction with Schnorr", LOG_PREFIX);
         Ok(sign(tx, self.keypair))
     }
@@ -262,7 +261,9 @@ impl ThresholdWallet {
     /// Production requires MuSig2 (libsecp256k1-zkp).
     ///
     /// Requires `ALLOW_UNSAFE_THRESHOLD=1` environment variable to be set.
-    #[deprecated(note = "XOR aggregation is NOT cryptographically secure. Use MuSig2 for production.")]
+    #[deprecated(
+        note = "XOR aggregation is NOT cryptographically secure. Use MuSig2 for production."
+    )]
     pub fn aggregate_pubkeys(&mut self) -> Result<Address, WalletError> {
         if std::env::var("ALLOW_UNSAFE_THRESHOLD").is_err() {
             return Err(WalletError::KeyGenFailed(
@@ -342,9 +343,8 @@ impl ThresholdWallet {
         hasher.update(message);
         let digest = hasher.finalize();
 
-        let msg = Message::from_digest_slice(&digest).map_err(|e| {
-            WalletError::SigningFailed(format!("Invalid message digest: {}", e))
-        })?;
+        let msg = Message::from_digest_slice(&digest)
+            .map_err(|e| WalletError::SigningFailed(format!("Invalid message digest: {}", e)))?;
 
         let sig = secp.sign_schnorr(&msg, &participant.keypair);
 
@@ -363,7 +363,9 @@ impl ThresholdWallet {
     /// Production requires MuSig2 interactive signing protocol.
     ///
     /// Requires `ALLOW_UNSAFE_THRESHOLD=1` environment variable to be set.
-    #[deprecated(note = "XOR signature combination is NOT cryptographically secure. Use MuSig2 for production.")]
+    #[deprecated(
+        note = "XOR signature combination is NOT cryptographically secure. Use MuSig2 for production."
+    )]
     pub fn combine_partial_signatures(
         &self,
         partial_sigs: &[Vec<u8>],
@@ -388,9 +390,8 @@ impl ThresholdWallet {
         let mut hasher = Sha256::new();
         hasher.update(message);
         let digest = hasher.finalize();
-        let msg = Message::from_digest_slice(&digest).map_err(|e| {
-            WalletError::SigningFailed(format!("Invalid message digest: {}", e))
-        })?;
+        let msg = Message::from_digest_slice(&digest)
+            .map_err(|e| WalletError::SigningFailed(format!("Invalid message digest: {}", e)))?;
 
         // Verify each partial signature individually
         for (i, sig_bytes) in partial_sigs.iter().enumerate() {
@@ -407,9 +408,10 @@ impl ThresholdWallet {
                 WalletError::SigningFailed(format!("Invalid signature format at {}: {}", i, e))
             })?;
 
-            let verified = self.participants.iter().any(|p| {
-                secp.verify_schnorr(&sig, &msg, &p.public_key).is_ok()
-            });
+            let verified = self
+                .participants
+                .iter()
+                .any(|p| secp.verify_schnorr(&sig, &msg, &p.public_key).is_ok());
 
             if !verified {
                 return Err(WalletError::SigningFailed(format!(
@@ -448,7 +450,11 @@ impl ThresholdWallet {
         combined_sig: &[u8],
         message: &[u8],
     ) -> Result<bool, WalletError> {
-        info!("{} Verifying threshold signature over {} bytes", LOG_PREFIX, message.len());
+        info!(
+            "{} Verifying threshold signature over {} bytes",
+            LOG_PREFIX,
+            message.len()
+        );
 
         if combined_sig.is_empty() {
             return Err(WalletError::SigningFailed(
@@ -527,7 +533,10 @@ mod tests {
         #[allow(deprecated)]
         let result = wallet.aggregate_pubkeys();
         // With env var set, it should succeed
-        assert!(result.is_ok(), "Should succeed when ALLOW_UNSAFE_THRESHOLD is set");
+        assert!(
+            result.is_ok(),
+            "Should succeed when ALLOW_UNSAFE_THRESHOLD is set"
+        );
     }
 
     #[test]
@@ -608,12 +617,10 @@ mod tests {
         let mut key3 = [3u8; 32];
         key3[0] = 0x03;
 
-        let mut wallet_a =
-            ThresholdWallet::from_keys(vec![key1, key2, key3], 2).unwrap();
+        let mut wallet_a = ThresholdWallet::from_keys(vec![key1, key2, key3], 2).unwrap();
         let addr_a = wallet_a.aggregate_pubkeys().unwrap();
 
-        let mut wallet_b =
-            ThresholdWallet::from_keys(vec![key1, key2, key3], 2).unwrap();
+        let mut wallet_b = ThresholdWallet::from_keys(vec![key1, key2, key3], 2).unwrap();
         let addr_b = wallet_b.aggregate_pubkeys().unwrap();
 
         assert_eq!(
@@ -632,8 +639,7 @@ mod tests {
         let mut key3 = [30u8; 32];
         key3[0] = 0x1e;
 
-        let mut wallet =
-            ThresholdWallet::from_keys(vec![key1, key2, key3], 2).unwrap();
+        let mut wallet = ThresholdWallet::from_keys(vec![key1, key2, key3], 2).unwrap();
         let addr = wallet.aggregate_pubkeys().unwrap();
 
         assert!(

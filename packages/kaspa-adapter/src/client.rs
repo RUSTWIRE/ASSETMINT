@@ -5,15 +5,17 @@
 //! Connects to local kaspad via Borsh-encoded wRPC for UTXO queries and tx broadcast.
 
 use kaspa_addresses::Address;
-use kaspa_consensus_core::hashing::sighash::{SigHashReusedValuesUnsync, calc_schnorr_signature_hash};
+use kaspa_consensus_core::hashing::sighash::{
+    calc_schnorr_signature_hash, SigHashReusedValuesUnsync,
+};
 use kaspa_consensus_core::hashing::sighash_type::SIG_HASH_ALL;
 use kaspa_consensus_core::network::NetworkType;
 use kaspa_consensus_core::sign::sign;
+use kaspa_consensus_core::subnets::SUBNETWORK_ID_NATIVE;
 use kaspa_consensus_core::tx::{
     MutableTransaction, ScriptPublicKey, Transaction, TransactionId, TransactionInput,
     TransactionOutpoint, TransactionOutput, UtxoEntry,
 };
-use kaspa_consensus_core::subnets::SUBNETWORK_ID_NATIVE;
 use kaspa_rpc_core::api::rpc::RpcApi;
 use kaspa_rpc_core::model::tx::RpcTransaction;
 use kaspa_txscript::pay_to_address_script;
@@ -79,7 +81,9 @@ impl KaspaClient {
             Some(network_id),
             None,
         )
-        .map_err(|e| ClientError::ConnectionFailed(format!("Failed to create RPC client: {}", e)))?;
+        .map_err(|e| {
+            ClientError::ConnectionFailed(format!("Failed to create RPC client: {}", e))
+        })?;
 
         Ok(Self {
             endpoint: endpoint.to_string(),
@@ -124,7 +128,10 @@ impl KaspaClient {
     /// Get server info (version, sync status, DAA score)
     pub async fn get_server_info(&self) -> Result<ServerInfo, ClientError> {
         info!("{} Querying server info", LOG_PREFIX);
-        let info = self.rpc.get_server_info().await
+        let info = self
+            .rpc
+            .get_server_info()
+            .await
             .map_err(|e| ClientError::RpcError(format!("{}", e)))?;
 
         Ok(ServerInfo {
@@ -138,23 +145,40 @@ impl KaspaClient {
     /// Get balance for an address (in sompis)
     pub async fn get_balance(&self, address: &str) -> Result<u64, ClientError> {
         info!("{} Querying balance for {}", LOG_PREFIX, address);
-        let addr: Address = address.try_into()
-            .map_err(|e: kaspa_addresses::AddressError| ClientError::AddressError(format!("{}", e)))?;
+        let addr: Address = address
+            .try_into()
+            .map_err(|e: kaspa_addresses::AddressError| {
+                ClientError::AddressError(format!("{}", e))
+            })?;
 
-        let balance = self.rpc.get_balance_by_address(addr).await
+        let balance = self
+            .rpc
+            .get_balance_by_address(addr)
+            .await
             .map_err(|e| ClientError::RpcError(format!("{}", e)))?;
 
-        info!("{} Balance: {} sompis ({:.4} KAS)", LOG_PREFIX, balance, balance as f64 / 1e8);
+        info!(
+            "{} Balance: {} sompis ({:.4} KAS)",
+            LOG_PREFIX,
+            balance,
+            balance as f64 / 1e8
+        );
         Ok(balance)
     }
 
     /// Get UTXOs for an address
     pub async fn get_utxos(&self, address: &str) -> Result<Vec<Utxo>, ClientError> {
         info!("{} Querying UTXOs for {}", LOG_PREFIX, address);
-        let addr: Address = address.try_into()
-            .map_err(|e: kaspa_addresses::AddressError| ClientError::AddressError(format!("{}", e)))?;
+        let addr: Address = address
+            .try_into()
+            .map_err(|e: kaspa_addresses::AddressError| {
+                ClientError::AddressError(format!("{}", e))
+            })?;
 
-        let entries = self.rpc.get_utxos_by_addresses(vec![addr]).await
+        let entries = self
+            .rpc
+            .get_utxos_by_addresses(vec![addr])
+            .await
             .map_err(|e| ClientError::RpcError(format!("{}", e)))?;
 
         let utxos: Vec<Utxo> = entries
@@ -173,7 +197,10 @@ impl KaspaClient {
 
     /// Get current block DAG info
     pub async fn get_block_dag_info(&self) -> Result<(u64, u64, f64), ClientError> {
-        let dag = self.rpc.get_block_dag_info().await
+        let dag = self
+            .rpc
+            .get_block_dag_info()
+            .await
             .map_err(|e| ClientError::RpcError(format!("{}", e)))?;
 
         Ok((dag.block_count, dag.virtual_daa_score, dag.difficulty))
@@ -181,33 +208,52 @@ impl KaspaClient {
 
     /// Get spendable UTXOs for an address (with full entry data for signing).
     /// Filters out UTXOs that are already being spent by mempool transactions.
-    pub async fn get_spendable_utxos(&self, address: &str) -> Result<Vec<SpendableUtxo>, ClientError> {
+    pub async fn get_spendable_utxos(
+        &self,
+        address: &str,
+    ) -> Result<Vec<SpendableUtxo>, ClientError> {
         info!("{} Querying spendable UTXOs for {}", LOG_PREFIX, address);
-        let addr: Address = address.try_into()
-            .map_err(|e: kaspa_addresses::AddressError| ClientError::AddressError(format!("{}", e)))?;
+        let addr: Address = address
+            .try_into()
+            .map_err(|e: kaspa_addresses::AddressError| {
+                ClientError::AddressError(format!("{}", e))
+            })?;
 
-        let entries = self.rpc.get_utxos_by_addresses(vec![addr.clone()]).await
+        let entries = self
+            .rpc
+            .get_utxos_by_addresses(vec![addr.clone()])
+            .await
             .map_err(|e| ClientError::RpcError(format!("{}", e)))?;
 
         // Query mempool to find which UTXOs are already being spent
-        let mempool_entries = self.rpc
+        let mempool_entries = self
+            .rpc
             .get_mempool_entries_by_addresses(vec![addr], false, false)
             .await
             .unwrap_or_default();
 
         // Collect all outpoints being spent by mempool transactions
-        let mut mempool_spent: std::collections::HashSet<(kaspa_consensus_core::tx::TransactionId, u32)> =
-            std::collections::HashSet::new();
+        let mut mempool_spent: std::collections::HashSet<(
+            kaspa_consensus_core::tx::TransactionId,
+            u32,
+        )> = std::collections::HashSet::new();
         for entry_by_addr in &mempool_entries {
             for mempool_entry in &entry_by_addr.sending {
                 for input in &mempool_entry.transaction.inputs {
-                    mempool_spent.insert((input.previous_outpoint.transaction_id, input.previous_outpoint.index));
+                    mempool_spent.insert((
+                        input.previous_outpoint.transaction_id,
+                        input.previous_outpoint.index,
+                    ));
                 }
             }
         }
 
         if !mempool_spent.is_empty() {
-            info!("{} Excluding {} outpoints spent in mempool", LOG_PREFIX, mempool_spent.len());
+            info!(
+                "{} Excluding {} outpoints spent in mempool",
+                LOG_PREFIX,
+                mempool_spent.len()
+            );
         }
 
         let utxos: Vec<SpendableUtxo> = entries
@@ -221,7 +267,11 @@ impl KaspaClient {
             })
             .collect();
 
-        info!("{} Found {} spendable UTXOs (after mempool filter)", LOG_PREFIX, utxos.len());
+        info!(
+            "{} Found {} spendable UTXOs (after mempool filter)",
+            LOG_PREFIX,
+            utxos.len()
+        );
         Ok(utxos)
     }
 
@@ -230,7 +280,10 @@ impl KaspaClient {
         info!("{} Broadcasting transaction {}", LOG_PREFIX, tx.id());
 
         let rpc_tx = RpcTransaction::from(tx);
-        let tx_id = self.rpc.submit_transaction(rpc_tx, false).await
+        let tx_id = self
+            .rpc
+            .submit_transaction(rpc_tx, false)
+            .await
             .map_err(|e| ClientError::RpcError(format!("Submit failed: {}", e)))?;
 
         info!("{} Transaction accepted: {}", LOG_PREFIX, tx_id);
@@ -258,10 +311,18 @@ impl KaspaClient {
         }
 
         // 2. Parse addresses
-        let to_addr: Address = to_address.try_into()
-            .map_err(|e: kaspa_addresses::AddressError| ClientError::AddressError(format!("{}", e)))?;
-        let change_addr: Address = from_address.try_into()
-            .map_err(|e: kaspa_addresses::AddressError| ClientError::AddressError(format!("{}", e)))?;
+        let to_addr: Address =
+            to_address
+                .try_into()
+                .map_err(|e: kaspa_addresses::AddressError| {
+                    ClientError::AddressError(format!("{}", e))
+                })?;
+        let change_addr: Address =
+            from_address
+                .try_into()
+                .map_err(|e: kaspa_addresses::AddressError| {
+                    ClientError::AddressError(format!("{}", e))
+                })?;
 
         // 3. Build unsigned transaction
         let params = TransferParams {
@@ -275,16 +336,19 @@ impl KaspaClient {
             .map_err(|e| ClientError::RpcError(format!("Build failed: {}", e)))?;
 
         // 4. Create signable transaction (MutableTransaction with populated UTXO entries)
-        let signable = MutableTransaction::with_entries(unsigned_tx, utxo_entries
-            .into_iter()
-            .map(|(_outpoint, entry)| kaspa_consensus_core::tx::UtxoEntry {
-                amount: entry.amount,
-                script_public_key: entry.script_public_key,
-                block_daa_score: entry.block_daa_score,
-                is_coinbase: entry.is_coinbase,
-                covenant_id: entry.covenant_id,
-            })
-            .collect());
+        let signable = MutableTransaction::with_entries(
+            unsigned_tx,
+            utxo_entries
+                .into_iter()
+                .map(|(_outpoint, entry)| kaspa_consensus_core::tx::UtxoEntry {
+                    amount: entry.amount,
+                    script_public_key: entry.script_public_key,
+                    block_daa_score: entry.block_daa_score,
+                    is_coinbase: entry.is_coinbase,
+                    covenant_id: entry.covenant_id,
+                })
+                .collect(),
+        );
 
         // 5. Sign with Schnorr
         info!("{} Signing transaction with Schnorr keypair", LOG_PREFIX);
@@ -293,10 +357,7 @@ impl KaspaClient {
         // 6. Submit
         let tx_id = self.submit_transaction(&signed.tx).await?;
 
-        info!(
-            "{} Transfer complete! TX: {}",
-            LOG_PREFIX, tx_id
-        );
+        info!("{} Transfer complete! TX: {}", LOG_PREFIX, tx_id);
 
         Ok(tx_id)
     }
@@ -314,10 +375,7 @@ impl KaspaClient {
     ) -> Result<TransactionId, ClientError> {
         info!(
             "{} Deploying contract '{}' with {} sompis to P2SH {}",
-            LOG_PREFIX,
-            contract.contract_name,
-            funding_sompis,
-            contract.p2sh_address
+            LOG_PREFIX, contract.contract_name, funding_sompis, contract.p2sh_address
         );
 
         // Fund the P2SH address — this creates the covenant UTXO
@@ -334,9 +392,20 @@ impl KaspaClient {
         audit_hash: [u8; 32],
         keypair: &Keypair,
     ) -> Result<TransactionId, ClientError> {
-        info!("{} Committing audit hash to DAG: {}", LOG_PREFIX, hex::encode(&audit_hash));
+        info!(
+            "{} Committing audit hash to DAG: {}",
+            LOG_PREFIX,
+            hex::encode(&audit_hash)
+        );
         // Send minimal amount (1000 sompis) to self with audit hash as OP_RETURN
-        self.send_kas(from_address, from_address, 1000, keypair, Some(audit_hash.to_vec())).await
+        self.send_kas(
+            from_address,
+            from_address,
+            1000,
+            keypair,
+            Some(audit_hash.to_vec()),
+        )
+        .await
     }
 
     /// Consolidate fragmented UTXOs into fewer, larger outputs.
@@ -357,7 +426,11 @@ impl KaspaClient {
         loop {
             let utxos = self.get_spendable_utxos(address).await?;
             if utxos.len() <= 3 {
-                info!("{} Consolidation complete: {} UTXOs remaining", LOG_PREFIX, utxos.len());
+                info!(
+                    "{} Consolidation complete: {} UTXOs remaining",
+                    LOG_PREFIX,
+                    utxos.len()
+                );
                 break;
             }
 
@@ -377,10 +450,17 @@ impl KaspaClient {
             let send_amount = batch_total - fee_estimate;
             info!(
                 "{} Consolidation batch: {} of {} UTXOs, {} sompis → {} sompis",
-                LOG_PREFIX, batch.len(), utxos.len(), batch_total, send_amount
+                LOG_PREFIX,
+                batch.len(),
+                utxos.len(),
+                batch_total,
+                send_amount
             );
 
-            match self.send_kas(address, address, send_amount, keypair, None).await {
+            match self
+                .send_kas(address, address, send_amount, keypair, None)
+                .await
+            {
                 Ok(tx_id) => {
                     info!("{} Consolidation TX: {}", LOG_PREFIX, tx_id);
                     total_consolidated += 1;
@@ -443,7 +523,10 @@ impl KaspaClient {
     ) -> Result<TransactionId, ClientError> {
         info!(
             "{} Spending P2SH UTXO {}:{} ({} sompis) with {} witness params",
-            LOG_PREFIX, p2sh_utxo_txid, p2sh_utxo_index, p2sh_utxo_amount,
+            LOG_PREFIX,
+            p2sh_utxo_txid,
+            p2sh_utxo_index,
+            p2sh_utxo_amount,
             witness_params.len()
         );
 
@@ -466,13 +549,13 @@ impl KaspaClient {
         );
 
         let tx = Transaction::new(
-            0,                     // version
-            vec![input],           // inputs
-            outputs,               // outputs
-            0,                     // lock_time
-            SUBNETWORK_ID_NATIVE,  // subnetwork_id
-            0,                     // gas
-            vec![],                // payload
+            0,                    // version
+            vec![input],          // inputs
+            outputs,              // outputs
+            0,                    // lock_time
+            SUBNETWORK_ID_NATIVE, // subnetwork_id
+            0,                    // gas
+            vec![],               // payload
         );
 
         // Create a signable transaction with the P2SH UTXO entry.
@@ -490,12 +573,8 @@ impl KaspaClient {
 
         // Compute the sighash for input 0
         let reused_values = SigHashReusedValuesUnsync::new();
-        let sig_hash = calc_schnorr_signature_hash(
-            &signable.as_verifiable(),
-            0,
-            SIG_HASH_ALL,
-            &reused_values,
-        );
+        let sig_hash =
+            calc_schnorr_signature_hash(&signable.as_verifiable(), 0, SIG_HASH_ALL, &reused_values);
 
         // Sign the sighash with Schnorr
         let msg = secp256k1::Message::from_digest_slice(sig_hash.as_bytes().as_slice())
@@ -558,7 +637,9 @@ impl KaspaClient {
 
         info!(
             "{} Built P2SH signature_script: {} bytes ({} witness params + redeem script)",
-            LOG_PREFIX, script_sig.len(), witness_params.len()
+            LOG_PREFIX,
+            script_sig.len(),
+            witness_params.len()
         );
 
         // Update the transaction with the real signature_script
@@ -568,10 +649,7 @@ impl KaspaClient {
         // Submit to the network
         let tx_id = self.submit_transaction(&final_tx).await?;
 
-        info!(
-            "{} P2SH covenant spend complete! TX: {}",
-            LOG_PREFIX, tx_id
-        );
+        info!("{} P2SH covenant spend complete! TX: {}", LOG_PREFIX, tx_id);
 
         Ok(tx_id)
     }
@@ -615,12 +693,18 @@ impl KaspaClient {
 
         // Use the first (largest) UTXO
         let utxo = &utxos[0];
-        let txid: TransactionId = utxo.txid.parse()
+        let txid: TransactionId = utxo
+            .txid
+            .parse()
             .map_err(|e| ClientError::RpcError(format!("Invalid txid: {}", e)))?;
 
         // Build the output
-        let out_addr: Address = output_address.try_into()
-            .map_err(|e: kaspa_addresses::AddressError| ClientError::AddressError(format!("{}", e)))?;
+        let out_addr: Address =
+            output_address
+                .try_into()
+                .map_err(|e: kaspa_addresses::AddressError| {
+                    ClientError::AddressError(format!("{}", e))
+                })?;
         let out_script = pay_to_address_script(&out_addr);
         let outputs = vec![TransactionOutput::new(output_amount, out_script)];
 

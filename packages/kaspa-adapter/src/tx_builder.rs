@@ -134,11 +134,7 @@ pub fn build_transfer(
 
     info!(
         "{} Building transfer: {} sompis to {}, fee={}, change={}",
-        LOG_PREFIX,
-        params.amount,
-        params.to_address,
-        fee,
-        change
+        LOG_PREFIX, params.amount, params.to_address, fee, change
     );
 
     // Build inputs
@@ -189,13 +185,13 @@ pub fn build_transfer(
 
     // Build the transaction
     let tx = Transaction::new(
-        0,                     // version
-        inputs,                // inputs
-        outputs,               // outputs
-        0,                     // lock_time
-        SUBNETWORK_ID_NATIVE,  // subnetwork_id
-        0,                     // gas
-        vec![],                // payload
+        0,                    // version
+        inputs,               // inputs
+        outputs,              // outputs
+        0,                    // lock_time
+        SUBNETWORK_ID_NATIVE, // subnetwork_id
+        0,                    // gas
+        vec![],               // payload
     );
 
     info!(

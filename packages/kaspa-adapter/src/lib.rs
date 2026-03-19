@@ -12,10 +12,10 @@
 //! **Testnet-12 ONLY** — ws://tn12-node.kaspa.com:17210
 
 pub mod client;
-pub mod wallet;
-pub mod tx_builder;
-pub mod script;
 pub mod covenant_builder;
+pub mod script;
+pub mod tx_builder;
+pub mod wallet;
 
 pub use wallet::ThresholdWallet;
 

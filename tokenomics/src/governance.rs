@@ -243,7 +243,12 @@ mod tests {
     fn test_create_proposal() {
         let mut gov = GovernanceEngine::new();
         let p = gov
-            .create_proposal("Test", "A test proposal", "kaspatest:alice", MIN_PROPOSE_STAKE)
+            .create_proposal(
+                "Test",
+                "A test proposal",
+                "kaspatest:alice",
+                MIN_PROPOSE_STAKE,
+            )
             .unwrap();
         assert_eq!(p.id, 1);
         assert_eq!(p.status, ProposalStatus::Active);

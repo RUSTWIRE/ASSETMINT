@@ -37,7 +37,10 @@ pub struct ZkVerifier {
 impl ZkVerifier {
     /// Create a new ZK verifier
     pub fn new() -> Self {
-        info!("{} Initializing ZK-KYC verifier (Groth16/BN254)", LOG_PREFIX);
+        info!(
+            "{} Initializing ZK-KYC verifier (Groth16/BN254)",
+            LOG_PREFIX
+        );
         Self {
             verifying_key: None,
         }
@@ -68,9 +71,10 @@ impl ZkVerifier {
     pub fn verify(&self, proof: &ZkProof) -> Result<bool, VerifierError> {
         info!("{} Verifying Groth16 ZK-KYC proof", LOG_PREFIX);
 
-        let vk = self.verifying_key.as_ref().ok_or_else(|| {
-            VerifierError::KeyNotLoaded("Verification key not loaded".into())
-        })?;
+        let vk = self
+            .verifying_key
+            .as_ref()
+            .ok_or_else(|| VerifierError::KeyNotLoaded("Verification key not loaded".into()))?;
 
         let start = std::time::Instant::now();
 
@@ -88,10 +92,9 @@ impl ZkVerifier {
 
         let merkle_root = Fr::deserialize_compressed(&proof.public_inputs[0][..])
             .map_err(|e| VerifierError::InvalidProof(format!("root deserialization: {}", e)))?;
-        let nullifier = Fr::deserialize_compressed(&proof.public_inputs[1][..])
-            .map_err(|e| {
-                VerifierError::InvalidProof(format!("nullifier deserialization: {}", e))
-            })?;
+        let nullifier = Fr::deserialize_compressed(&proof.public_inputs[1][..]).map_err(|e| {
+            VerifierError::InvalidProof(format!("nullifier deserialization: {}", e))
+        })?;
 
         let public_inputs: Vec<Fr> = vec![merkle_root, nullifier];
 
@@ -100,7 +103,9 @@ impl ZkVerifier {
 
         // Verify the proof
         let valid = Groth16::<Bn254>::verify_with_processed_vk(&pvk, &public_inputs, &groth_proof)
-            .map_err(|e: ark_relations::r1cs::SynthesisError| VerifierError::VerificationFailed(e.to_string()))?;
+            .map_err(|e: ark_relations::r1cs::SynthesisError| {
+                VerifierError::VerificationFailed(e.to_string())
+            })?;
 
         let elapsed = start.elapsed();
         info!(
@@ -113,9 +118,10 @@ impl ZkVerifier {
 
     /// Compute the hash of the verification key (for on-chain commitment)
     pub fn verification_key_hash(&self) -> Result<[u8; 32], VerifierError> {
-        let vk = self.verifying_key.as_ref().ok_or_else(|| {
-            VerifierError::KeyNotLoaded("Verification key not loaded".into())
-        })?;
+        let vk = self
+            .verifying_key
+            .as_ref()
+            .ok_or_else(|| VerifierError::KeyNotLoaded("Verification key not loaded".into()))?;
 
         use ark_serialize::CanonicalSerialize;
         use sha2::{Digest, Sha256};
@@ -183,11 +189,15 @@ mod tests {
         };
 
         // 4. Generate proof
-        let proof = prover.generate_proof(&witness).expect("proof gen should succeed");
+        let proof = prover
+            .generate_proof(&witness)
+            .expect("proof gen should succeed");
         assert!(!proof.proof_bytes.is_empty());
 
         // 5. Verify proof
-        let valid = verifier.verify(&proof).expect("verification should succeed");
+        let valid = verifier
+            .verify(&proof)
+            .expect("verification should succeed");
         assert!(valid, "Valid proof should verify");
 
         // 6. Verify proof hash is non-zero
