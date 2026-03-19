@@ -37,7 +37,7 @@ Service health check. Always returns 200.
 ```json
 {
   "status": "ok",
-  "service": "compliance-rust",
+  "service": "assetmint-core",
   "kaspa_connected": true
 }
 ```
@@ -338,3 +338,197 @@ All endpoints return errors in a consistent format:
 ```
 
 Common HTTP status codes: 400 (bad request), 404 (identity not found), 409 (duplicate identity), 412 (precondition failed), 502 (kaspad unreachable), 503 (Kaspa client not connected).
+
+---
+
+# Sovereign Metadata API Reference
+
+Base URL: `http://localhost:8900`
+
+Source: [`infrastructure/dkg-node/sovereign-metadata/server.js`](../infrastructure/dkg-node/sovereign-metadata/server.js)
+
+Self-hosted, private-by-default metadata store with SHA-256 integrity hashes and tamper detection. Replaces OriginTrail DKG Edge Node.
+
+## Endpoint Summary
+
+| # | Method | Path | Description | Status |
+|---|--------|------|-------------|--------|
+| 1 | POST | `/publish` | Store asset metadata, returns UAL and SHA-256 hash | Real |
+| 2 | GET | `/get` | Retrieve metadata by UAL | Real |
+| 3 | POST | `/verify` | Verify metadata integrity against stored hash | Real |
+| 4 | GET | `/assets` | List all published assets | Real |
+| 5 | GET | `/info` | Service info (version, storage path) | Real |
+| 6 | GET | `/health` | Service health check | Real |
+| 7 | POST | `/metadata/publish-and-commit` | Publish metadata and commit hash to Kaspa DAG | Real |
+
+---
+
+## 1. POST /publish
+
+Store asset metadata with a SHA-256 integrity hash.
+
+**Request body:**
+
+```json
+{
+  "name": "Test Asset",
+  "ticker": "KTEST",
+  "type": "real-estate",
+  "jurisdiction": "US"
+}
+```
+
+**Response:**
+
+```json
+{
+  "ual": "did:assetmint:sovereign/a1b2c3d4e5f67890",
+  "metadata_hash": "f0e1d2c3b4a5968778695a4b3c2d1e0f...",
+  "status": "published",
+  "private": true,
+  "verify_instruction": "Commit metadata_hash on-chain via POST /audit/commit to make it verifiable on Kaspa DAG"
+}
+```
+
+---
+
+## 2. GET /get
+
+Retrieve metadata by UAL.
+
+**Query parameters:**
+
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| `ual` | string | Yes | Asset UAL (e.g. `did:assetmint:sovereign/a1b2c3d4e5f67890`) |
+
+**Response:**
+
+```json
+{
+  "ual": "did:assetmint:sovereign/a1b2c3d4e5f67890",
+  "metadata": {
+    "name": "Test Asset",
+    "ticker": "KTEST",
+    "type": "real-estate",
+    "jurisdiction": "US"
+  },
+  "metadata_hash": "f0e1d2c3b4a5968778695a4b3c2d1e0f...",
+  "created_at": "2026-03-19T12:00:00Z"
+}
+```
+
+---
+
+## 3. POST /verify
+
+Verify metadata integrity against stored SHA-256 hash.
+
+**Request body:**
+
+```json
+{
+  "ual": "did:assetmint:sovereign/a1b2c3d4e5f67890",
+  "metadata": {
+    "name": "Test Asset",
+    "ticker": "KTEST",
+    "type": "real-estate",
+    "jurisdiction": "US"
+  }
+}
+```
+
+**Response:**
+
+```json
+{
+  "verified": true,
+  "ual": "did:assetmint:sovereign/a1b2c3d4e5f67890",
+  "stored_hash": "f0e1d2c3b4a5968778695a4b3c2d1e0f...",
+  "computed_hash": "f0e1d2c3b4a5968778695a4b3c2d1e0f...",
+  "tampered": false
+}
+```
+
+---
+
+## 4. GET /assets
+
+List all published assets.
+
+**Response:**
+
+```json
+{
+  "assets": [
+    {
+      "ual": "did:assetmint:sovereign/a1b2c3d4e5f67890",
+      "metadata_hash": "f0e1d2c3...",
+      "created_at": "2026-03-19T12:00:00Z"
+    }
+  ],
+  "count": 1
+}
+```
+
+---
+
+## 5. GET /info
+
+Service information.
+
+**Response:**
+
+```json
+{
+  "service": "sovereign-metadata",
+  "version": "1.0.0",
+  "storage": "/data/metadata.json"
+}
+```
+
+---
+
+## 6. GET /health
+
+Service health check.
+
+**Response:**
+
+```json
+{
+  "status": "ok",
+  "service": "sovereign-metadata"
+}
+```
+
+---
+
+## 7. POST /metadata/publish-and-commit
+
+Publish metadata and commit the SHA-256 hash to the Kaspa DAG in a single atomic operation. Combines `POST /publish` with an on-chain hash commitment.
+
+**Request body:**
+
+```json
+{
+  "name": "Test Asset",
+  "ticker": "KTEST",
+  "type": "real-estate",
+  "jurisdiction": "US",
+  "from_address": "kaspatest:qq...",
+  "private_key": "hex-encoded-32-bytes"
+}
+```
+
+**Response:**
+
+```json
+{
+  "ual": "did:assetmint:sovereign/a1b2c3d4e5f67890",
+  "metadata_hash": "f0e1d2c3b4a5968778695a4b3c2d1e0f...",
+  "status": "published_and_committed",
+  "tx_id": "abcdef1234...",
+  "private": true
+}
+```

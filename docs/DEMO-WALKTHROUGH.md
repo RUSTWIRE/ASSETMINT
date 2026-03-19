@@ -66,7 +66,7 @@ curl -s http://localhost:3001/health | jq
 ```json
 {
   "status": "ok",
-  "service": "compliance-rust",
+  "service": "assetmint-core",
   "kaspa_connected": true
 }
 ```
@@ -647,6 +647,39 @@ curl -s -X POST http://localhost:8900/verify \
 `verified` will be `false` and `tampered` will be `true`. This provides
 tamper detection without requiring on-chain storage of the full metadata --
 only the hash needs to be anchored on Kaspa.
+
+---
+
+## Step 13b: Publish Metadata with Hash Commitment
+
+Publish metadata and automatically commit the SHA-256 hash to the Kaspa DAG in
+a single call. This combines `POST /publish` and `POST /audit/commit` into one
+atomic operation.
+
+**What to do:**
+
+```bash
+curl -s -X POST http://localhost:8900/metadata/publish-and-commit \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Test Asset",
+    "ticker": "KTEST",
+    "type": "real-estate",
+    "jurisdiction": "US",
+    "from_address": "kaspatest:qq...",
+    "private_key": "hex-encoded-32-bytes"
+  }' | jq
+```
+
+**What to expect:**
+
+A JSON response containing the UAL, metadata hash, and the Kaspa transaction ID
+anchoring the hash on-chain.
+
+**Why this matters:** Unlike the two-step flow (publish then manually call
+`/audit/commit`), this endpoint ensures the metadata hash is committed to the
+Kaspa DAG atomically. The on-chain TX ID provides a tamper-evident anchor that
+anyone can verify independently.
 
 ---
 

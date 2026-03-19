@@ -11,7 +11,7 @@
 | `contracts/schemas/` | JSON | M0 | AssetMint-1.0 asset definition schema |
 | `packages/kaspa-adapter/` | Rust | M2 | rusty-kaspa WASM wrapper: client, wallet, tx-builder, script loader |
 | `packages/dkg-bridge/` | TypeScript | M2 | Thin HTTP client for self-hosted DKG Edge Node |
-| `services/compliance-rust/` | Rust | M2 | Full Polymesh compliance port: identity, claims, rules, ZK prover/verifier |
+| `services/assetmint-core/` | Rust | M2 | Full Polymesh compliance port: identity, claims, rules, ZK prover/verifier |
 | `services/oracle-pool/` | Rust | M3 | Simulated centralized multisig oracle + IOraclePool upgrade stub |
 | `services/sync/` | Rust | M3 | DKG state-verity sync loop |
 | `tokenomics/` | Rust | M3 | ASTM KRC-20 token, staking, governance, fee model |

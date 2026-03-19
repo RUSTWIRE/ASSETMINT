@@ -53,7 +53,7 @@ Manages on-chain state for an RWA asset. Holds references to the DKG Universal A
 
 ## 4. ZkKycVerifier
 
-On-chain ZK proof verification via hash-commitment scheme. Since Kaspa script does not yet have native pairing operations, the prover commits the proof off-chain and the on-chain script verifies the hash binding between the proof, verification key, and public inputs. Full Groth16 verification (pairing checks) runs in the compliance-rust service.
+On-chain ZK proof verification via hash-commitment scheme. Since Kaspa script does not yet have native pairing operations, the prover commits the proof off-chain and the on-chain script verifies the hash binding between the proof, verification key, and public inputs. Full Groth16 verification (pairing checks) runs in the assetmint-core service.
 
 | Field | Value |
 |-------|-------|

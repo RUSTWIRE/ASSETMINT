@@ -32,8 +32,8 @@ Transfer restrictions are enforced at the UTXO level, not in smart contract stor
 **2. ZK-KYC Privacy (Groth16 Proofs)**
 Investors prove they are in the set of approved addresses using zero-knowledge proofs. The chain verifies compliance without learning the investor's identity. Only a 32-byte proof hash is stored on-chain.
 
-**3. Sovereign Provenance (OriginTrail DKG)**
-Asset metadata -- title records, valuations, legal documentation -- is published to the OriginTrail Decentralized Knowledge Graph. This creates an immutable, verifiable provenance trail anchored to the asset token.
+**3. Sovereign Provenance (Self-Hosted Metadata)**
+Asset metadata -- title records, valuations, legal documentation -- is stored in a self-hosted Sovereign Metadata Service with SHA-256 integrity hashes and tamper detection. Metadata hashes are committed to the Kaspa DAG for immutable, verifiable provenance anchored to the asset token. All data stays on YOUR infrastructure -- private by default.
 
 **4. ASTM Protocol Token (KRC-20)**
 The platform's native token captures fees from every RWA transfer, distributes staking rewards, and enables on-chain governance for protocol upgrades.
@@ -46,19 +46,19 @@ The platform's native token captures fees from every RWA transfer, distributes s
 ┌──────────────────────────────────────────────────────────────────┐
 │                    Dashboard (Next.js 15)                        │
 ├──────────────┬────────────────┬───────────────────────────────────┤
-│ Compliance   │  Oracle API    │  DKG Edge Node                   │
+│ Compliance   │  Oracle API    │  Sovereign Metadata              │
 │ API (:3001)  │  (:3002)       │  (:8900)                         │
 ├──────────────┴────────────────┴───────────────────────────────────┤
 │               Rust Workspace (6 crates)                          │
 │  compliance  │  oracle  │  sync  │  tokenomics  │  zk-circuits   │
 ├──────────────────────────────────────────────────────────────────┤
-│          SilverScript Covenants (5 contracts)                    │
+│          SilverScript Covenants (7 contracts)                    │
 ├──────────────────────────────────────────────────────────────────┤
 │       Kaspa Testnet-12  •  10 BPS  •  PHANTOM/GHOSTDAG          │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
-The full system comprises 5 SilverScript contracts, 6 Rust crates, 2 REST APIs, a Next.js dashboard with 8 pages, and 75 passing tests across the workspace.
+The full system comprises 7 deployed SilverScript contracts, 6 Rust crates, a sovereign metadata service, 2 REST APIs, a Next.js dashboard with 8 pages, and 105 passing tests across the workspace.
 
 ---
 
@@ -122,8 +122,9 @@ ASTM stakers vote on protocol proposals with weight proportional to their staked
 | M1 | Done | 5 SilverScript contracts, Groth16 ZK-KYC circuit, trusted setup |
 | M2 | Done | Polymesh compliance port, identity registry, rules engine, REST API |
 | M3 | Done | ASTM token (KRC-20), staking, governance, oracle with Ed25519 attestations |
-| M4 | Done | Next.js 15 dashboard (8 pages), E2E integration test, 75 tests passing |
-| M5 | In progress | Security audit, formal verification, investor whitepaper |
+| M4 | Done | Next.js 15 dashboard (8 pages), E2E integration test, 105 tests passing |
+| M5 | Done | Sovereign metadata, covenant builder, on-chain staking, 12 TN12 transactions |
+| M6 | In progress | Security audit, formal verification, investor whitepaper |
 | M6 | Planned | Mainnet preparation, deployment tooling, launch readiness |
 
 ---

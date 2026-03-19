@@ -5,6 +5,7 @@
 
 import { useState } from "react";
 import { ShieldAlert, Loader2, AlertTriangle, ExternalLink, Info } from "lucide-react";
+import { DemoBanner } from "@/components/demo-banner";
 import { useWalletStore } from "@/store/wallet";
 import { DEPLOYED_CONTRACTS } from "@/lib/contracts";
 import { explorer } from "@/lib/api";
@@ -46,6 +47,7 @@ export default function ClawbackPage() {
 
   return (
     <div className="space-y-8">
+      <DemoBanner feature="Clawback uses mock examples." details="The deployed Clawback covenant contract is real (TX verified on TN12), but the enforcement execution flow is not yet implemented." />
       <div>
         <h2 className="text-2xl font-bold text-white">Issuer Clawback</h2>
         <p className="text-gray-400 text-sm mt-1">

@@ -5,6 +5,7 @@
 
 import { useState } from "react";
 import { Gem, Lock, Vote, Clock, TrendingUp, Info, AlertTriangle, ExternalLink } from "lucide-react";
+import { DemoBanner } from "@/components/demo-banner";
 import { useWalletStore } from "@/store/wallet";
 import { KTT_TOKENS, KTT_REGISTRY, KTT_TRANSFER_COUNT } from "@/lib/ktt";
 import { explorer } from "@/lib/api";
@@ -114,6 +115,7 @@ export default function ASTMPage() {
 
   return (
     <div className="space-y-8">
+      <DemoBanner feature="ASTM token display uses simulated data." details="KRC-20 OP_RETURN inscription is rejected by Kaspa. The KTT covenant-native token system is the production path." />
       {/* KTT Integration Banner */}
       <div className="bg-emerald-950/50 border border-emerald-700/50 rounded-lg p-4 mb-4">
         <div className="flex items-start gap-3">

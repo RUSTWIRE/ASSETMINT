@@ -2,16 +2,16 @@
 
 > This file preserves critical context across sessions. DO NOT DELETE.
 
-## Project Status: ALL 5 MILESTONES COMPLETE
+## Project Status: ALL MILESTONES COMPLETE — 105 TESTS, 12 TN12 TXs
 
 ### Completed
-- **M0**: Full scaffold, 9 vendor repos cloned, Rust workspace (6 crates) compiles, SilverScript compiler built, DKG Edge Node config, git branches created
-- **M1**: 5 SilverScript contracts written & compiled, Groth16 ZK-KYC circuit implemented, trusted setup, prover, verifier all working.
-- **M2**: Full Rust Polymesh compliance port — identity registry, Ed25519 claims, composable rules engine, Axum REST API. 23 tests pass.
-- **M3**: ASTM token (KRC-20 inscriptions), staking, governance, fee model, simulated multisig oracle with Ed25519 attestations, DKG state-verity sync. 47 tests pass.
-- **M4**: Next.js 15 dashboard (8 pages), Kaspa wallet/API layer, E2E integration test. 75 tests pass across workspace.
-- **M5**: Property-based testing (8 proptest), security audit, Criterion benchmarks, architecture docs, investor brief, rubric. 83 tests pass.
-- **LIVE KASPA**: kaspa-adapter wired to real rusty-kaspa RPC (kaspa-wrpc-client @ c6819f3). Compliance API connects to local kaspad (127.0.0.1:17210) on startup. Live endpoints: `/network`, `/balance`, `/health` (with kaspa_connected). Frontend fetches real block count, DAA score, difficulty from kaspad. **85 tests pass** (incl. 2 live TN12 integration tests).
+- **M0**: Full scaffold, 9 vendor repos cloned, Rust workspace (6 crates) compiles, SilverScript compiler built, git branches created
+- **M1**: 7 SilverScript contracts written, compiled & deployed on TN12. Groth16 ZK-KYC circuit implemented, trusted setup, prover, verifier all working.
+- **M2**: Full Rust Polymesh compliance reimplementation — identity registry, Ed25519 claims, composable rules engine, Axum REST API. 33 tests.
+- **M3**: ASTM token, staking with timelock covenants, governance, fee model, simulated multisig oracle with Ed25519 attestations. 35 tokenomics tests.
+- **M4**: Next.js 15 dashboard (8 pages), Kaspa wallet/API layer, E2E integration test. 7 ZK tests.
+- **M5**: Sovereign metadata service (port 8900), covenant builder with 3 TN12-proven patterns, on-chain staking module, metadata-to-DAG commit endpoint. **105 tests pass**.
+- **LIVE KASPA**: kaspa-adapter wired to real rusty-kaspa RPC (kaspa-wrpc-client @ c6819f3). 12 confirmed TN12 transactions. Mempool-aware UTXO selection. Covenant execution proven (TX 27385b04).
 
 ### Running the Stack
 ```bash
@@ -19,7 +19,7 @@
 kaspad --testnet --netsuffix=12 --rpclisten-borsh=0.0.0.0:17210 --utxoindex
 
 # Terminal 2: Compliance API (port 3001, auto-connects to kaspad)
-cd /Users/rory/ASSETMINT && cargo run -p compliance-rust
+cd /Users/rory/ASSETMINT && make demo
 
 # Terminal 3: Frontend dashboard (port 3000)
 cd /Users/rory/ASSETMINT/apps/dashboard-fe && npm run dev
@@ -59,7 +59,7 @@ cd /Users/rory/ASSETMINT/apps/dashboard-fe && npm run dev
 ### Total Workspace Tests: 83
 | Crate | Unit | Integration | Proptest |
 |-------|------|-------------|---------|
-| compliance-rust | 23 | 1 (E2E) | 8 |
+| assetmint-core | 23 | 1 (E2E) | 8 |
 | zk-circuits | 4 | — | — |
 | tokenomics | 30 | — | — |
 | oracle-pool | 10 | — | — |
@@ -85,8 +85,8 @@ Constructor args: `contracts/silverscript/args/*.json` (uses `{"kind":"array","d
 |-----------|------|-------|-------------|
 | KycCircuit | `zk-circuits/src/kyc_circuit.rs` | 3 pass | MiMC-based Merkle inclusion + nullifier binding |
 | Trusted Setup | `zk-circuits/src/setup.rs` | 1 pass | Groth16 key generation (deterministic for testnet) |
-| ZkProver | `services/compliance-rust/src/zk_prover.rs` | 1 pass | Full proof generation with ZkWitness |
-| ZkVerifier | `services/compliance-rust/src/zk_verifier.rs` | 1 pass | Full proof verification + VK hash |
+| ZkProver | `services/assetmint-core/src/zk_prover.rs` | 1 pass | Full proof generation with ZkWitness |
+| ZkVerifier | `services/assetmint-core/src/zk_verifier.rs` | 1 pass | Full proof verification + VK hash |
 
 Key implementation notes:
 - Uses simplified MiMC-like hash (not cryptographically secure — demo only)
@@ -108,13 +108,13 @@ Contracts using `validateOutputState()` must:
 
 | Module | File | Tests | Description |
 |--------|------|-------|-------------|
-| Identity Registry | `services/compliance-rust/src/identity.rs` | 5 pass | SQLite-backed DID registry with claims loading |
-| Claims | `services/compliance-rust/src/claims.rs` | 4 pass | Ed25519-signed claims with expiry verification |
-| Rules Engine | `services/compliance-rust/src/rules.rs` | 5 pass | Composable AND/OR rules with HoldPeriod |
-| REST API | `services/compliance-rust/src/api.rs` | 5 pass | Axum endpoints: identity, claims, evaluate, merkle-root |
-| ZK Prover | `services/compliance-rust/src/zk_prover.rs` | 1 pass | Groth16 proof generation |
-| ZK Verifier | `services/compliance-rust/src/zk_verifier.rs` | 1 pass | Groth16 proof verification |
-| Merkle Tree | `services/compliance-rust/src/merkle.rs` | 2 pass | SHA-256 Merkle tree for approved addresses |
+| Identity Registry | `services/assetmint-core/src/identity.rs` | 5 pass | SQLite-backed DID registry with claims loading |
+| Claims | `services/assetmint-core/src/claims.rs` | 4 pass | Ed25519-signed claims with expiry verification |
+| Rules Engine | `services/assetmint-core/src/rules.rs` | 5 pass | Composable AND/OR rules with HoldPeriod |
+| REST API | `services/assetmint-core/src/api.rs` | 5 pass | Axum endpoints: identity, claims, evaluate, merkle-root |
+| ZK Prover | `services/assetmint-core/src/zk_prover.rs` | 1 pass | Groth16 proof generation |
+| ZK Verifier | `services/assetmint-core/src/zk_verifier.rs` | 1 pass | Groth16 proof verification |
+| Merkle Tree | `services/assetmint-core/src/merkle.rs` | 2 pass | SHA-256 Merkle tree for approved addresses |
 
 ### API Endpoints (port 3001)
 
@@ -186,7 +186,7 @@ Key components:
 - `disclaimer-banner.tsx` — Regulatory disclaimer on every page (amber, dismissible)
 - `sidebar.tsx` — Navigation with Lucide icons
 - `wallet-button.tsx` — Simulated Kaspa testnet wallet (connect/disconnect)
-- `src/lib/api.ts` — Fetch client for compliance-rust (port 3001) and oracle-pool (port 3002)
+- `src/lib/api.ts` — Fetch client for assetmint-core (port 3001) and oracle-pool (port 3002)
 - `src/store/wallet.ts` — Zustand wallet state store
 
 No Hedera/EVM deps. Pure Kaspa-native frontend.
@@ -195,14 +195,14 @@ No Hedera/EVM deps. Pure Kaspa-native frontend.
 
 | Test | File | Steps | Description |
 |------|------|-------|-------------|
-| Full RWA Cycle | `services/compliance-rust/tests/e2e_cycle.rs` | 8 steps | Register → KYC → transfer (allow/deny) → MaxAmount → Merkle → ZK proof → revoke |
+| Full RWA Cycle | `services/assetmint-core/tests/e2e_cycle.rs` | 8 steps | Register → KYC → transfer (allow/deny) → MaxAmount → Merkle → ZK proof → revoke |
 
 ### Total Workspace Tests: 75
 
 | Crate | Tests |
 |-------|-------|
-| compliance-rust (unit) | 23 |
-| compliance-rust (E2E) | 1 |
+| assetmint-core (unit) | 23 |
+| assetmint-core (E2E) | 1 |
 | zk-circuits | 4 |
 | tokenomics | 30 |
 | oracle-pool | 10 |
@@ -215,7 +215,7 @@ No Hedera/EVM deps. Pure Kaspa-native frontend.
 | SilverScript contracts | `contracts/silverscript/*.sil` | SilverScript | ✅ M1 complete |
 | Kaspa adapter | `packages/kaspa-adapter/` | Rust | Stubs done |
 | DKG bridge | `packages/dkg-bridge/` | TypeScript | Stubs done |
-| Compliance engine | `services/compliance-rust/` | Rust | ✅ M2 complete (23 tests) |
+| Compliance engine | `services/assetmint-core/` | Rust | ✅ M2 complete (23 tests) |
 | Oracle pool | `services/oracle-pool/` | Rust | ✅ M3 complete (10 tests) |
 | State sync | `services/sync/` | Rust | ✅ M3 complete (7 tests) |
 | Tokenomics | `tokenomics/` | Rust | ✅ M3 complete (30 tests) |
@@ -266,7 +266,7 @@ vendor/silverscript/target/release/silverc contract.sil --constructor-args args.
 | Crate | Key Dependencies |
 |-------|-----------------|
 | kaspa-adapter | sha2, hex, thiserror, tracing |
-| compliance-rust | axum 0.8, rusqlite 0.32, ark-groth16 0.5, ark-bn254 0.5, ark-snark 0.5, ed25519-dalek 2, zk-circuits |
+| assetmint-core | axum 0.8, rusqlite 0.32, ark-groth16 0.5, ark-bn254 0.5, ark-snark 0.5, ed25519-dalek 2, zk-circuits |
 | oracle-pool | axum 0.8, reqwest 0.12, chrono 0.4, async-trait 0.1 |
 | sync | reqwest 0.12 |
 | tokenomics | (workspace deps only) |

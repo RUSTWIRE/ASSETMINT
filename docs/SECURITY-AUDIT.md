@@ -46,11 +46,11 @@ This audit covers the full AssetMint stack as of Milestone 0:
 
 - **5 SilverScript contracts**: `rwa-core.sil`, `clawback.sil`, `state-verity.sil`, `zkkyc-verifier.sil`, `reserves.sil`
 - **ZK-KYC circuit**: Groth16 over BN254 with simplified MiMC-like hash (`zk-circuits/`)
-- **Compliance engine**: Identity registry, claims issuance, transfer rules (`services/compliance-rust/`)
+- **Compliance engine**: Identity registry, claims issuance, transfer rules (`services/assetmint-core/`)
 - **Oracle pool**: Centralized 2-of-3 multisig price attestation (`services/oracle-pool/`)
 - **ASTM tokenomics**: KRC-20 inscriptions, staking, governance, fee model (`tokenomics/`)
 - **Frontend dashboard**: Next.js with simulated wallet (`apps/dashboard-fe/`)
-- **State sync service**: DKG polling and covenant state transitions (`services/sync/`)
+- **State sync service**: Merkle root polling and covenant state transitions (`services/sync/`)
 
 ### Methodology
 
@@ -128,7 +128,7 @@ This audit covers the full AssetMint stack as of Milestone 0:
 
 1. **Identity Registration**: Browser -> Compliance API -> SQLite. No authentication on the API endpoint. Any caller can register arbitrary DIDs.
 
-2. **Claim Issuance**: Browser -> Compliance API -> Ed25519 signing -> SQLite. The claim issuer key is hardcoded as `[42u8; 32]` in `create_default_state()` (file: `services/compliance-rust/src/api.rs`, line 267).
+2. **Claim Issuance**: Browser -> Compliance API -> Ed25519 signing -> SQLite. The claim issuer key is hardcoded as `[42u8; 32]` in `create_default_state()` (file: `services/assetmint-core/src/api.rs`, line 267).
 
 3. **Transfer Evaluation**: Browser -> Compliance API -> load identity + claims from SQLite -> evaluate rules -> return JSON. Transfer parameters arrive via query string (GET request) which may be logged in access logs.
 
@@ -275,7 +275,7 @@ The Groth16 trusted setup (`zk-circuits/src/setup.rs`, line 55) uses:
 let mut rng = StdRng::seed_from_u64(0xDEAD_BEEF_CAFE_BABE);
 ```
 
-And the prover (`services/compliance-rust/src/zk_prover.rs`, line 138) uses:
+And the prover (`services/assetmint-core/src/zk_prover.rs`, line 138) uses:
 
 ```rust
 let mut rng = StdRng::seed_from_u64(0xCAFE_BABE);
@@ -332,7 +332,7 @@ In AssetMint, the proof hash is committed on-chain via `sha256(proof_bytes)`. If
 
 **Severity: Informational (No Vulnerability)**
 
-The identity registry (`services/compliance-rust/src/identity.rs`) uses `rusqlite` with parameterized queries throughout. All user-supplied values are passed via `params![]` macro, which uses SQLite's prepared statement API with bound parameters.
+The identity registry (`services/assetmint-core/src/identity.rs`) uses `rusqlite` with parameterized queries throughout. All user-supplied values are passed via `params![]` macro, which uses SQLite's prepared statement API with bound parameters.
 
 Verified safe patterns:
 - Line 98: `params![did, primary_key, now as i64]`
@@ -347,7 +347,7 @@ Verified safe patterns:
 
 **Severity: Low**
 
-The claim signing and verification flow (`services/compliance-rust/src/claims.rs`) is correctly implemented:
+The claim signing and verification flow (`services/assetmint-core/src/claims.rs`) is correctly implemented:
 
 - Claims are signed over `SHA256(subject_did || claim_type_json || expiry_le || issued_at_le)` (lines 121-127)
 - Verification reconstructs the same canonical byte representation and verifies the Ed25519 signature (lines 148-167)
@@ -391,7 +391,7 @@ The `register()` function checks for uniqueness via the `UNIQUE` constraint on t
 
 **Severity: High**
 
-The compliance API (`services/compliance-rust/src/api.rs`) has **no rate limiting** on any endpoint. The Axum router (lines 252-259) binds all routes without middleware for:
+The compliance API (`services/assetmint-core/src/api.rs`) has **no rate limiting** on any endpoint. The Axum router (lines 252-259) binds all routes without middleware for:
 
 - Request rate limiting
 - Authentication/authorization

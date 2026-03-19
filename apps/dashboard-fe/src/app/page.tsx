@@ -17,7 +17,11 @@ import {
   UserPlus,
   ClipboardCheck,
   FileCode,
-  Coins,
+  CheckCircle2,
+  XCircle,
+  Loader2,
+  AlertTriangle,
+  Send,
 } from "lucide-react";
 import { useWalletStore } from "@/store/wallet";
 import { formatKAS } from "@/lib/wallet";
@@ -67,6 +71,8 @@ export default function DashboardPage() {
   const [health, setHealth] = useState<HealthStatus | null>(null);
   const [healthError, setHealthError] = useState(false);
   const [network, setNetwork] = useState<NetworkInfo | null>(null);
+  const [metadataStatus, setMetadataStatus] = useState<"checking" | "online" | "offline">("checking");
+  const [oracleStatus, setOracleStatus] = useState<"checking" | "online" | "offline">("checking");
 
   useEffect(() => {
     console.log("[K-RWA] Dashboard mounted, fetching health + network status");
@@ -90,6 +96,18 @@ export default function DashboardPage() {
       .catch(() => {
         console.log("[K-RWA] Network info not available");
       });
+
+    fetch("http://localhost:8900/health")
+      .then((r) => {
+        if (r.ok) setMetadataStatus("online");
+        else setMetadataStatus("offline");
+      })
+      .catch(() => setMetadataStatus("offline"));
+
+    api
+      .oracleHealth()
+      .then(() => setOracleStatus("online"))
+      .catch(() => setOracleStatus("offline"));
   }, []);
 
   return (
@@ -101,44 +119,69 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      {/* System Status Bar */}
-      <div className="flex flex-wrap items-center gap-3 bg-gray-900/60 border border-gray-800 rounded-lg px-4 py-2.5">
-        <span className="text-xs text-gray-500 font-medium uppercase tracking-wider mr-1">
-          System Status
-        </span>
-        <span
-          className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full ${
-            health
-              ? "bg-emerald-500/10 text-emerald-400"
-              : healthError
-                ? "bg-red-500/10 text-red-400"
-                : "bg-gray-800 text-gray-400"
-          }`}
-        >
-          <span className="w-1.5 h-1.5 rounded-full bg-current" />
-          Backend API: {health ? "Connected" : healthError ? "Offline" : "Checking..."}
-        </span>
-        <span
-          className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full ${
-            network?.is_synced
-              ? "bg-emerald-500/10 text-emerald-400"
-              : network
-                ? "bg-red-500/10 text-red-400"
-                : "bg-gray-800 text-gray-400"
-          }`}
-        >
-          <span className="w-1.5 h-1.5 rounded-full bg-current" />
-          Kaspa TN12:{" "}
-          {network?.is_synced
-            ? `Synced (block ${network.block_count.toLocaleString()})`
-            : network
-              ? "Not connected"
-              : "Checking..."}
-        </span>
-        <span className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400">
-          <span className="w-1.5 h-1.5 rounded-full bg-current" />
-          Contracts: {CONTRACTS.length} deployed on TN12
-        </span>
+      {/* System Status */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="bg-gray-900 rounded-xl border border-gray-800 p-4 flex items-center gap-3">
+          {health ? (
+            <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+          ) : healthError ? (
+            <XCircle className="w-5 h-5 text-red-400 shrink-0" />
+          ) : (
+            <Loader2 className="w-5 h-5 text-gray-400 animate-spin shrink-0" />
+          )}
+          <div className="min-w-0">
+            <p className="text-xs text-gray-500">Backend API</p>
+            <p className={`text-sm font-medium truncate ${health ? "text-emerald-400" : healthError ? "text-red-400" : "text-gray-400"}`}>
+              {health ? "Connected" : healthError ? "Offline" : "Checking..."}
+            </p>
+          </div>
+        </div>
+
+        <div className="bg-gray-900 rounded-xl border border-gray-800 p-4 flex items-center gap-3">
+          {network?.is_synced ? (
+            <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+          ) : network ? (
+            <XCircle className="w-5 h-5 text-red-400 shrink-0" />
+          ) : (
+            <Loader2 className="w-5 h-5 text-gray-400 animate-spin shrink-0" />
+          )}
+          <div className="min-w-0">
+            <p className="text-xs text-gray-500">Kaspa TN12</p>
+            <p className={`text-sm font-medium truncate ${network?.is_synced ? "text-emerald-400" : network ? "text-red-400" : "text-gray-400"}`}>
+              {network?.is_synced
+                ? `Synced (${network.block_count.toLocaleString()} blocks)`
+                : network
+                  ? "Not synced"
+                  : "Checking..."}
+            </p>
+          </div>
+        </div>
+
+        <div className="bg-gray-900 rounded-xl border border-gray-800 p-4 flex items-center gap-3">
+          {metadataStatus === "online" ? (
+            <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+          ) : metadataStatus === "offline" ? (
+            <XCircle className="w-5 h-5 text-red-400 shrink-0" />
+          ) : (
+            <Loader2 className="w-5 h-5 text-gray-400 animate-spin shrink-0" />
+          )}
+          <div className="min-w-0">
+            <p className="text-xs text-gray-500">Sovereign Metadata</p>
+            <p className={`text-sm font-medium truncate ${metadataStatus === "online" ? "text-emerald-400" : metadataStatus === "offline" ? "text-red-400" : "text-gray-400"}`}>
+              {metadataStatus === "online" ? "Online (port 8900)" : metadataStatus === "offline" ? "Offline" : "Checking..."}
+            </p>
+          </div>
+        </div>
+
+        <div className="bg-gray-900 rounded-xl border border-gray-800 p-4 flex items-center gap-3">
+          <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0" />
+          <div className="min-w-0">
+            <p className="text-xs text-gray-500">Oracle</p>
+            <p className="text-sm font-medium text-amber-400 truncate">
+              CoinGecko (simulated)
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Quick Actions */}
@@ -155,22 +198,22 @@ export default function DashboardPage() {
           className="flex items-center gap-2 bg-gray-900 border border-gray-800 rounded-lg px-4 py-3 text-sm text-gray-300 hover:border-indigo-500/50 hover:text-white transition-colors"
         >
           <ClipboardCheck className="w-4 h-4 text-amber-400" />
-          Evaluate Compliance
+          Issue KYC
+        </Link>
+        <Link
+          href="/transfer"
+          className="flex items-center gap-2 bg-gray-900 border border-gray-800 rounded-lg px-4 py-3 text-sm text-gray-300 hover:border-indigo-500/50 hover:text-white transition-colors"
+        >
+          <Send className="w-4 h-4 text-emerald-400" />
+          Transfer Asset
         </Link>
         <a
           href="#contracts"
           className="flex items-center gap-2 bg-gray-900 border border-gray-800 rounded-lg px-4 py-3 text-sm text-gray-300 hover:border-indigo-500/50 hover:text-white transition-colors"
         >
-          <FileCode className="w-4 h-4 text-emerald-400" />
+          <FileCode className="w-4 h-4 text-purple-400" />
           View Contracts
         </a>
-        <Link
-          href="/mint"
-          className="flex items-center gap-2 bg-gray-900 border border-gray-800 rounded-lg px-4 py-3 text-sm text-gray-300 hover:border-indigo-500/50 hover:text-white transition-colors"
-        >
-          <Coins className="w-4 h-4 text-purple-400" />
-          Mint Asset
-        </Link>
       </div>
 
       {/* Stats Cards */}

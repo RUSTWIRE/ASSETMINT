@@ -14,6 +14,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { useWalletStore } from "@/store/wallet";
+import { DemoBanner } from "@/components/demo-banner";
 import { cn } from "@/lib/cn";
 import { COMPLIANCE_API, explorer } from "@/lib/api";
 import { DEPLOYED_CONTRACTS } from "@/lib/contracts";
@@ -250,6 +251,7 @@ export default function MintPage() {
 
   return (
     <div className="space-y-8">
+      <DemoBanner feature="Steps 2 (DKG) and 5 (KRC-20) use the sovereign metadata service instead of OriginTrail." details="Metadata is stored privately via SHA-256 integrity hashes on port 8900. On-chain hash commitment available via POST /metadata/publish-and-commit." />
       <div>
         <h2 className="text-2xl font-bold text-white">Mint RWA Token</h2>
         <p className="text-gray-400 text-sm mt-1">

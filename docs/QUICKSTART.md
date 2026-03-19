@@ -13,7 +13,7 @@ Get the demo running in under five minutes.
 | Node.js | 18+ | Dashboard frontend (Next.js) |
 | kaspad | TN12 | Local Kaspa Testnet-12 node for live blockchain queries |
 
-Optional: Docker (for the DKG Edge Node).
+Optional: Docker (for the Sovereign Metadata Service on port 8900).
 
 ## Quick Start
 
@@ -35,6 +35,7 @@ make setup && make demo
 |---------|------|-----|
 | Dashboard Frontend | 3000 | `http://localhost:3000` |
 | Compliance API | 3001 | `http://localhost:3001` |
+| Sovereign Metadata | 8900 | `http://localhost:8900` |
 | kaspad RPC | 17210 | `ws://127.0.0.1:17210` |
 
 ## First Verification
@@ -50,7 +51,7 @@ Expected response:
 ```json
 {
   "status": "ok",
-  "service": "compliance-rust",
+  "service": "assetmint-core",
   "kaspa_connected": false
 }
 ```

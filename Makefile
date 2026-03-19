@@ -37,12 +37,18 @@ frontend: ## Start Next.js dashboard (port 3000)
 	@sleep 2
 	@echo "[K-RWA] Frontend ready: http://localhost:3000"
 
+metadata: ## Start sovereign metadata service (port 8900, requires Docker)
+	@echo "[K-RWA] Starting Sovereign Metadata Service on :8900..."
+	@cd infrastructure/dkg-node && docker compose up -d sovereign-metadata
+	@echo "[K-RWA] Metadata service ready: http://localhost:8900"
+
 demo: backend frontend ## Start full demo (backend + frontend)
 	@echo ""
 	@echo "[K-RWA] ========================================"
 	@echo "[K-RWA]  AssetMint Demo Running"
 	@echo "[K-RWA]  Dashboard:  http://localhost:3000"
 	@echo "[K-RWA]  API:        http://localhost:3001"
+	@echo "[K-RWA]  Metadata:   http://localhost:8900 (run 'make metadata' separately)"
 	@echo "[K-RWA]  Kaspad:     ws://127.0.0.1:17210"
 	@echo "[K-RWA] ========================================"
 	@echo "[K-RWA] Press Ctrl+C to stop all services"
