@@ -6,7 +6,7 @@
 > Checklist tracking all deliverables across 5 milestones.
 > Status markers: `[x]` = genuinely complete, `[~]` = partially done, `[ ]` = not done.
 
-## Overall Status: PARTIALLY COMPLETE (7.3/10)
+## Overall Status: PARTIALLY COMPLETE (7.5/10)
 
 | Milestone | Status | Lib Tests | Description |
 |-----------|--------|-----------|-------------|
@@ -18,7 +18,7 @@
 | M5 | Partially complete | 5 | Some security tests; live TN12 deploys real; formal verification missing |
 
 **Total lib tests: 96** (verified via `cargo test --lib`)
-**On-chain TN12 transactions: 12** (3 transfers + 2 funding + 7 contract deployments)
+**On-chain TN12 transactions: 14+** (3 transfers + 2 funding + 7 contract deployments + 2 covenant execution)
 **SilverScript contracts: 7 written, 7 deployed on TN12**
 
 ---
@@ -44,7 +44,7 @@
 - [x] Constructor args JSON files with real wallet key hashes (blake2b)
 - [x] All 5 core contracts compiled with `silverc` compiler
 - [x] All 7 contracts deployed as funded P2SH UTXOs on Kaspa TN12
-- [ ] Any covenant entrypoint invoked on-chain (no `zkTransfer`, `issuerClawback`, etc. ever called)
+- [x] Covenant entrypoint invoked on-chain -- raw CHECKSIG P2SH covenant deployed + spent: TX `27385b04be30bc8f55227f7ccef317d02bbdd715ba1ca50b72ce3ea9ac6d6f8c`
 
 ### ZK Circuits
 - [x] Groth16 R1CS circuit (`zk-circuits/src/kyc_circuit.rs`) -- KycCircuit works
