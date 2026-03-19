@@ -4,7 +4,7 @@
 # AssetMint — One-Command Demo Startup
 # Usage: make demo
 
-.PHONY: demo setup backend frontend test stop clean help
+.PHONY: demo setup backend frontend test stop clean cli help
 
 help: ## Show available commands
 	@echo "AssetMint Demo Commands:"
@@ -73,6 +73,9 @@ stop: ## Stop all running services
 	-@pkill -f "target.*assetmint" 2>/dev/null || true
 	-@pkill -f "next dev" 2>/dev/null || true
 	@echo "[K-RWA] Services stopped."
+
+cli: ## Run AssetMint CLI (pass args via ARGS, e.g. make cli ARGS="health")
+	cargo run -p assetmint-core --bin assetmint -- $(ARGS)
 
 clean: ## Clean build artifacts
 	cargo clean

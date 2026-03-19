@@ -1,0 +1,106 @@
+# DISCLAIMER: Technical demo code — legal wrappers required in production
+# SPDX-License-Identifier: MIT
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Rust workspace: check, test, clippy, fmt
+  # ---------------------------------------------------------------------------
+  rust:
+    name: Rust checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      - name: Cache cargo registry + build artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: cargo check
+        run: cargo check --workspace
+
+      - name: cargo test (lib only)
+        run: cargo test --workspace --lib
+
+      - name: cargo clippy (warning, non-blocking)
+        run: cargo clippy --workspace -- -D warnings
+        continue-on-error: true
+
+      - name: cargo fmt check
+        run: cargo fmt --all -- --check
+
+  # ---------------------------------------------------------------------------
+  # Next.js dashboard frontend
+  # ---------------------------------------------------------------------------
+  frontend:
+    name: Frontend checks
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/dashboard-fe
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: apps/dashboard-fe/package-lock.json
+
+      # NOTE: The dashboard depends on a local `file:` package (ktt).
+      # In CI we install with --ignore-scripts and --legacy-peer-deps to
+      # tolerate the missing local link. If the ktt package is published
+      # to a registry in the future, remove these flags.
+      - name: npm ci
+        run: npm ci --ignore-scripts || npm install --legacy-peer-deps --ignore-scripts
+
+      - name: TypeScript type-check
+        run: npx tsc --noEmit
+
+      - name: Next.js build
+        run: npm run build
+
+  # ---------------------------------------------------------------------------
+  # Sovereign metadata service (plain Node.js)
+  # ---------------------------------------------------------------------------
+  metadata:
+    name: Metadata service check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infrastructure/dkg-node/sovereign-metadata
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Syntax check server.js
+        run: node -c server.js

@@ -20,13 +20,13 @@ import {
   CheckCircle2,
   XCircle,
   Loader2,
-  AlertTriangle,
   Send,
 } from "lucide-react";
 import { useWalletStore } from "@/store/wallet";
 import { formatKAS } from "@/lib/wallet";
 import { api, explorer } from "@/lib/api";
 import { DEPLOYED_CONTRACTS } from "@/lib/contracts";
+import { useServiceStatus } from "@/hooks/useServiceStatus";
 
 interface HealthStatus {
   status: string;
@@ -67,6 +67,7 @@ const REAL_TRANSACTIONS: Array<{
   { id: "6c1fee2b7387cadd777a5af8b62144f2c7dfc712a1eb463a9134594b6a2e429f", type: "Deploy", contract: "Compliance Covenant", status: "confirmed" },
   { id: "d0bcf48c8e879ee9d72a40ebe4424e671389848bcea5cd9c5ed1bafe0f392a56", type: "Transfer", from: "Compliance", to: "Recipient", amount: "0.9999 KAS", status: "confirmed" },
   { id: "7554b507d7bc0a2f83c5691a5224922f884c08987bdbeb9e5309054ad48604a4", type: "Deploy", contract: "Staking Timelock", status: "confirmed" },
+  { id: "f64733cc75743e341ee0d3ddc52c44f62161061bd8d5d71ff4e9c46c457612be", type: "Deploy", contract: "Clawback Covenant", status: "confirmed" },
 ];
 
 const CONTRACTS = Object.values(DEPLOYED_CONTRACTS);
@@ -77,8 +78,7 @@ export default function DashboardPage() {
   const [health, setHealth] = useState<HealthStatus | null>(null);
   const [healthError, setHealthError] = useState(false);
   const [network, setNetwork] = useState<NetworkInfo | null>(null);
-  const [metadataStatus, setMetadataStatus] = useState<"checking" | "online" | "offline">("checking");
-  const [oracleStatus, setOracleStatus] = useState<"checking" | "online" | "offline">("checking");
+  const services = useServiceStatus();
 
   useEffect(() => {
     console.log("[K-RWA] Dashboard mounted, fetching health + network status");
@@ -103,17 +103,6 @@ export default function DashboardPage() {
         console.log("[K-RWA] Network info not available");
       });
 
-    fetch("http://localhost:8900/health")
-      .then((r) => {
-        if (r.ok) setMetadataStatus("online");
-        else setMetadataStatus("offline");
-      })
-      .catch(() => setMetadataStatus("offline"));
-
-    api
-      .oracleHealth()
-      .then(() => setOracleStatus("online"))
-      .catch(() => setOracleStatus("offline"));
   }, []);
 
   return (
@@ -127,67 +116,43 @@ export default function DashboardPage() {
 
       {/* System Status */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div className="bg-gray-900 rounded-xl border border-gray-800 p-4 flex items-center gap-3">
-          {health ? (
-            <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
-          ) : healthError ? (
-            <XCircle className="w-5 h-5 text-red-400 shrink-0" />
-          ) : (
-            <Loader2 className="w-5 h-5 text-gray-400 animate-spin shrink-0" />
-          )}
-          <div className="min-w-0">
-            <p className="text-xs text-gray-500">Backend API</p>
-            <p className={`text-sm font-medium truncate ${health ? "text-emerald-400" : healthError ? "text-red-400" : "text-gray-400"}`}>
-              {health ? "Connected" : healthError ? "Offline" : "Checking..."}
-            </p>
+        {services.map((svc) => (
+          <div
+            key={svc.name}
+            className="bg-gray-900 rounded-xl border border-gray-800 p-4 flex items-center gap-3"
+          >
+            {svc.status === "online" ? (
+              <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+            ) : svc.status === "offline" ? (
+              <XCircle className="w-5 h-5 text-red-400 shrink-0" />
+            ) : (
+              <Loader2 className="w-5 h-5 text-amber-400 animate-spin shrink-0" />
+            )}
+            <div className="min-w-0">
+              <p className="text-xs text-gray-500">{svc.name}</p>
+              <p
+                className={`text-sm font-medium truncate ${
+                  svc.status === "online"
+                    ? "text-emerald-400"
+                    : svc.status === "offline"
+                      ? "text-red-400"
+                      : "text-amber-400"
+                }`}
+              >
+                {svc.status === "online"
+                  ? svc.detail || "Online"
+                  : svc.status === "offline"
+                    ? svc.detail || "Offline"
+                    : "Checking..."}
+              </p>
+              {svc.status === "online" && svc.latency != null && (
+                <p className="text-[10px] text-gray-600 font-mono">
+                  {svc.latency}ms
+                </p>
+              )}
+            </div>
           </div>
-        </div>
-
-        <div className="bg-gray-900 rounded-xl border border-gray-800 p-4 flex items-center gap-3">
-          {network?.is_synced ? (
-            <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
-          ) : network ? (
-            <XCircle className="w-5 h-5 text-red-400 shrink-0" />
-          ) : (
-            <Loader2 className="w-5 h-5 text-gray-400 animate-spin shrink-0" />
-          )}
-          <div className="min-w-0">
-            <p className="text-xs text-gray-500">Kaspa TN12</p>
-            <p className={`text-sm font-medium truncate ${network?.is_synced ? "text-emerald-400" : network ? "text-red-400" : "text-gray-400"}`}>
-              {network?.is_synced
-                ? `Synced (${network.block_count.toLocaleString()} blocks)`
-                : network
-                  ? "Not synced"
-                  : "Checking..."}
-            </p>
-          </div>
-        </div>
-
-        <div className="bg-gray-900 rounded-xl border border-gray-800 p-4 flex items-center gap-3">
-          {metadataStatus === "online" ? (
-            <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
-          ) : metadataStatus === "offline" ? (
-            <XCircle className="w-5 h-5 text-red-400 shrink-0" />
-          ) : (
-            <Loader2 className="w-5 h-5 text-gray-400 animate-spin shrink-0" />
-          )}
-          <div className="min-w-0">
-            <p className="text-xs text-gray-500">Sovereign Metadata</p>
-            <p className={`text-sm font-medium truncate ${metadataStatus === "online" ? "text-emerald-400" : metadataStatus === "offline" ? "text-red-400" : "text-gray-400"}`}>
-              {metadataStatus === "online" ? "Online (port 8900)" : metadataStatus === "offline" ? "Offline" : "Checking..."}
-            </p>
-          </div>
-        </div>
-
-        <div className="bg-gray-900 rounded-xl border border-gray-800 p-4 flex items-center gap-3">
-          <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0" />
-          <div className="min-w-0">
-            <p className="text-xs text-gray-500">Oracle</p>
-            <p className="text-sm font-medium text-amber-400 truncate">
-              CoinGecko (simulated)
-            </p>
-          </div>
-        </div>
+        ))}
       </div>
 
       {/* Quick Actions */}
