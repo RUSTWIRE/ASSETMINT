@@ -15,6 +15,8 @@ use axum::{
 };
 use axum::http::Request;
 use serde::{Deserialize, Serialize};
+use std::fs::OpenOptions;
+use std::io::Write;
 use std::sync::{Arc, Mutex};
 use tracing::info;
 
@@ -972,6 +974,7 @@ fn parse_claim_type(type_str: &str, jurisdiction: Option<&str>) -> Result<ClaimT
 // ── Audit Middleware ──────────────────────────────────────────────────
 
 /// Audit logging middleware — logs all requests with method, path, and status.
+/// Writes structured JSON lines to a file (configured via AUDIT_LOG_PATH env var).
 async fn audit_log_middleware(
     request: Request<axum::body::Body>,
     next: Next,
@@ -988,11 +991,28 @@ async fn audit_log_middleware(
     let start = std::time::Instant::now();
     let response = next.run(request).await;
     let duration = start.elapsed();
+    let status = response.status().as_u16();
 
+    // Stdout log
     println!(
         "[K-RWA] AUDIT: {} {} from {} -> {} ({:?})",
-        method, path, ip, response.status(), duration
+        method, path, ip, status, duration
     );
+
+    // File log (JSON lines)
+    let audit_path = std::env::var("AUDIT_LOG_PATH")
+        .unwrap_or_else(|_| "/tmp/assetmint_audit.log".to_string());
+    if let Ok(mut file) = OpenOptions::new().create(true).append(true).open(&audit_path) {
+        let timestamp = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_secs();
+        let _ = writeln!(
+            file,
+            r#"{{"timestamp":{},"method":"{}","path":"{}","ip":"{}","status":{},"duration_ms":{}}}"#,
+            timestamp, method, path, ip, status, duration.as_millis()
+        );
+    }
 
     response
 }

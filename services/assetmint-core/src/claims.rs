@@ -54,6 +54,8 @@ pub struct Claim {
     pub signature: String,
     /// Issuance timestamp
     pub issued_at: u64,
+    /// Key version that signed this claim (for key rotation support)
+    pub key_version: u32,
 }
 
 // ── W3C Verifiable Credentials ────────────────────────────────────────
@@ -262,6 +264,7 @@ pub struct ClaimIssuer {
     pub did: String,
     signing_key: SigningKey,
     pub verifying_key: VerifyingKey,
+    pub key_version: u32,
 }
 
 impl ClaimIssuer {
@@ -279,7 +282,15 @@ impl ClaimIssuer {
             did: did.to_string(),
             signing_key,
             verifying_key,
+            key_version: 1,
         }
+    }
+
+    /// Create a claim issuer with a specific key version (for key rotation)
+    pub fn with_version(did: &str, seed: &[u8; 32], version: u32) -> Self {
+        let mut issuer = Self::new(did, seed);
+        issuer.key_version = version;
+        issuer
     }
 
     /// Issue a signed claim
@@ -312,6 +323,7 @@ impl ClaimIssuer {
             expiry,
             signature: hex::encode(signature.to_bytes()),
             issued_at: now,
+            key_version: self.key_version,
         }
     }
 }
@@ -400,6 +412,7 @@ mod tests {
 
         assert_eq!(claim.claim_type, ClaimType::KycVerified);
         assert_eq!(claim.issuer_did, "did:kaspa:issuer");
+        assert_eq!(claim.key_version, 1);
         assert!(!claim.signature.is_empty());
 
         let result = verify_claim(&claim, &issuer.verifying_key);
@@ -474,5 +487,24 @@ mod tests {
             ClaimType::JurisdictionAllowed("US".to_string())
         );
         assert!(verify_claim(&claim, &issuer.verifying_key).unwrap());
+    }
+
+    #[test]
+    fn test_key_rotation_versioning() {
+        let issuer_v1 = ClaimIssuer::with_version("did:kaspa:issuer", &[42u8; 32], 1);
+        let issuer_v2 = ClaimIssuer::with_version("did:kaspa:issuer", &[99u8; 32], 2);
+
+        let claim_v1 = issuer_v1.issue_claim("did:kaspa:alice", ClaimType::KycVerified, 0);
+        let claim_v2 = issuer_v2.issue_claim("did:kaspa:alice", ClaimType::KycVerified, 0);
+
+        assert_eq!(claim_v1.key_version, 1);
+        assert_eq!(claim_v2.key_version, 2);
+
+        // v1 claim verifies with v1 key
+        assert!(verify_claim(&claim_v1, &issuer_v1.verifying_key).unwrap());
+        // v2 claim verifies with v2 key
+        assert!(verify_claim(&claim_v2, &issuer_v2.verifying_key).unwrap());
+        // v1 claim does NOT verify with v2 key
+        assert!(verify_claim(&claim_v1, &issuer_v2.verifying_key).is_err());
     }
 }

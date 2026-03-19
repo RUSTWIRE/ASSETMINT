@@ -181,6 +181,7 @@ impl IdentityRegistry {
                     expiry: row.get::<_, i64>(4)? as u64,
                     signature: row.get(5)?,
                     issued_at: row.get::<_, i64>(6)? as u64,
+                    key_version: 1,
                 })
             })
             .map_err(|e| IdentityError::StorageError(e.to_string()))?
@@ -349,6 +350,7 @@ mod tests {
             expiry: 0,
             signature: "sig_placeholder".into(),
             issued_at: 1000,
+            key_version: 1,
         };
         registry.add_claim(&claim).unwrap();
 

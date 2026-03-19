@@ -26,7 +26,7 @@ setup: ## Install all dependencies
 
 backend: ## Start AssetMint compliance API (port 3001)
 	@echo "[K-RWA] Starting AssetMint Core API on :3001..."
-	@CLAIM_ISSUER_KEY=$$(openssl rand -hex 32) OPERATOR_PRIVATE_KEY=ab08984d79824336161553b77e366abde831ebde78d78f0440e6833b2f2e2f92 IDENTITY_DB_PATH=/tmp/assetmint_identities.db cargo run -p assetmint-core --quiet &
+	@CLAIM_ISSUER_KEY=$$(openssl rand -hex 32) OPERATOR_PRIVATE_KEY=ab08984d79824336161553b77e366abde831ebde78d78f0440e6833b2f2e2f92 IDENTITY_DB_PATH=/tmp/assetmint_identities.db AUDIT_LOG_PATH=/tmp/assetmint_audit.log cargo run -p assetmint-core --quiet &
 	@sleep 3
 	@echo "[K-RWA] Backend API ready: http://localhost:3001"
 	@echo "[K-RWA] Health check: curl http://localhost:3001/health"

@@ -431,6 +431,7 @@ mod tests {
             expiry: 0,
             signature: "test".into(),
             issued_at: 1000,
+            key_version: 1,
         }
     }
 
@@ -488,6 +489,7 @@ mod tests {
                 expiry: 0,
                 signature: "test".into(),
                 issued_at: 1000,
+                key_version: 1,
             }],
         );
 
@@ -534,6 +536,7 @@ mod tests {
             expiry: 0,
             signature: "test".into(),
             issued_at: 1000,
+            key_version: 1,
         }
     }
 
@@ -545,6 +548,7 @@ mod tests {
             expiry: 0,
             signature: "test".into(),
             issued_at: 1000,
+            key_version: 1,
         }
     }
 
@@ -556,6 +560,7 @@ mod tests {
             expiry: 0,
             signature: "test".into(),
             issued_at: 1000,
+            key_version: 1,
         }
     }
 
@@ -567,6 +572,7 @@ mod tests {
             expiry: 0,
             signature: "test".into(),
             issued_at: 1000,
+            key_version: 1,
         }
     }
 

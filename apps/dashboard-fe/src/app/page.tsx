@@ -66,6 +66,7 @@ const REAL_TRANSACTIONS: Array<{
   { id: "ccfdab27756445ce5fa565cbf98efc34bb5487a3f07b4e529f63ee9955dc7775", type: "Transfer", from: "Covenant", to: "Recipient", amount: "0.9999 KAS", status: "confirmed" },
   { id: "6c1fee2b7387cadd777a5af8b62144f2c7dfc712a1eb463a9134594b6a2e429f", type: "Deploy", contract: "Compliance Covenant", status: "confirmed" },
   { id: "d0bcf48c8e879ee9d72a40ebe4424e671389848bcea5cd9c5ed1bafe0f392a56", type: "Transfer", from: "Compliance", to: "Recipient", amount: "0.9999 KAS", status: "confirmed" },
+  { id: "7554b507d7bc0a2f83c5691a5224922f884c08987bdbeb9e5309054ad48604a4", type: "Deploy", contract: "Staking Timelock", status: "confirmed" },
 ];
 
 const CONTRACTS = Object.values(DEPLOYED_CONTRACTS);

@@ -123,7 +123,7 @@ ASTM stakers vote on protocol proposals with weight proportional to their staked
 | M2 | Done | Polymesh compliance port, identity registry, rules engine, REST API |
 | M3 | Done | ASTM token (KRC-20), staking, governance, oracle with Ed25519 attestations |
 | M4 | Done | Next.js 15 dashboard (8 pages), E2E integration test, 105 tests passing |
-| M5 | Done | Sovereign metadata, covenant builder, on-chain staking, 16 TN12 transactions |
+| M5 | Done | Sovereign metadata, covenant builder, on-chain staking, 17 TN12 transactions |
 | M6 | In progress | Security audit, formal verification, investor whitepaper |
 | M6 | Planned | Mainnet preparation, deployment tooling, launch readiness |
 

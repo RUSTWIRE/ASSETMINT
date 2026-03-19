@@ -51,7 +51,7 @@ Real wRPC connection to a local kaspad v1.1.0-rc.3 node. Real transactions broad
 - **File:** `packages/kaspa-adapter/src/client.rs`
 - Borsh wRPC via `kaspa-wrpc-client` (git rev `c6819f3`)
 - Working methods: `get_server_info`, `get_balance_by_address`, `get_utxos_by_addresses`, `get_block_dag_info`, `submit_transaction`
-- 16 confirmed transactions on TN12 (see table below)
+- 17 confirmed transactions on TN12 (see table below)
 - Mempool-aware UTXO selection: filters mempool-spent outpoints via `get_mempool_entries_by_addresses`
 - Storage mass protection: MAX_INPUTS=25 cap
 
@@ -135,14 +135,16 @@ Axum 0.8 with CORS. Real endpoints connected to real backends.
 - **CHECKSIG proven on TN12:** Deploy TX `5139f1fd`, Spend TX `ccfdab27`
 - **Compliance covenant proven on TN12:** Deploy TX `6c1fee2b`, Spend TX `d0bcf48c` (42-byte script with value conservation)
 
-### On-Chain Staking (7/10)
+### On-Chain Staking (8/10)
 
 - **File:** `tokenomics/src/on_chain.rs`
 - Timelock covenant using `CHECKLOCKTIMEVERIFY`
 - `build_covenant(owner_pubkey, unlock_daa_score)` returns redeem script
 - `derive_p2sh_address()` returns `kaspatest:p...` P2SH address
 - 5 unit tests for script structure
-- **Limitation:** Demo-only -- not yet deployed on TN12 (needs integration test)
+- **DEPLOYED ON TN12:** TX `7554b507d7bc0a2f83c5691a5224922f884c08987bdbeb9e5309054ad48604a4`
+- P2SH: `kaspatest:ppc5nvww9rhd58fkll53x5g7npdjv4vnp3s4cadv08st3yy93hpgvstmm6z2k`
+- 47-byte script with CHECKSIG + CHECKLOCKTIMEVERIFY + 1-hour timelock
 
 ---
 
@@ -294,7 +296,7 @@ These numbers are real, from Criterion benchmarks and release-mode test runs.
 | ZK proof generation | < 200ms | ~50ms | `zk_prover::tests::test_proof_generation` |
 | ZK proof verification | < 50ms | ~5ms | `zk_verifier::tests::test_full_prove_verify_cycle` |
 | Lib test count | Comprehensive | 113 passing | `cargo test --lib` (see breakdown below) |
-| Live TN12 transactions | >= 1 | 16 confirmed | 3 transfers + 2 wallet funding + 7 contract deploys + 2 covenant deploy + 2 covenant spend |
+| Live TN12 transactions | >= 1 | 17 confirmed | 3 transfers + 2 wallet funding + 7 contract deploys + 2 covenant deploy + 2 covenant spend |
 
 ---
 
