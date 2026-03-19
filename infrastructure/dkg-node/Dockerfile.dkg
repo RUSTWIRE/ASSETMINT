@@ -1,0 +1,16 @@
+# DISCLAIMER: Technical demo code — legal wrappers required in production
+# SPDX-License-Identifier: MIT
+#
+# DKG Edge Node for AssetMint — uses OriginTrail's official ot-node image
+# All Knowledge Assets are PRIVATE by default
+
+FROM origintrail/ot-node:latest
+
+# Configure for private/local mode
+ENV NODE_ENV=testnet
+ENV OT_NODE_HOSTNAME=0.0.0.0
+ENV OT_NODE_PORT=8900
+
+EXPOSE 8900
+
+# The ot-node image starts automatically

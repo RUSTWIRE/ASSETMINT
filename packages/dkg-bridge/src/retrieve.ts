@@ -20,12 +20,15 @@ export async function retrieveAsset(
 ): Promise<AssetMetadata | null> {
   console.log(`${LOG_PREFIX} Retrieving asset from DKG: ${ual}`);
 
-  // TODO: Use dkg.js SDK
-  // const DKG = require('dkg.js');
-  // const dkg = new DKG({ endpoint, ... });
-  // const result = await dkg.asset.get(ual, { contentType: 'all' });
-  // return parseKnowledgeAsset(result);
+  // Retrieve from AssetMint Sovereign Metadata Service
+  const response = await fetch(`${endpoint}/get?ual=${encodeURIComponent(ual)}`);
 
-  console.log(`${LOG_PREFIX} Asset retrieval not yet implemented`);
-  return null;
+  if (!response.ok) {
+    console.log(`${LOG_PREFIX} Asset not found: ${ual}`);
+    return null;
+  }
+
+  const record = await response.json() as { metadata: AssetMetadata };
+  console.log(`${LOG_PREFIX} Asset retrieved: ${ual} (sovereign, private)`);
+  return record.metadata;
 }

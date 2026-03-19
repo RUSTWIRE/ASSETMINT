@@ -42,21 +42,18 @@ export async function publishAsset(
 ): Promise<string> {
   console.log(`${LOG_PREFIX} Publishing asset to DKG: ${metadata.name}`);
 
-  // TODO: Use dkg.js SDK for proper Knowledge Asset creation
-  // const DKG = require('dkg.js');
-  // const dkg = new DKG({ endpoint, ... });
-  // const result = await dkg.asset.publish({
-  //   public: {
-  //     '@context': 'https://schema.org',
-  //     '@type': metadata.assetType,
-  //     name: metadata.name,
-  //     ...
-  //   }
-  // }, { epochsNum: 12 });
-  // return result.UAL;
+  // Publish to AssetMint Sovereign Metadata Service (localhost:8900)
+  const response = await fetch(`${endpoint}/publish`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(metadata),
+  });
 
-  // Placeholder: return mock UAL
-  const mockUal = `did:dkg:otp/0x1234/${Date.now()}`;
-  console.log(`${LOG_PREFIX} Asset published: UAL=${mockUal}`);
-  return mockUal;
+  if (!response.ok) {
+    throw new Error(`${LOG_PREFIX} Publish failed: ${response.statusText}`);
+  }
+
+  const result = await response.json() as { ual: string };
+  console.log(`${LOG_PREFIX} Asset published: UAL=${result.ual} (sovereign, private)`);
+  return result.ual;
 }
