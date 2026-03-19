@@ -18,27 +18,26 @@ The definitive institutional-grade, ZK-private, sovereign Real-World Asset (RWA)
 ## Quick Start
 
 ```bash
-# 1. Clone and enter
+# Clone and enter
 git clone <repo-url> && cd ASSETMINT
 
-# 2. Clone vendor repos
-./scripts/clone-vendors.sh
-
-# 3. Start DKG Edge Node
-cd infrastructure/dkg-node && docker-compose up -d
-
-# 4. Build Rust workspace
-cargo build
-
-# 5. Build SilverScript compiler
-cd vendor/silverscript && cargo build --release
-
-# 6. Start compliance API
-cd services/compliance-rust && cargo run
-
-# 7. Start frontend
-cd apps/dashboard-fe && npm install && npm run dev
+# One-command setup and demo launch
+make setup && make demo
 ```
+
+This starts the compliance API on port 3001 and the dashboard on port 3000. See [docs/QUICKSTART.md](docs/QUICKSTART.md) for prerequisites and verification steps.
+
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [docs/QUICKSTART.md](docs/QUICKSTART.md) | Prerequisites, setup, and first verification |
+| [docs/DEMO-WALKTHROUGH.md](docs/DEMO-WALKTHROUGH.md) | Guided tour of the minting wizard and compliance flow |
+| [docs/API-REFERENCE.md](docs/API-REFERENCE.md) | All 12 compliance API endpoints with request/response examples |
+| [docs/CONTRACTS.md](docs/CONTRACTS.md) | 7 deployed SilverScript covenants with TX hashes and P2SH addresses |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | System architecture and component overview |
+| [docs/INVESTOR-BRIEF.md](docs/INVESTOR-BRIEF.md) | Investor-facing project summary |
+| [docs/SECURITY-AUDIT.md](docs/SECURITY-AUDIT.md) | Security considerations and audit notes |
 
 ## Network Configuration
 

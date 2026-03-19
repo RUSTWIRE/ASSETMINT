@@ -1,0 +1,30 @@
+{
+  "name": "assetmint-dashboard",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "ktt": "file:../../../KTT - KCR-20T",
+    "lucide-react": "^0.493.0",
+    "next": "15.2.6",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "recharts": "^2.15.1",
+    "tailwind-merge": "^3.0.2",
+    "zustand": "^5.0.7"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.4",
+    "@types/node": "^22.12.0",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "postcss": "^8.5.1",
+    "tailwindcss": "^4.1.4",
+    "typescript": "^5.7.3"
+  }
+}

@@ -16,6 +16,8 @@ pub mod wallet;
 pub mod tx_builder;
 pub mod script;
 
+pub use wallet::ThresholdWallet;
+
 /// Log prefix for all AssetMint operations
 pub const LOG_PREFIX: &str = "[K-RWA]";
 

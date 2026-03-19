@@ -34,9 +34,9 @@ services:
       - dkg_blazegraph_data:/var/lib/blazegraph
 
   # Compliance API (Rust/Axum)
-  # Build: cd services/compliance-rust && cargo build --release
+  # Build: cd services/assetmint-core && cargo build --release
   # compliance-api:
-  #   build: ./services/compliance-rust
+  #   build: ./services/assetmint-core
   #   ports:
   #     - "${COMPLIANCE_API_PORT:-3001}:3001"
   #   environment:

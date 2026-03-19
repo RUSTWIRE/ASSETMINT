@@ -5,7 +5,7 @@
 resolver = "2"
 members = [
     "packages/kaspa-adapter",
-    "services/compliance-rust",
+    "services/assetmint-core",
     "services/oracle-pool",
     "services/sync",
     "tokenomics",

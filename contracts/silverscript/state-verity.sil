@@ -1,0 +1,66 @@
+pragma silverscript ^0.1.0;
+
+// DISCLAIMER: Technical demo code — legal wrappers required in production
+// SPDX-License-Identifier: MIT
+//
+// state-verity.sil — Oracle Attestation + DKG State Transition
+//
+// This contract manages the on-chain state of an RWA asset. It holds a
+// reference to the DKG UAL (Universal Asset Locator), the current oracle
+// price attestation hash, and the compliance Merkle root. State transitions
+// must be oracle-attested and signed by the state manager.
+//
+// Path A (updateState): Oracle-attested state transition (new price, new DKG UAL)
+// Path B (managerReclaim): State manager reclaims the state UTXO
+
+contract StateVerity(
+    byte[32] initDkgUalHash,
+    byte[32] initOracleAttestationHash,
+    byte[32] initComplianceMerkleRoot,
+    byte[32] initStateManagerKeyHash
+) {
+    byte[32] dkgUalHash = initDkgUalHash;
+    byte[32] oracleAttestationHash = initOracleAttestationHash;
+    byte[32] complianceMerkleRoot = initComplianceMerkleRoot;
+    byte[32] stateManagerKeyHash = initStateManagerKeyHash;
+
+    int constant MINER_FEE = 1000;
+
+    // Path A: Oracle-attested state update
+    // The state manager provides a new oracle attestation and updated DKG reference.
+    // The contract enforces that the output preserves the covenant with new state.
+    entrypoint function updateState(
+        pubkey managerPk,
+        sig managerSig,
+        byte[32] newDkgUalHash,
+        byte[32] newOracleAttestationHash,
+        byte[32] newComplianceMerkleRoot
+    ) {
+        // 1. Verify state manager identity
+        require(blake2b(managerPk) == stateManagerKeyHash);
+        require(checkSig(managerSig, managerPk));
+
+        // 2. Verify the new oracle attestation is non-zero (actual verification
+        //    happens off-chain via the oracle-pool service; on-chain we commit the hash)
+        require(newOracleAttestationHash != 0x0000000000000000000000000000000000000000000000000000000000000000);
+
+        // 3. Preserve UTXO value
+        int inputValue = tx.inputs[this.activeInputIndex].value;
+        require(tx.outputs[0].value >= inputValue - MINER_FEE);
+
+        // 4. Covenant preservation: output must recreate contract with updated state
+        validateOutputState(0, {
+            dkgUalHash: newDkgUalHash,
+            oracleAttestationHash: newOracleAttestationHash,
+            complianceMerkleRoot: newComplianceMerkleRoot,
+            stateManagerKeyHash: stateManagerKeyHash
+        });
+    }
+
+    // Path B: State manager reclaims the state UTXO
+    // Used when the asset is being retired or migrated
+    entrypoint function managerReclaim(pubkey managerPk, sig managerSig) {
+        require(blake2b(managerPk) == stateManagerKeyHash);
+        require(checkSig(managerSig, managerPk));
+    }
+}

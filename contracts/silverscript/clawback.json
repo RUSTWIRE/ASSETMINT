@@ -1,0 +1,716 @@
+{
+  "contract_name": "Clawback",
+  "script": [
+    107,
+    108,
+    118,
+    0,
+    156,
+    99,
+    117,
+    81,
+    121,
+    32,
+    254,
+    80,
+    21,
+    157,
+    13,
+    178,
+    29,
+    162,
+    17,
+    245,
+    24,
+    166,
+    69,
+    69,
+    223,
+    240,
+    170,
+    225,
+    232,
+    56,
+    185,
+    37,
+    209,
+    89,
+    91,
+    183,
+    225,
+    245,
+    18,
+    117,
+    103,
+    210,
+    172,
+    105,
+    0,
+    195,
+    81,
+    121,
+    3,
+    0,
+    0,
+    32,
+    124,
+    126,
+    1,
+    172,
+    126,
+    135,
+    105,
+    0,
+    194,
+    185,
+    190,
+    2,
+    232,
+    3,
+    148,
+    162,
+    105,
+    117,
+    117,
+    81,
+    103,
+    118,
+    81,
+    156,
+    99,
+    117,
+    82,
+    121,
+    170,
+    32,
+    214,
+    141,
+    183,
+    152,
+    253,
+    163,
+    224,
+    209,
+    95,
+    102,
+    243,
+    209,
+    75,
+    108,
+    9,
+    69,
+    200,
+    77,
+    132,
+    45,
+    104,
+    79,
+    164,
+    84,
+    123,
+    212,
+    108,
+    55,
+    156,
+    200,
+    196,
+    252,
+    135,
+    105,
+    81,
+    121,
+    83,
+    121,
+    172,
+    105,
+    0,
+    195,
+    81,
+    121,
+    3,
+    0,
+    0,
+    32,
+    124,
+    126,
+    1,
+    172,
+    126,
+    135,
+    105,
+    0,
+    194,
+    185,
+    190,
+    2,
+    232,
+    3,
+    148,
+    162,
+    105,
+    180,
+    82,
+    162,
+    105,
+    117,
+    117,
+    117,
+    81,
+    103,
+    117,
+    0,
+    105,
+    104,
+    104
+  ],
+  "ast": {
+    "name": "Clawback",
+    "params": [
+      {
+        "type_ref": {
+          "base": "pubkey"
+        },
+        "name": "owner",
+        "span": "pubkey owner",
+        "type_span": "pubkey ",
+        "name_span": "owner"
+      },
+      {
+        "type_ref": {
+          "base": "byte",
+          "array_dims": [
+            {
+              "kind": "fixed",
+              "value": 32
+            }
+          ]
+        },
+        "name": "issuerKeyHash",
+        "span": "byte[32] issuerKeyHash",
+        "type_span": "byte[32]",
+        "name_span": "issuerKeyHash"
+      }
+    ],
+    "constants": [
+      {
+        "type_ref": {
+          "base": "int"
+        },
+        "name": "MINER_FEE",
+        "expr": {
+          "kind": "int",
+          "data": 1000,
+          "span": "1000"
+        },
+        "span": "int constant MINER_FEE = 1000;",
+        "type_span": "int ",
+        "name_span": "MINER_FEE"
+      }
+    ],
+    "functions": [
+      {
+        "name": "ownerSpend",
+        "params": [
+          {
+            "type_ref": {
+              "base": "sig"
+            },
+            "name": "ownerSig",
+            "span": "sig ownerSig",
+            "type_span": "sig ",
+            "name_span": "ownerSig"
+          },
+          {
+            "type_ref": {
+              "base": "pubkey"
+            },
+            "name": "recipientPk",
+            "span": "pubkey recipientPk",
+            "type_span": "pubkey ",
+            "name_span": "recipientPk"
+          }
+        ],
+        "entrypoint": true,
+        "return_types": [],
+        "body": [
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "call",
+                "data": {
+                  "name": "checkSig",
+                  "args": [
+                    {
+                      "kind": "identifier",
+                      "data": "ownerSig",
+                      "span": "ownerSig"
+                    },
+                    {
+                      "kind": "identifier",
+                      "data": "owner",
+                      "span": "owner"
+                    }
+                  ],
+                  "name_span": "checkSig"
+                },
+                "span": "checkSig(ownerSig, owner)"
+              },
+              "message": null,
+              "span": "require(checkSig(ownerSig, owner));",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "byte",
+                "array_dims": [
+                  {
+                    "kind": "fixed",
+                    "value": 34
+                  }
+                ]
+              },
+              "modifiers": [],
+              "name": "recipientLock",
+              "expr": {
+                "kind": "new",
+                "data": {
+                  "name": "ScriptPubKeyP2PK",
+                  "args": [
+                    {
+                      "kind": "identifier",
+                      "data": "recipientPk",
+                      "span": "recipientPk"
+                    }
+                  ],
+                  "name_span": "ScriptPubKeyP2PK"
+                },
+                "span": "new ScriptPubKeyP2PK(recipientPk)"
+              },
+              "span": "byte[34] recipientLock = new ScriptPubKeyP2PK(recipientPk);",
+              "type_span": "byte[34]",
+              "modifier_spans": [],
+              "name_span": "recipientLock"
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "eq",
+                  "left": {
+                    "kind": "introspection",
+                    "data": {
+                      "kind": "output_script_pub_key",
+                      "index": {
+                        "kind": "int",
+                        "data": 0,
+                        "span": "0"
+                      },
+                      "field_span": ".scriptPubKey"
+                    },
+                    "span": "tx.outputs[0].scriptPubKey"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "recipientLock",
+                    "span": "recipientLock"
+                  }
+                },
+                "span": "tx.outputs[0].scriptPubKey == recipientLock"
+              },
+              "message": null,
+              "span": "require(tx.outputs[0].scriptPubKey == recipientLock);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "int"
+              },
+              "modifiers": [],
+              "name": "inputValue",
+              "expr": {
+                "kind": "introspection",
+                "data": {
+                  "kind": "input_value",
+                  "index": {
+                    "kind": "nullary",
+                    "data": "active_input_index",
+                    "span": "this.activeInputIndex"
+                  },
+                  "field_span": ".value"
+                },
+                "span": "tx.inputs[this.activeInputIndex].value"
+              },
+              "span": "int inputValue = tx.inputs[this.activeInputIndex].value;",
+              "type_span": "int ",
+              "modifier_spans": [],
+              "name_span": "inputValue"
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "ge",
+                  "left": {
+                    "kind": "introspection",
+                    "data": {
+                      "kind": "output_value",
+                      "index": {
+                        "kind": "int",
+                        "data": 0,
+                        "span": "0"
+                      },
+                      "field_span": ".value"
+                    },
+                    "span": "tx.outputs[0].value"
+                  },
+                  "right": {
+                    "kind": "binary",
+                    "data": {
+                      "op": "sub",
+                      "left": {
+                        "kind": "identifier",
+                        "data": "inputValue",
+                        "span": "inputValue"
+                      },
+                      "right": {
+                        "kind": "identifier",
+                        "data": "MINER_FEE",
+                        "span": "MINER_FEE"
+                      }
+                    },
+                    "span": "inputValue - MINER_FEE"
+                  }
+                },
+                "span": "tx.outputs[0].value >= inputValue - MINER_FEE"
+              },
+              "message": null,
+              "span": "require(tx.outputs[0].value >= inputValue - MINER_FEE);",
+              "message_span": null
+            }
+          }
+        ],
+        "return_type_spans": [],
+        "span": "entrypoint function ownerSpend(sig ownerSig, pubkey recipientPk) {\n        // Verify the owner's signature\n        require(checkSig(ownerSig, owner));\n\n        // First output must go to the specified recipient\n        byte[34] recipientLock = new ScriptPubKeyP2PK(recipientPk);\n        require(tx.outputs[0].scriptPubKey == recipientLock);\n\n        // Ensure meaningful transfer amount\n        int inputValue = tx.inputs[this.activeInputIndex].value;\n        require(tx.outputs[0].value >= inputValue - MINER_FEE);\n    }",
+        "name_span": "ownerSpend",
+        "body_span": "require(checkSig(ownerSig, owner));\n\n        // First output must go to the specified recipient\n        byte[34] recipientLock = new ScriptPubKeyP2PK(recipientPk);\n        require(tx.outputs[0].scriptPubKey == recipientLock);\n\n        // Ensure meaningful transfer amount\n        int inputValue = tx.inputs[this.activeInputIndex].value;\n        require(tx.outputs[0].value >= inputValue - MINER_FEE);"
+      },
+      {
+        "name": "issuerClawback",
+        "params": [
+          {
+            "type_ref": {
+              "base": "pubkey"
+            },
+            "name": "issuerPk",
+            "span": "pubkey issuerPk",
+            "type_span": "pubkey ",
+            "name_span": "issuerPk"
+          },
+          {
+            "type_ref": {
+              "base": "sig"
+            },
+            "name": "issuerSig",
+            "span": "sig issuerSig",
+            "type_span": "sig ",
+            "name_span": "issuerSig"
+          },
+          {
+            "type_ref": {
+              "base": "pubkey"
+            },
+            "name": "issuerReceivePk",
+            "span": "pubkey issuerReceivePk",
+            "type_span": "pubkey ",
+            "name_span": "issuerReceivePk"
+          }
+        ],
+        "entrypoint": true,
+        "return_types": [],
+        "body": [
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "eq",
+                  "left": {
+                    "kind": "call",
+                    "data": {
+                      "name": "blake2b",
+                      "args": [
+                        {
+                          "kind": "identifier",
+                          "data": "issuerPk",
+                          "span": "issuerPk"
+                        }
+                      ],
+                      "name_span": "blake2b"
+                    },
+                    "span": "blake2b(issuerPk)"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "issuerKeyHash",
+                    "span": "issuerKeyHash"
+                  }
+                },
+                "span": "blake2b(issuerPk) == issuerKeyHash"
+              },
+              "message": null,
+              "span": "require(blake2b(issuerPk) == issuerKeyHash);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "call",
+                "data": {
+                  "name": "checkSig",
+                  "args": [
+                    {
+                      "kind": "identifier",
+                      "data": "issuerSig",
+                      "span": "issuerSig"
+                    },
+                    {
+                      "kind": "identifier",
+                      "data": "issuerPk",
+                      "span": "issuerPk"
+                    }
+                  ],
+                  "name_span": "checkSig"
+                },
+                "span": "checkSig(issuerSig, issuerPk)"
+              },
+              "message": null,
+              "span": "require(checkSig(issuerSig, issuerPk));",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "byte",
+                "array_dims": [
+                  {
+                    "kind": "fixed",
+                    "value": 34
+                  }
+                ]
+              },
+              "modifiers": [],
+              "name": "issuerLock",
+              "expr": {
+                "kind": "new",
+                "data": {
+                  "name": "ScriptPubKeyP2PK",
+                  "args": [
+                    {
+                      "kind": "identifier",
+                      "data": "issuerReceivePk",
+                      "span": "issuerReceivePk"
+                    }
+                  ],
+                  "name_span": "ScriptPubKeyP2PK"
+                },
+                "span": "new ScriptPubKeyP2PK(issuerReceivePk)"
+              },
+              "span": "byte[34] issuerLock = new ScriptPubKeyP2PK(issuerReceivePk);",
+              "type_span": "byte[34]",
+              "modifier_spans": [],
+              "name_span": "issuerLock"
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "eq",
+                  "left": {
+                    "kind": "introspection",
+                    "data": {
+                      "kind": "output_script_pub_key",
+                      "index": {
+                        "kind": "int",
+                        "data": 0,
+                        "span": "0"
+                      },
+                      "field_span": ".scriptPubKey"
+                    },
+                    "span": "tx.outputs[0].scriptPubKey"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "issuerLock",
+                    "span": "issuerLock"
+                  }
+                },
+                "span": "tx.outputs[0].scriptPubKey == issuerLock"
+              },
+              "message": null,
+              "span": "require(tx.outputs[0].scriptPubKey == issuerLock);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "int"
+              },
+              "modifiers": [],
+              "name": "inputValue",
+              "expr": {
+                "kind": "introspection",
+                "data": {
+                  "kind": "input_value",
+                  "index": {
+                    "kind": "nullary",
+                    "data": "active_input_index",
+                    "span": "this.activeInputIndex"
+                  },
+                  "field_span": ".value"
+                },
+                "span": "tx.inputs[this.activeInputIndex].value"
+              },
+              "span": "int inputValue = tx.inputs[this.activeInputIndex].value;",
+              "type_span": "int ",
+              "modifier_spans": [],
+              "name_span": "inputValue"
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "ge",
+                  "left": {
+                    "kind": "introspection",
+                    "data": {
+                      "kind": "output_value",
+                      "index": {
+                        "kind": "int",
+                        "data": 0,
+                        "span": "0"
+                      },
+                      "field_span": ".value"
+                    },
+                    "span": "tx.outputs[0].value"
+                  },
+                  "right": {
+                    "kind": "binary",
+                    "data": {
+                      "op": "sub",
+                      "left": {
+                        "kind": "identifier",
+                        "data": "inputValue",
+                        "span": "inputValue"
+                      },
+                      "right": {
+                        "kind": "identifier",
+                        "data": "MINER_FEE",
+                        "span": "MINER_FEE"
+                      }
+                    },
+                    "span": "inputValue - MINER_FEE"
+                  }
+                },
+                "span": "tx.outputs[0].value >= inputValue - MINER_FEE"
+              },
+              "message": null,
+              "span": "require(tx.outputs[0].value >= inputValue - MINER_FEE);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "ge",
+                  "left": {
+                    "kind": "nullary",
+                    "data": "tx_outputs_length",
+                    "span": "tx.outputs.length"
+                  },
+                  "right": {
+                    "kind": "int",
+                    "data": 2,
+                    "span": "2"
+                  }
+                },
+                "span": "tx.outputs.length >= 2"
+              },
+              "message": null,
+              "span": "require(tx.outputs.length >= 2);",
+              "message_span": null
+            }
+          }
+        ],
+        "return_type_spans": [],
+        "span": "entrypoint function issuerClawback(\n        pubkey issuerPk,\n        sig issuerSig,\n        pubkey issuerReceivePk\n    ) {\n        // Verify issuer identity via hash commitment\n        require(blake2b(issuerPk) == issuerKeyHash);\n        require(checkSig(issuerSig, issuerPk));\n\n        // First output: send reclaimed funds to issuer's receive address\n        byte[34] issuerLock = new ScriptPubKeyP2PK(issuerReceivePk);\n        require(tx.outputs[0].scriptPubKey == issuerLock);\n\n        // Transfer full value minus fee\n        int inputValue = tx.inputs[this.activeInputIndex].value;\n        require(tx.outputs[0].value >= inputValue - MINER_FEE);\n\n        // Second output: OP_RETURN with clawback reason metadata\n        // The reason is encoded in the transaction witness data\n        // Enforce that a second output exists (for the OP_RETURN data)\n        require(tx.outputs.length >= 2);\n    }",
+        "name_span": "issuerClawback",
+        "body_span": "require(blake2b(issuerPk) == issuerKeyHash);\n        require(checkSig(issuerSig, issuerPk));\n\n        // First output: send reclaimed funds to issuer's receive address\n        byte[34] issuerLock = new ScriptPubKeyP2PK(issuerReceivePk);\n        require(tx.outputs[0].scriptPubKey == issuerLock);\n\n        // Transfer full value minus fee\n        int inputValue = tx.inputs[this.activeInputIndex].value;\n        require(tx.outputs[0].value >= inputValue - MINER_FEE);\n\n        // Second output: OP_RETURN with clawback reason metadata\n        // The reason is encoded in the transaction witness data\n        // Enforce that a second output exists (for the OP_RETURN data)\n        require(tx.outputs.length >= 2);"
+      }
+    ],
+    "span": "contract Clawback(\n    pubkey owner,\n    byte[32] issuerKeyHash\n) {\n    int constant MINER_FEE = 1000;\n\n    // Path A: Owner spends normally\n    // The owner can transfer the UTXO to any recipient\n    entrypoint function ownerSpend(sig ownerSig, pubkey recipientPk) {\n        // Verify the owner's signature\n        require(checkSig(ownerSig, owner));\n\n        // First output must go to the specified recipient\n        byte[34] recipientLock = new ScriptPubKeyP2PK(recipientPk);\n        require(tx.outputs[0].scriptPubKey == recipientLock);\n\n        // Ensure meaningful transfer amount\n        int inputValue = tx.inputs[this.activeInputIndex].value;\n        require(tx.outputs[0].value >= inputValue - MINER_FEE);\n    }\n\n    // Path B: Issuer clawback — unconditional reclaim\n    // The issuer can reclaim the UTXO at any time for regulatory reasons.\n    // A second output carries OP_RETURN metadata with the clawback reason.\n    entrypoint function issuerClawback(\n        pubkey issuerPk,\n        sig issuerSig,\n        pubkey issuerReceivePk\n    ) {\n        // Verify issuer identity via hash commitment\n        require(blake2b(issuerPk) == issuerKeyHash);\n        require(checkSig(issuerSig, issuerPk));\n\n        // First output: send reclaimed funds to issuer's receive address\n        byte[34] issuerLock = new ScriptPubKeyP2PK(issuerReceivePk);\n        require(tx.outputs[0].scriptPubKey == issuerLock);\n\n        // Transfer full value minus fee\n        int inputValue = tx.inputs[this.activeInputIndex].value;\n        require(tx.outputs[0].value >= inputValue - MINER_FEE);\n\n        // Second output: OP_RETURN with clawback reason metadata\n        // The reason is encoded in the transaction witness data\n        // Enforce that a second output exists (for the OP_RETURN data)\n        require(tx.outputs.length >= 2);\n    }\n}",
+    "name_span": "Clawback"
+  },
+  "abi": [
+    {
+      "name": "ownerSpend",
+      "inputs": [
+        {
+          "name": "ownerSig",
+          "type_name": "sig"
+        },
+        {
+          "name": "recipientPk",
+          "type_name": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "issuerClawback",
+      "inputs": [
+        {
+          "name": "issuerPk",
+          "type_name": "pubkey"
+        },
+        {
+          "name": "issuerSig",
+          "type_name": "sig"
+        },
+        {
+          "name": "issuerReceivePk",
+          "type_name": "pubkey"
+        }
+      ]
+    }
+  ],
+  "without_selector": false,
+  "debug_info": null
+}

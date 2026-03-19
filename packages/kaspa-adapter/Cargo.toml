@@ -17,9 +17,21 @@ hex.workspace = true
 thiserror.workspace = true
 tracing.workspace = true
 
-# Kaspa-specific (will resolve from rusty-kaspa or crates.io)
-# kaspa-consensus-core = { path = "../../vendor/rusty-kaspa/consensus/core" }
-# kaspa-rpc-core = { path = "../../vendor/rusty-kaspa/rpc/core" }
+# Kaspa RPC (from rusty-kaspa at matching commit)
+kaspa-wrpc-client = { git = "https://github.com/kaspanet/rusty-kaspa.git", rev = "c6819f3" }
+kaspa-rpc-core = { git = "https://github.com/kaspanet/rusty-kaspa.git", rev = "c6819f3" }
+kaspa-consensus-core = { git = "https://github.com/kaspanet/rusty-kaspa.git", rev = "c6819f3" }
+kaspa-addresses = { git = "https://github.com/kaspanet/rusty-kaspa.git", rev = "c6819f3" }
+kaspa-consensus-client = { git = "https://github.com/kaspanet/rusty-kaspa.git", rev = "c6819f3" }
+kaspa-txscript = { git = "https://github.com/kaspanet/rusty-kaspa.git", rev = "c6819f3" }
+
+# Crypto
+secp256k1 = "0.29"
+rand = "0.8"
+async-trait = "0.1"
 
 [dev-dependencies]
 tokio = { version = "1", features = ["test-util"] }
+blake2b_simd = "1.0"
+serde_json = "1"
+tokenomics = { path = "../../tokenomics" }

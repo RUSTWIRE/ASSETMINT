@@ -1,0 +1,365 @@
+// DISCLAIMER: Technical demo code — legal wrappers required in production
+// SPDX-License-Identifier: MIT
+
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import {
+  Wallet,
+  ShieldCheck,
+  TrendingUp,
+  ArrowUpRight,
+  ArrowDownLeft,
+  Activity,
+  FileCode2,
+  ExternalLink,
+  UserPlus,
+  ClipboardCheck,
+  FileCode,
+  Coins,
+} from "lucide-react";
+import { useWalletStore } from "@/store/wallet";
+import { formatKAS } from "@/lib/wallet";
+import { api, explorer } from "@/lib/api";
+import { DEPLOYED_CONTRACTS } from "@/lib/contracts";
+
+interface HealthStatus {
+  status: string;
+  service: string;
+  kaspa_connected: boolean;
+}
+
+interface NetworkInfo {
+  server_version: string;
+  is_synced: boolean;
+  virtual_daa_score: number;
+  network_id: string;
+  block_count: number;
+  difficulty: number;
+}
+
+// Real confirmed transactions from Kaspa Testnet-12
+const REAL_TRANSACTIONS: Array<{
+  id: string;
+  type: "Transfer" | "Deploy";
+  from?: string;
+  to?: string;
+  amount?: string;
+  contract?: string;
+  status: "confirmed";
+}> = [
+  { id: "a48b2c4b", type: "Transfer", from: "Alice", to: "Bob", amount: "0.1 KAS", status: "confirmed" },
+  { id: "dfc0e959", type: "Transfer", from: "Alice", to: "Bob", amount: "0.1 KAS", status: "confirmed" },
+  { id: "f4489bd4", type: "Transfer", from: "Bob", to: "Alice", amount: "0.05 KAS", status: "confirmed" },
+  { id: "6080b477", type: "Deploy", contract: "Clawback", status: "confirmed" },
+  { id: "d7ed4958", type: "Deploy", contract: "RwaCore", status: "confirmed" },
+  { id: "94c50753", type: "Deploy", contract: "StateVerity", status: "confirmed" },
+  { id: "c29499ad", type: "Deploy", contract: "ZkKycVerifier", status: "confirmed" },
+  { id: "346fdbd3", type: "Deploy", contract: "Reserves", status: "confirmed" },
+];
+
+const CONTRACTS = Object.values(DEPLOYED_CONTRACTS);
+const RULE_COUNT = 5; // KYC, accreditation, jurisdiction, lock-up, max-amount
+
+export default function DashboardPage() {
+  const { wallet } = useWalletStore();
+  const [health, setHealth] = useState<HealthStatus | null>(null);
+  const [healthError, setHealthError] = useState(false);
+  const [network, setNetwork] = useState<NetworkInfo | null>(null);
+
+  useEffect(() => {
+    console.log("[K-RWA] Dashboard mounted, fetching health + network status");
+    api
+      .health()
+      .then((data) => {
+        console.log("[K-RWA] Health response:", data);
+        setHealth(data);
+      })
+      .catch(() => {
+        console.log("[K-RWA] Compliance backend not reachable");
+        setHealthError(true);
+      });
+
+    api
+      .networkInfo()
+      .then((data) => {
+        console.log("[K-RWA] Network info:", data);
+        setNetwork(data);
+      })
+      .catch(() => {
+        console.log("[K-RWA] Network info not available");
+      });
+  }, []);
+
+  return (
+    <div className="space-y-8">
+      <div>
+        <h2 className="text-2xl font-bold text-white">Portfolio Overview</h2>
+        <p className="text-gray-400 text-sm mt-1">
+          AssetMint dashboard -- Kaspa Testnet-12
+        </p>
+      </div>
+
+      {/* System Status Bar */}
+      <div className="flex flex-wrap items-center gap-3 bg-gray-900/60 border border-gray-800 rounded-lg px-4 py-2.5">
+        <span className="text-xs text-gray-500 font-medium uppercase tracking-wider mr-1">
+          System Status
+        </span>
+        <span
+          className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full ${
+            health
+              ? "bg-emerald-500/10 text-emerald-400"
+              : healthError
+                ? "bg-red-500/10 text-red-400"
+                : "bg-gray-800 text-gray-400"
+          }`}
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-current" />
+          Backend API: {health ? "Connected" : healthError ? "Offline" : "Checking..."}
+        </span>
+        <span
+          className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full ${
+            network?.is_synced
+              ? "bg-emerald-500/10 text-emerald-400"
+              : network
+                ? "bg-red-500/10 text-red-400"
+                : "bg-gray-800 text-gray-400"
+          }`}
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-current" />
+          Kaspa TN12:{" "}
+          {network?.is_synced
+            ? `Synced (block ${network.block_count.toLocaleString()})`
+            : network
+              ? "Not connected"
+              : "Checking..."}
+        </span>
+        <span className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400">
+          <span className="w-1.5 h-1.5 rounded-full bg-current" />
+          Contracts: {CONTRACTS.length} deployed on TN12
+        </span>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <Link
+          href="/transfer"
+          className="flex items-center gap-2 bg-gray-900 border border-gray-800 rounded-lg px-4 py-3 text-sm text-gray-300 hover:border-indigo-500/50 hover:text-white transition-colors"
+        >
+          <UserPlus className="w-4 h-4 text-indigo-400" />
+          Register Identity
+        </Link>
+        <Link
+          href="/transfer"
+          className="flex items-center gap-2 bg-gray-900 border border-gray-800 rounded-lg px-4 py-3 text-sm text-gray-300 hover:border-indigo-500/50 hover:text-white transition-colors"
+        >
+          <ClipboardCheck className="w-4 h-4 text-amber-400" />
+          Evaluate Compliance
+        </Link>
+        <a
+          href="#contracts"
+          className="flex items-center gap-2 bg-gray-900 border border-gray-800 rounded-lg px-4 py-3 text-sm text-gray-300 hover:border-indigo-500/50 hover:text-white transition-colors"
+        >
+          <FileCode className="w-4 h-4 text-emerald-400" />
+          View Contracts
+        </a>
+        <Link
+          href="/mint"
+          className="flex items-center gap-2 bg-gray-900 border border-gray-800 rounded-lg px-4 py-3 text-sm text-gray-300 hover:border-indigo-500/50 hover:text-white transition-colors"
+        >
+          <Coins className="w-4 h-4 text-purple-400" />
+          Mint Asset
+        </Link>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Wallet Balance */}
+        <div className="bg-gray-900 rounded-xl border border-gray-800 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm text-gray-400">KAS Balance</span>
+            <Wallet className="w-5 h-5 text-indigo-400" />
+          </div>
+          <p className="text-2xl font-bold text-white">
+            {wallet ? `${formatKAS(wallet.balance)} KAS` : "--"}
+          </p>
+          <p className="text-xs text-gray-500 mt-1">
+            {wallet ? "Testnet tokens" : "Connect wallet"}
+          </p>
+        </div>
+
+        {/* ASTM Balance */}
+        <div className="bg-gray-900 rounded-xl border border-gray-800 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm text-gray-400">ASTM Balance</span>
+            <TrendingUp className="w-5 h-5 text-gray-600" />
+          </div>
+          <p className="text-2xl font-bold text-gray-500">Not deployed</p>
+          <p className="text-xs text-gray-600 mt-1">
+            KRC-20 token not yet broadcast
+          </p>
+        </div>
+
+        {/* Compliance Engine */}
+        <div className="bg-gray-900 rounded-xl border border-gray-800 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm text-gray-400">Compliance Engine</span>
+            <ShieldCheck className="w-5 h-5 text-amber-400" />
+          </div>
+          <p className="text-2xl font-bold text-white">
+            {health ? `${RULE_COUNT} rules` : healthError ? "Offline" : "Checking..."}
+          </p>
+          <p className="text-xs text-gray-500 mt-1">
+            {health
+              ? `Kaspa: ${health.kaspa_connected ? "Connected" : "Disconnected"}`
+              : healthError
+                ? "Backend not reachable"
+                : "Connecting..."}
+          </p>
+        </div>
+
+        {/* Live Network Stats */}
+        <div className="bg-gray-900 rounded-xl border border-gray-800 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm text-gray-400">Kaspa Network</span>
+            <Activity className="w-5 h-5 text-purple-400" />
+          </div>
+          <p className="text-2xl font-bold text-white">
+            {network ? network.network_id : "--"}
+          </p>
+          <p className="text-xs text-gray-500 mt-1">
+            {network
+              ? `v${network.server_version} | ${network.block_count.toLocaleString()} blocks | DAA ${network.virtual_daa_score.toLocaleString()}`
+              : "Fetching..."}
+          </p>
+        </div>
+      </div>
+
+      {/* Deployed Contracts */}
+      <div id="contracts" className="bg-gray-900 rounded-xl border border-gray-800">
+        <div className="px-6 py-4 border-b border-gray-800">
+          <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+            <FileCode2 className="w-5 h-5 text-indigo-400" />
+            Deployed Contracts
+          </h3>
+          <p className="text-xs text-gray-500">
+            {CONTRACTS.length} SilverScript covenants on Testnet-12
+          </p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full" role="table">
+            <thead>
+              <tr className="text-left text-xs text-gray-500 border-b border-gray-800">
+                <th className="px-6 py-3 font-medium">Contract</th>
+                <th className="px-6 py-3 font-medium">Script Size</th>
+                <th className="px-6 py-3 font-medium">P2SH Address</th>
+                <th className="px-6 py-3 font-medium">TX</th>
+              </tr>
+            </thead>
+            <tbody>
+              {CONTRACTS.map((c) => (
+                <tr
+                  key={c.name}
+                  className="border-b border-gray-800/50 hover:bg-gray-800/30 transition-colors"
+                >
+                  <td className="px-6 py-4 text-sm text-white font-medium">
+                    {c.name}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-300 font-mono">
+                    {c.scriptSize} bytes
+                  </td>
+                  <td className="px-6 py-4">
+                    <a
+                      href={explorer.addressUrl(c.p2shAddress)}
+                      target="_blank"
+                      rel="noopener"
+                      className="text-xs text-indigo-400 hover:text-indigo-300 font-mono"
+                    >
+                      {c.p2shAddress.slice(0, 18)}...{c.p2shAddress.slice(-8)}
+                    </a>
+                  </td>
+                  <td className="px-6 py-4">
+                    <a
+                      href={explorer.txUrl(c.txId)}
+                      target="_blank"
+                      rel="noopener"
+                      className="text-xs text-blue-400 hover:text-blue-300 font-mono flex items-center gap-1"
+                    >
+                      {c.txId.slice(0, 10)}...
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Recent Transactions */}
+      <div className="bg-gray-900 rounded-xl border border-gray-800">
+        <div className="px-6 py-4 border-b border-gray-800">
+          <h3 className="text-lg font-semibold text-white">
+            Recent Transactions
+          </h3>
+          <p className="text-xs text-gray-500">Confirmed on Kaspa Testnet-12</p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full" role="table">
+            <thead>
+              <tr className="text-left text-xs text-gray-500 border-b border-gray-800">
+                <th className="px-6 py-3 font-medium">Type</th>
+                <th className="px-6 py-3 font-medium">Details</th>
+                <th className="px-6 py-3 font-medium">Status</th>
+                <th className="px-6 py-3 font-medium">Explorer</th>
+              </tr>
+            </thead>
+            <tbody>
+              {REAL_TRANSACTIONS.map((tx) => (
+                <tr
+                  key={tx.id}
+                  className="border-b border-gray-800/50 hover:bg-gray-800/30 transition-colors"
+                >
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-2">
+                      {tx.type === "Deploy" ? (
+                        <ArrowDownLeft className="w-4 h-4 text-emerald-400" />
+                      ) : (
+                        <ArrowUpRight className="w-4 h-4 text-blue-400" />
+                      )}
+                      <span className="text-sm text-gray-300">
+                        {tx.type}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-300">
+                    {tx.type === "Transfer"
+                      ? `${tx.from} → ${tx.to} (${tx.amount})`
+                      : `Contract: ${tx.contract}`}
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className="text-xs px-2 py-1 rounded-full font-medium bg-emerald-500/10 text-emerald-400">
+                      {tx.status}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <a
+                      href={explorer.txUrl(tx.id)}
+                      target="_blank"
+                      rel="noopener"
+                      className="text-xs text-blue-400 hover:text-blue-300 font-mono flex items-center gap-1"
+                    >
+                      {tx.id.slice(0, 8)}...
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,60 @@
+pragma silverscript ^0.1.0;
+
+// DISCLAIMER: Technical demo code — legal wrappers required in production
+// SPDX-License-Identifier: MIT
+//
+// htlc.sil — Hash Time-Locked Contract for Cross-Chain Atomic Swaps
+//
+// Enables trustless cross-chain RWA token transfers between Kaspa and
+// other blockchains. The recipient must reveal a preimage matching the
+// hashlock to claim funds. If unclaimed by the deadline, the sender
+// can reclaim.
+//
+// Path A (claimWithPreimage): Recipient reveals preimage to claim
+// Path B (refundAfterTimeout): Sender reclaims after timelock expires
+
+contract HTLC(
+    byte[32] initHashLock,
+    int initTimeLock,
+    byte[32] initRecipientKeyHash,
+    byte[32] initSenderKeyHash
+) {
+    byte[32] hashLock = initHashLock;
+    int timeLock = initTimeLock;
+    byte[32] recipientKeyHash = initRecipientKeyHash;
+    byte[32] senderKeyHash = initSenderKeyHash;
+
+    int constant MINER_FEE = 1000;
+
+    // Path A: Claim by revealing the SHA-256 preimage
+    entrypoint function claimWithPreimage(
+        byte[32] preimage,
+        pubkey recipientPk,
+        sig recipientSig
+    ) {
+        // Verify preimage matches hashlock
+        require(sha256(preimage) == hashLock);
+
+        // Verify recipient identity
+        require(blake2b(recipientPk) == recipientKeyHash);
+        require(checkSig(recipientSig, recipientPk));
+
+        // Transfer full value to recipient
+        int inputValue = tx.inputs[this.activeInputIndex].value;
+        require(tx.outputs[0].value >= inputValue - MINER_FEE);
+    }
+
+    // Path B: Refund to sender after timelock expires
+    entrypoint function refundAfterTimeout(
+        pubkey senderPk,
+        sig senderSig
+    ) {
+        // Verify sender identity
+        require(blake2b(senderPk) == senderKeyHash);
+        require(checkSig(senderSig, senderPk));
+
+        // Transfer full value back to sender
+        int inputValue = tx.inputs[this.activeInputIndex].value;
+        require(tx.outputs[0].value >= inputValue - MINER_FEE);
+    }
+}

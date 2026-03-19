@@ -17,6 +17,7 @@ ark-serialize = { version = "0.5", features = ["derive"] }
 ark-ff = "0.5"
 ark-ec = "0.5"
 ark-r1cs-std = "0.5"
+ark-snark = "0.5"
 ark-crypto-primitives = { version = "0.5", features = ["crh"] }
 
 sha2.workspace = true

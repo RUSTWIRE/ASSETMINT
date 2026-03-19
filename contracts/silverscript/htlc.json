@@ -1,0 +1,771 @@
+{
+  "contract_name": "HTLC",
+  "script": [
+    107,
+    32,
+    90,
+    112,
+    76,
+    238,
+    1,
+    207,
+    210,
+    207,
+    63,
+    36,
+    116,
+    185,
+    115,
+    210,
+    65,
+    129,
+    180,
+    180,
+    64,
+    32,
+    66,
+    201,
+    130,
+    177,
+    19,
+    209,
+    21,
+    244,
+    203,
+    189,
+    54,
+    154,
+    8,
+    255,
+    201,
+    154,
+    59,
+    0,
+    0,
+    0,
+    0,
+    32,
+    68,
+    30,
+    220,
+    86,
+    206,
+    188,
+    142,
+    40,
+    93,
+    2,
+    38,
+    122,
+    166,
+    80,
+    129,
+    159,
+    21,
+    173,
+    215,
+    176,
+    110,
+    249,
+    180,
+    27,
+    38,
+    144,
+    18,
+    141,
+    206,
+    101,
+    89,
+    36,
+    32,
+    156,
+    131,
+    20,
+    109,
+    79,
+    225,
+    150,
+    87,
+    89,
+    47,
+    6,
+    203,
+    29,
+    192,
+    233,
+    250,
+    50,
+    6,
+    207,
+    137,
+    17,
+    191,
+    217,
+    242,
+    231,
+    128,
+    245,
+    96,
+    219,
+    76,
+    144,
+    94,
+    108,
+    118,
+    0,
+    156,
+    99,
+    117,
+    86,
+    121,
+    168,
+    84,
+    121,
+    135,
+    105,
+    85,
+    121,
+    170,
+    82,
+    121,
+    135,
+    105,
+    84,
+    121,
+    86,
+    121,
+    172,
+    105,
+    0,
+    194,
+    185,
+    190,
+    2,
+    232,
+    3,
+    148,
+    162,
+    105,
+    117,
+    117,
+    117,
+    117,
+    117,
+    117,
+    117,
+    81,
+    103,
+    118,
+    81,
+    156,
+    99,
+    117,
+    85,
+    121,
+    170,
+    81,
+    121,
+    135,
+    105,
+    84,
+    121,
+    86,
+    121,
+    172,
+    105,
+    0,
+    194,
+    185,
+    190,
+    2,
+    232,
+    3,
+    148,
+    162,
+    105,
+    117,
+    117,
+    117,
+    117,
+    117,
+    117,
+    81,
+    103,
+    117,
+    0,
+    105,
+    104,
+    104
+  ],
+  "ast": {
+    "name": "HTLC",
+    "params": [
+      {
+        "type_ref": {
+          "base": "byte",
+          "array_dims": [
+            {
+              "kind": "fixed",
+              "value": 32
+            }
+          ]
+        },
+        "name": "initHashLock",
+        "span": "byte[32] initHashLock",
+        "type_span": "byte[32]",
+        "name_span": "initHashLock"
+      },
+      {
+        "type_ref": {
+          "base": "int"
+        },
+        "name": "initTimeLock",
+        "span": "int initTimeLock",
+        "type_span": "int ",
+        "name_span": "initTimeLock"
+      },
+      {
+        "type_ref": {
+          "base": "byte",
+          "array_dims": [
+            {
+              "kind": "fixed",
+              "value": 32
+            }
+          ]
+        },
+        "name": "initRecipientKeyHash",
+        "span": "byte[32] initRecipientKeyHash",
+        "type_span": "byte[32]",
+        "name_span": "initRecipientKeyHash"
+      },
+      {
+        "type_ref": {
+          "base": "byte",
+          "array_dims": [
+            {
+              "kind": "fixed",
+              "value": 32
+            }
+          ]
+        },
+        "name": "initSenderKeyHash",
+        "span": "byte[32] initSenderKeyHash",
+        "type_span": "byte[32]",
+        "name_span": "initSenderKeyHash"
+      }
+    ],
+    "fields": [
+      {
+        "type_ref": {
+          "base": "byte",
+          "array_dims": [
+            {
+              "kind": "fixed",
+              "value": 32
+            }
+          ]
+        },
+        "name": "hashLock",
+        "expr": {
+          "kind": "identifier",
+          "data": "initHashLock",
+          "span": "initHashLock"
+        },
+        "span": "byte[32] hashLock = initHashLock;",
+        "type_span": "byte[32]",
+        "name_span": "hashLock"
+      },
+      {
+        "type_ref": {
+          "base": "int"
+        },
+        "name": "timeLock",
+        "expr": {
+          "kind": "identifier",
+          "data": "initTimeLock",
+          "span": "initTimeLock"
+        },
+        "span": "int timeLock = initTimeLock;",
+        "type_span": "int ",
+        "name_span": "timeLock"
+      },
+      {
+        "type_ref": {
+          "base": "byte",
+          "array_dims": [
+            {
+              "kind": "fixed",
+              "value": 32
+            }
+          ]
+        },
+        "name": "recipientKeyHash",
+        "expr": {
+          "kind": "identifier",
+          "data": "initRecipientKeyHash",
+          "span": "initRecipientKeyHash"
+        },
+        "span": "byte[32] recipientKeyHash = initRecipientKeyHash;",
+        "type_span": "byte[32]",
+        "name_span": "recipientKeyHash"
+      },
+      {
+        "type_ref": {
+          "base": "byte",
+          "array_dims": [
+            {
+              "kind": "fixed",
+              "value": 32
+            }
+          ]
+        },
+        "name": "senderKeyHash",
+        "expr": {
+          "kind": "identifier",
+          "data": "initSenderKeyHash",
+          "span": "initSenderKeyHash"
+        },
+        "span": "byte[32] senderKeyHash = initSenderKeyHash;",
+        "type_span": "byte[32]",
+        "name_span": "senderKeyHash"
+      }
+    ],
+    "constants": [
+      {
+        "type_ref": {
+          "base": "int"
+        },
+        "name": "MINER_FEE",
+        "expr": {
+          "kind": "int",
+          "data": 1000,
+          "span": "1000"
+        },
+        "span": "int constant MINER_FEE = 1000;",
+        "type_span": "int ",
+        "name_span": "MINER_FEE"
+      }
+    ],
+    "functions": [
+      {
+        "name": "claimWithPreimage",
+        "params": [
+          {
+            "type_ref": {
+              "base": "byte",
+              "array_dims": [
+                {
+                  "kind": "fixed",
+                  "value": 32
+                }
+              ]
+            },
+            "name": "preimage",
+            "span": "byte[32] preimage",
+            "type_span": "byte[32]",
+            "name_span": "preimage"
+          },
+          {
+            "type_ref": {
+              "base": "pubkey"
+            },
+            "name": "recipientPk",
+            "span": "pubkey recipientPk",
+            "type_span": "pubkey ",
+            "name_span": "recipientPk"
+          },
+          {
+            "type_ref": {
+              "base": "sig"
+            },
+            "name": "recipientSig",
+            "span": "sig recipientSig",
+            "type_span": "sig ",
+            "name_span": "recipientSig"
+          }
+        ],
+        "entrypoint": true,
+        "return_types": [],
+        "body": [
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "eq",
+                  "left": {
+                    "kind": "call",
+                    "data": {
+                      "name": "sha256",
+                      "args": [
+                        {
+                          "kind": "identifier",
+                          "data": "preimage",
+                          "span": "preimage"
+                        }
+                      ],
+                      "name_span": "sha256"
+                    },
+                    "span": "sha256(preimage)"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "hashLock",
+                    "span": "hashLock"
+                  }
+                },
+                "span": "sha256(preimage) == hashLock"
+              },
+              "message": null,
+              "span": "require(sha256(preimage) == hashLock);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "eq",
+                  "left": {
+                    "kind": "call",
+                    "data": {
+                      "name": "blake2b",
+                      "args": [
+                        {
+                          "kind": "identifier",
+                          "data": "recipientPk",
+                          "span": "recipientPk"
+                        }
+                      ],
+                      "name_span": "blake2b"
+                    },
+                    "span": "blake2b(recipientPk)"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "recipientKeyHash",
+                    "span": "recipientKeyHash"
+                  }
+                },
+                "span": "blake2b(recipientPk) == recipientKeyHash"
+              },
+              "message": null,
+              "span": "require(blake2b(recipientPk) == recipientKeyHash);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "call",
+                "data": {
+                  "name": "checkSig",
+                  "args": [
+                    {
+                      "kind": "identifier",
+                      "data": "recipientSig",
+                      "span": "recipientSig"
+                    },
+                    {
+                      "kind": "identifier",
+                      "data": "recipientPk",
+                      "span": "recipientPk"
+                    }
+                  ],
+                  "name_span": "checkSig"
+                },
+                "span": "checkSig(recipientSig, recipientPk)"
+              },
+              "message": null,
+              "span": "require(checkSig(recipientSig, recipientPk));",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "int"
+              },
+              "modifiers": [],
+              "name": "inputValue",
+              "expr": {
+                "kind": "introspection",
+                "data": {
+                  "kind": "input_value",
+                  "index": {
+                    "kind": "nullary",
+                    "data": "active_input_index",
+                    "span": "this.activeInputIndex"
+                  },
+                  "field_span": ".value"
+                },
+                "span": "tx.inputs[this.activeInputIndex].value"
+              },
+              "span": "int inputValue = tx.inputs[this.activeInputIndex].value;",
+              "type_span": "int ",
+              "modifier_spans": [],
+              "name_span": "inputValue"
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "ge",
+                  "left": {
+                    "kind": "introspection",
+                    "data": {
+                      "kind": "output_value",
+                      "index": {
+                        "kind": "int",
+                        "data": 0,
+                        "span": "0"
+                      },
+                      "field_span": ".value"
+                    },
+                    "span": "tx.outputs[0].value"
+                  },
+                  "right": {
+                    "kind": "binary",
+                    "data": {
+                      "op": "sub",
+                      "left": {
+                        "kind": "identifier",
+                        "data": "inputValue",
+                        "span": "inputValue"
+                      },
+                      "right": {
+                        "kind": "identifier",
+                        "data": "MINER_FEE",
+                        "span": "MINER_FEE"
+                      }
+                    },
+                    "span": "inputValue - MINER_FEE"
+                  }
+                },
+                "span": "tx.outputs[0].value >= inputValue - MINER_FEE"
+              },
+              "message": null,
+              "span": "require(tx.outputs[0].value >= inputValue - MINER_FEE);",
+              "message_span": null
+            }
+          }
+        ],
+        "return_type_spans": [],
+        "span": "entrypoint function claimWithPreimage(\n        byte[32] preimage,\n        pubkey recipientPk,\n        sig recipientSig\n    ) {\n        // Verify preimage matches hashlock\n        require(sha256(preimage) == hashLock);\n\n        // Verify recipient identity\n        require(blake2b(recipientPk) == recipientKeyHash);\n        require(checkSig(recipientSig, recipientPk));\n\n        // Transfer full value to recipient\n        int inputValue = tx.inputs[this.activeInputIndex].value;\n        require(tx.outputs[0].value >= inputValue - MINER_FEE);\n    }",
+        "name_span": "claimWithPreimage",
+        "body_span": "require(sha256(preimage) == hashLock);\n\n        // Verify recipient identity\n        require(blake2b(recipientPk) == recipientKeyHash);\n        require(checkSig(recipientSig, recipientPk));\n\n        // Transfer full value to recipient\n        int inputValue = tx.inputs[this.activeInputIndex].value;\n        require(tx.outputs[0].value >= inputValue - MINER_FEE);"
+      },
+      {
+        "name": "refundAfterTimeout",
+        "params": [
+          {
+            "type_ref": {
+              "base": "pubkey"
+            },
+            "name": "senderPk",
+            "span": "pubkey senderPk",
+            "type_span": "pubkey ",
+            "name_span": "senderPk"
+          },
+          {
+            "type_ref": {
+              "base": "sig"
+            },
+            "name": "senderSig",
+            "span": "sig senderSig",
+            "type_span": "sig ",
+            "name_span": "senderSig"
+          }
+        ],
+        "entrypoint": true,
+        "return_types": [],
+        "body": [
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "eq",
+                  "left": {
+                    "kind": "call",
+                    "data": {
+                      "name": "blake2b",
+                      "args": [
+                        {
+                          "kind": "identifier",
+                          "data": "senderPk",
+                          "span": "senderPk"
+                        }
+                      ],
+                      "name_span": "blake2b"
+                    },
+                    "span": "blake2b(senderPk)"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "senderKeyHash",
+                    "span": "senderKeyHash"
+                  }
+                },
+                "span": "blake2b(senderPk) == senderKeyHash"
+              },
+              "message": null,
+              "span": "require(blake2b(senderPk) == senderKeyHash);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "call",
+                "data": {
+                  "name": "checkSig",
+                  "args": [
+                    {
+                      "kind": "identifier",
+                      "data": "senderSig",
+                      "span": "senderSig"
+                    },
+                    {
+                      "kind": "identifier",
+                      "data": "senderPk",
+                      "span": "senderPk"
+                    }
+                  ],
+                  "name_span": "checkSig"
+                },
+                "span": "checkSig(senderSig, senderPk)"
+              },
+              "message": null,
+              "span": "require(checkSig(senderSig, senderPk));",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "int"
+              },
+              "modifiers": [],
+              "name": "inputValue",
+              "expr": {
+                "kind": "introspection",
+                "data": {
+                  "kind": "input_value",
+                  "index": {
+                    "kind": "nullary",
+                    "data": "active_input_index",
+                    "span": "this.activeInputIndex"
+                  },
+                  "field_span": ".value"
+                },
+                "span": "tx.inputs[this.activeInputIndex].value"
+              },
+              "span": "int inputValue = tx.inputs[this.activeInputIndex].value;",
+              "type_span": "int ",
+              "modifier_spans": [],
+              "name_span": "inputValue"
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "ge",
+                  "left": {
+                    "kind": "introspection",
+                    "data": {
+                      "kind": "output_value",
+                      "index": {
+                        "kind": "int",
+                        "data": 0,
+                        "span": "0"
+                      },
+                      "field_span": ".value"
+                    },
+                    "span": "tx.outputs[0].value"
+                  },
+                  "right": {
+                    "kind": "binary",
+                    "data": {
+                      "op": "sub",
+                      "left": {
+                        "kind": "identifier",
+                        "data": "inputValue",
+                        "span": "inputValue"
+                      },
+                      "right": {
+                        "kind": "identifier",
+                        "data": "MINER_FEE",
+                        "span": "MINER_FEE"
+                      }
+                    },
+                    "span": "inputValue - MINER_FEE"
+                  }
+                },
+                "span": "tx.outputs[0].value >= inputValue - MINER_FEE"
+              },
+              "message": null,
+              "span": "require(tx.outputs[0].value >= inputValue - MINER_FEE);",
+              "message_span": null
+            }
+          }
+        ],
+        "return_type_spans": [],
+        "span": "entrypoint function refundAfterTimeout(\n        pubkey senderPk,\n        sig senderSig\n    ) {\n        // Verify sender identity\n        require(blake2b(senderPk) == senderKeyHash);\n        require(checkSig(senderSig, senderPk));\n\n        // Transfer full value back to sender\n        int inputValue = tx.inputs[this.activeInputIndex].value;\n        require(tx.outputs[0].value >= inputValue - MINER_FEE);\n    }",
+        "name_span": "refundAfterTimeout",
+        "body_span": "require(blake2b(senderPk) == senderKeyHash);\n        require(checkSig(senderSig, senderPk));\n\n        // Transfer full value back to sender\n        int inputValue = tx.inputs[this.activeInputIndex].value;\n        require(tx.outputs[0].value >= inputValue - MINER_FEE);"
+      }
+    ],
+    "span": "contract HTLC(\n    byte[32] initHashLock,\n    int initTimeLock,\n    byte[32] initRecipientKeyHash,\n    byte[32] initSenderKeyHash\n) {\n    byte[32] hashLock = initHashLock;\n    int timeLock = initTimeLock;\n    byte[32] recipientKeyHash = initRecipientKeyHash;\n    byte[32] senderKeyHash = initSenderKeyHash;\n\n    int constant MINER_FEE = 1000;\n\n    // Path A: Claim by revealing the SHA-256 preimage\n    entrypoint function claimWithPreimage(\n        byte[32] preimage,\n        pubkey recipientPk,\n        sig recipientSig\n    ) {\n        // Verify preimage matches hashlock\n        require(sha256(preimage) == hashLock);\n\n        // Verify recipient identity\n        require(blake2b(recipientPk) == recipientKeyHash);\n        require(checkSig(recipientSig, recipientPk));\n\n        // Transfer full value to recipient\n        int inputValue = tx.inputs[this.activeInputIndex].value;\n        require(tx.outputs[0].value >= inputValue - MINER_FEE);\n    }\n\n    // Path B: Refund to sender after timelock expires\n    entrypoint function refundAfterTimeout(\n        pubkey senderPk,\n        sig senderSig\n    ) {\n        // Verify sender identity\n        require(blake2b(senderPk) == senderKeyHash);\n        require(checkSig(senderSig, senderPk));\n\n        // Transfer full value back to sender\n        int inputValue = tx.inputs[this.activeInputIndex].value;\n        require(tx.outputs[0].value >= inputValue - MINER_FEE);\n    }\n}",
+    "name_span": "HTLC"
+  },
+  "abi": [
+    {
+      "name": "claimWithPreimage",
+      "inputs": [
+        {
+          "name": "preimage",
+          "type_name": "byte[32]"
+        },
+        {
+          "name": "recipientPk",
+          "type_name": "pubkey"
+        },
+        {
+          "name": "recipientSig",
+          "type_name": "sig"
+        }
+      ]
+    },
+    {
+      "name": "refundAfterTimeout",
+      "inputs": [
+        {
+          "name": "senderPk",
+          "type_name": "pubkey"
+        },
+        {
+          "name": "senderSig",
+          "type_name": "sig"
+        }
+      ]
+    }
+  ],
+  "without_selector": false,
+  "debug_info": null
+}

@@ -1,0 +1,101 @@
+pragma silverscript ^0.1.0;
+
+// DISCLAIMER: Technical demo code — legal wrappers required in production
+// SPDX-License-Identifier: MIT
+//
+// reserves.sil — Proof-of-Reserves Attestation
+//
+// This contract enforces collateralization of RWA tokens. Withdrawals are
+// only permitted if the oracle-attested reserve ratio remains above the
+// minimum threshold. The oracle provides a signed attestation of the
+// current collateral value, and the contract prevents under-collateralized
+// withdrawals.
+//
+// Path A (withdraw): Withdraw with oracle-attested reserves check
+// Path B (deposit): Add collateral to the reserve
+// Path C (custodianReclaim): Custodian emergency reclaim
+
+contract Reserves(
+    byte[32] initOracleKeyHash,
+    byte[32] initCustodianKeyHash,
+    int initMinReserveRatio
+) {
+    byte[32] oracleKeyHash = initOracleKeyHash;
+    byte[32] custodianKeyHash = initCustodianKeyHash;
+    int minReserveRatio = initMinReserveRatio;
+
+    int constant MINER_FEE = 1000;
+    int constant RATIO_DENOMINATOR = 10000;
+
+    // Path A: Withdraw from reserve with proof-of-reserves check
+    // Requires oracle attestation that reserves remain sufficient after withdrawal
+    entrypoint function withdraw(
+        pubkey withdrawerPk,
+        sig withdrawerSig,
+        pubkey oraclePk,
+        sig oracleAttestation,
+        int attestedReserveValue,
+        int attestedTokenSupplyValue,
+        pubkey recipientPk
+    ) {
+        // 1. Verify withdrawer signature
+        require(checkSig(withdrawerSig, withdrawerPk));
+
+        // 2. Verify oracle attestation
+        require(blake2b(oraclePk) == oracleKeyHash);
+        require(checkSig(oracleAttestation, oraclePk));
+
+        // 3. Calculate withdrawal amount
+        int inputValue = tx.inputs[this.activeInputIndex].value;
+        int withdrawAmount = tx.outputs[0].value;
+        int changeValue = inputValue - withdrawAmount - MINER_FEE;
+
+        // 4. Verify reserve ratio remains above minimum after withdrawal
+        //    ratio = (attestedReserveValue - withdrawAmount) * RATIO_DENOMINATOR / attestedTokenSupplyValue
+        //    We check: (attestedReserveValue - withdrawAmount) * RATIO_DENOMINATOR >= minReserveRatio * attestedTokenSupplyValue
+        require(attestedTokenSupplyValue > 0);
+        require(attestedReserveValue >= withdrawAmount);
+        int remainingReserve = attestedReserveValue - withdrawAmount;
+        require(
+            remainingReserve * RATIO_DENOMINATOR >= minReserveRatio * attestedTokenSupplyValue
+        );
+
+        // 5. First output: send to recipient
+        byte[34] recipientLock = new ScriptPubKeyP2PK(recipientPk);
+        require(tx.outputs[0].scriptPubKey == recipientLock);
+        require(withdrawAmount > 0);
+
+        // 6. Covenant preservation: change goes back to reserve contract
+        if (changeValue > MINER_FEE) {
+            require(tx.outputs[1].value == changeValue);
+            validateOutputState(1, {
+                oracleKeyHash: oracleKeyHash,
+                custodianKeyHash: custodianKeyHash,
+                minReserveRatio: minReserveRatio
+            });
+        }
+    }
+
+    // Path B: Deposit additional collateral into the reserve
+    // Anyone can deposit — no signature required for the deposit itself
+    entrypoint function deposit() {
+        // Preserve the covenant: output must go back to the same contract
+        // The deposit increases the UTXO value (additional inputs fund the increase)
+        int inputValue = tx.inputs[this.activeInputIndex].value;
+        require(tx.outputs[0].value >= inputValue);
+
+        // Covenant preservation
+        validateOutputState(0, {
+            oracleKeyHash: oracleKeyHash,
+            custodianKeyHash: custodianKeyHash,
+            minReserveRatio: minReserveRatio
+        });
+    }
+
+    // Path C: Custodian emergency reclaim
+    // Only the custodian can reclaim all reserve funds (emergency/migration)
+    entrypoint function custodianReclaim(pubkey custodianPk, sig custodianSig) {
+        require(blake2b(custodianPk) == custodianKeyHash);
+        require(checkSig(custodianSig, custodianPk));
+    }
+}

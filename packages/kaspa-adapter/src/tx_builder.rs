@@ -2,124 +2,209 @@
 // SPDX-License-Identifier: MIT
 //
 //! UTXO transaction builder for Kaspa Testnet-12.
-//! Handles coin selection, covenant-spending tx construction,
-//! witness data attachment, and fee estimation.
+//! Builds real `Transaction` objects using rusty-kaspa consensus types,
+//! handles coin selection, fee estimation, change outputs, and OP_RETURN.
 
+use kaspa_addresses::Address;
+use kaspa_consensus_core::subnets::SUBNETWORK_ID_NATIVE;
+use kaspa_consensus_core::tx::{
+    ScriptPublicKey, Transaction, TransactionId, TransactionInput, TransactionOutpoint,
+    TransactionOutput,
+};
+use kaspa_rpc_core::RpcUtxoEntry;
+use kaspa_txscript::pay_to_address_script;
 use thiserror::Error;
 use tracing::info;
 
-use crate::client::Utxo;
 use crate::LOG_PREFIX;
 
 #[derive(Error, Debug)]
 pub enum TxBuilderError {
     #[error("[K-RWA] Insufficient funds: need {needed}, have {available}")]
     InsufficientFunds { needed: u64, available: u64 },
-    #[error("[K-RWA] Invalid script: {0}")]
-    InvalidScript(String),
+    #[error("[K-RWA] Invalid address: {0}")]
+    InvalidAddress(String),
     #[error("[K-RWA] Build failed: {0}")]
     BuildFailed(String),
+    #[error("[K-RWA] No inputs provided")]
+    NoInputs,
+    #[error("[K-RWA] No outputs provided")]
+    NoOutputs,
 }
 
-/// Transaction output specification
+/// A UTXO ready to be spent (includes the entry data needed for signing)
 #[derive(Debug, Clone)]
-pub struct TxOutput {
-    /// Destination address or P2SH script hash
-    pub address: String,
-    /// Amount in sompis (1 KAS = 100_000_000 sompis)
+pub struct SpendableUtxo {
+    pub txid: TransactionId,
+    pub index: u32,
     pub amount: u64,
-    /// Optional OP_RETURN data (DKG UAL, schema metadata)
+    pub script_public_key: ScriptPublicKey,
+}
+
+/// Simple P2PK transfer parameters
+#[derive(Debug)]
+pub struct TransferParams {
+    pub to_address: Address,
+    pub amount: u64,
+    pub change_address: Address,
     pub op_return_data: Option<Vec<u8>>,
 }
 
-/// Witness data for covenant spending
-#[derive(Debug, Clone)]
-pub struct WitnessData {
-    /// Signature(s)
-    pub signatures: Vec<Vec<u8>>,
-    /// ZK proof bytes (Groth16)
-    pub zk_proof: Option<Vec<u8>>,
-    /// Merkle proof path
-    pub merkle_proof: Option<Vec<Vec<u8>>>,
-    /// Oracle attestation
-    pub oracle_attestation: Option<Vec<u8>>,
-}
+/// Minimum fee per transaction (in sompis)
+const MIN_RELAY_FEE: u64 = 1000;
 
-/// Builds transactions for Kaspa Testnet-12
-pub struct TransactionBuilder {
-    inputs: Vec<Utxo>,
-    outputs: Vec<TxOutput>,
-    witness: Option<WitnessData>,
-    fee_rate: u64,
-}
+/// Mass per transaction input (approximate)
+const MASS_PER_INPUT: u64 = 1000;
+/// Mass per transaction output (approximate)
+const MASS_PER_OUTPUT: u64 = 1000;
+/// Mass per signature operation
+const MASS_PER_SIG_OP: u64 = 10000;
 
-impl TransactionBuilder {
-    /// Create a new transaction builder
-    pub fn new() -> Self {
-        info!("{} Creating new transaction builder", LOG_PREFIX);
-        Self {
-            inputs: Vec::new(),
-            outputs: Vec::new(),
-            witness: None,
-            fee_rate: 1, // 1 sompi/byte default
+/// Maximum inputs per transaction to stay under Kaspa's 1,000,000 storage mass limit.
+/// Actual mass per input is ~27,000 (includes script_public_key serialization, sig ops,
+/// and output storage mass). Conservative limit: 25 inputs ≈ 675,000 mass.
+const MAX_INPUTS: usize = 25;
+
+/// Select UTXOs greedily (largest-first) to cover the target amount + fee.
+/// Limits selection to MAX_INPUTS to avoid exceeding Kaspa's storage mass limit.
+pub fn select_utxos(
+    utxos: &[SpendableUtxo],
+    target: u64,
+) -> Result<(Vec<SpendableUtxo>, u64), TxBuilderError> {
+    let mut sorted: Vec<SpendableUtxo> = utxos.to_vec();
+    sorted.sort_by(|a, b| b.amount.cmp(&a.amount));
+
+    let mut selected = Vec::new();
+    let mut total: u64 = 0;
+
+    for utxo in sorted {
+        if selected.len() >= MAX_INPUTS {
+            break;
+        }
+        selected.push(utxo.clone());
+        total += utxo.amount;
+
+        // Estimate fee based on current selection
+        let fee = estimate_fee(selected.len(), 2); // 2 outputs: dest + change
+        if total >= target + fee {
+            info!(
+                "{} Selected {} UTXOs, total={} sompis, target={}, fee={}",
+                LOG_PREFIX,
+                selected.len(),
+                total,
+                target,
+                fee
+            );
+            return Ok((selected, fee));
         }
     }
 
-    /// Add UTXOs as inputs (coin selection: largest-first)
-    pub fn add_inputs(&mut self, utxos: Vec<Utxo>) -> &mut Self {
-        let mut sorted = utxos;
-        sorted.sort_by(|a, b| b.amount.cmp(&a.amount));
-        self.inputs.extend(sorted);
-        self
-    }
-
-    /// Add an output
-    pub fn add_output(&mut self, output: TxOutput) -> &mut Self {
-        self.outputs.push(output);
-        self
-    }
-
-    /// Attach witness data (for covenant spending)
-    pub fn set_witness(&mut self, witness: WitnessData) -> &mut Self {
-        self.witness = Some(witness);
-        self
-    }
-
-    /// Estimate transaction fee
-    pub fn estimate_fee(&self) -> u64 {
-        // TODO: Calculate based on tx size
-        // Target: ≤0.001 KAS per transfer
-        let estimated_size = 250 + (self.inputs.len() * 148) + (self.outputs.len() * 34);
-        (estimated_size as u64) * self.fee_rate
-    }
-
-    /// Build and serialize the transaction
-    pub fn build(&self) -> Result<Vec<u8>, TxBuilderError> {
-        info!("{} Building transaction with {} inputs and {} outputs",
-            LOG_PREFIX, self.inputs.len(), self.outputs.len());
-
-        let total_in: u64 = self.inputs.iter().map(|u| u.amount).sum();
-        let total_out: u64 = self.outputs.iter().map(|o| o.amount).sum();
-        let fee = self.estimate_fee();
-
-        if total_in < total_out + fee {
-            return Err(TxBuilderError::InsufficientFunds {
-                needed: total_out + fee,
-                available: total_in,
-            });
-        }
-
-        // TODO: Serialize using kaspa-consensus-core Transaction type
-        // Include witness data for covenant spending paths
-        info!("{} Transaction built: {} inputs, {} outputs, fee={} sompis",
-            LOG_PREFIX, self.inputs.len(), self.outputs.len(), fee);
-
-        Ok(vec![])
-    }
+    Err(TxBuilderError::InsufficientFunds {
+        needed: target + estimate_fee(selected.len(), 2),
+        available: total,
+    })
 }
 
-impl Default for TransactionBuilder {
-    fn default() -> Self {
-        Self::new()
+/// Estimate the fee for a transaction
+fn estimate_fee(num_inputs: usize, num_outputs: usize) -> u64 {
+    let mass = (num_inputs as u64 * MASS_PER_INPUT)
+        + (num_outputs as u64 * MASS_PER_OUTPUT)
+        + (num_inputs as u64 * MASS_PER_SIG_OP);
+    // fee = mass * minimum_fee_rate / 1000, minimum MIN_RELAY_FEE
+    std::cmp::max(mass, MIN_RELAY_FEE)
+}
+
+/// Build a P2PK transfer transaction.
+///
+/// Returns (Transaction, Vec<(TransactionOutpoint, RpcUtxoEntry)>) — the
+/// unsigned transaction and the UTXO entries needed for signing context.
+pub fn build_transfer(
+    utxos: &[SpendableUtxo],
+    params: &TransferParams,
+) -> Result<(Transaction, Vec<(TransactionOutpoint, RpcUtxoEntry)>), TxBuilderError> {
+    if utxos.is_empty() {
+        return Err(TxBuilderError::NoInputs);
     }
+
+    // Select UTXOs
+    let (selected, fee) = select_utxos(utxos, params.amount)?;
+
+    let total_in: u64 = selected.iter().map(|u| u.amount).sum();
+    let change = total_in - params.amount - fee;
+
+    info!(
+        "{} Building transfer: {} sompis to {}, fee={}, change={}",
+        LOG_PREFIX,
+        params.amount,
+        params.to_address,
+        fee,
+        change
+    );
+
+    // Build inputs
+    let mut inputs = Vec::new();
+    let mut utxo_entries = Vec::new();
+
+    for utxo in &selected {
+        let outpoint = TransactionOutpoint::new(utxo.txid, utxo.index);
+
+        inputs.push(TransactionInput::new(
+            outpoint.clone(),
+            vec![], // Empty sig script — filled by signing
+            0,      // sequence
+            1,      // sig_op_count (1 for P2PK)
+        ));
+
+        // Build the UTXO entry for signing context
+        let entry = RpcUtxoEntry {
+            amount: utxo.amount,
+            script_public_key: utxo.script_public_key.clone(),
+            block_daa_score: 0,
+            is_coinbase: false,
+            covenant_id: None,
+        };
+        utxo_entries.push((outpoint, entry));
+    }
+
+    // Build outputs
+    let mut outputs = Vec::new();
+
+    // Destination output
+    let dest_script = pay_to_address_script(&params.to_address);
+    outputs.push(TransactionOutput::new(params.amount, dest_script));
+
+    // Change output (if any)
+    if change > 0 {
+        let change_script = pay_to_address_script(&params.change_address);
+        outputs.push(TransactionOutput::new(change, change_script));
+    }
+
+    // OP_RETURN output (if any)
+    if let Some(data) = &params.op_return_data {
+        let mut script_bytes = vec![0x6a]; // OP_RETURN
+        script_bytes.extend(data);
+        let op_return_script = ScriptPublicKey::new(0, script_bytes.into());
+        outputs.push(TransactionOutput::new(0, op_return_script));
+    }
+
+    // Build the transaction
+    let tx = Transaction::new(
+        0,                     // version
+        inputs,                // inputs
+        outputs,               // outputs
+        0,                     // lock_time
+        SUBNETWORK_ID_NATIVE,  // subnetwork_id
+        0,                     // gas
+        vec![],                // payload
+    );
+
+    info!(
+        "{} Transaction built: id={}, {} inputs, {} outputs",
+        LOG_PREFIX,
+        tx.id(),
+        tx.inputs.len(),
+        tx.outputs.len()
+    );
+
+    Ok((tx, utxo_entries))
 }

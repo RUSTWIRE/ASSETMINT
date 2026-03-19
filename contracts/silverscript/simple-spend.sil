@@ -1,0 +1,23 @@
+pragma silverscript ^0.1.0;
+
+// DISCLAIMER: Technical demo code — legal wrappers required in production
+// SPDX-License-Identifier: MIT
+//
+// simple-spend.sil — Minimal covenant for testing P2SH execution
+//
+// The simplest possible covenant: owner proves identity via checkSig,
+// funds go to wherever the transaction outputs specify.
+// No ScriptPubKeyP2PK construction (which causes numeric overflow).
+
+contract SimpleSpend(
+    byte[32] ownerKeyHash
+) {
+    int constant MINER_FEE = 1000;
+
+    entrypoint function spend(pubkey ownerPk, sig ownerSig) {
+        require(blake2b(ownerPk) == ownerKeyHash);
+        require(checkSig(ownerSig, ownerPk));
+        int inputValue = tx.inputs[this.activeInputIndex].value;
+        require(tx.outputs[0].value >= inputValue - MINER_FEE);
+    }
+}

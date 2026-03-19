@@ -1,0 +1,36 @@
+# DISCLAIMER: Technical demo code — legal wrappers required in production
+# SPDX-License-Identifier: MIT
+#
+# AssetMint Demo Stack (containerized)
+# Usage: docker compose -f docker-compose.demo.yml up --build
+# Testnet-12 ONLY — no mainnet connections
+
+services:
+  compliance-api:
+    build:
+      context: .
+      dockerfile: services/assetmint-core/Dockerfile
+    ports:
+      - "${COMPLIANCE_API_PORT:-3001}:3001"
+    environment:
+      - RUST_LOG=info
+      - KASPA_WS=ws://host.docker.internal:17210
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  dashboard:
+    build:
+      context: ./apps/dashboard-fe
+      dockerfile: Dockerfile
+    ports:
+      - "${DASHBOARD_PORT:-3000}:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://compliance-api:3001
+    depends_on:
+      compliance-api:
+        condition: service_healthy

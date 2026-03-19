@@ -1,0 +1,285 @@
+{
+  "contract_name": "SimpleSpend",
+  "script": [
+    81,
+    121,
+    170,
+    32,
+    126,
+    76,
+    81,
+    205,
+    140,
+    110,
+    176,
+    56,
+    199,
+    222,
+    240,
+    88,
+    142,
+    150,
+    13,
+    116,
+    175,
+    15,
+    144,
+    68,
+    226,
+    247,
+    54,
+    161,
+    67,
+    141,
+    47,
+    82,
+    197,
+    209,
+    47,
+    134,
+    135,
+    105,
+    0,
+    121,
+    82,
+    121,
+    172,
+    105,
+    0,
+    194,
+    185,
+    190,
+    2,
+    232,
+    3,
+    148,
+    162,
+    105,
+    117,
+    117,
+    81
+  ],
+  "ast": {
+    "name": "SimpleSpend",
+    "params": [
+      {
+        "type_ref": {
+          "base": "byte",
+          "array_dims": [
+            {
+              "kind": "fixed",
+              "value": 32
+            }
+          ]
+        },
+        "name": "ownerKeyHash",
+        "span": "byte[32] ownerKeyHash",
+        "type_span": "byte[32]",
+        "name_span": "ownerKeyHash"
+      }
+    ],
+    "constants": [
+      {
+        "type_ref": {
+          "base": "int"
+        },
+        "name": "MINER_FEE",
+        "expr": {
+          "kind": "int",
+          "data": 1000,
+          "span": "1000"
+        },
+        "span": "int constant MINER_FEE = 1000;",
+        "type_span": "int ",
+        "name_span": "MINER_FEE"
+      }
+    ],
+    "functions": [
+      {
+        "name": "spend",
+        "params": [
+          {
+            "type_ref": {
+              "base": "pubkey"
+            },
+            "name": "ownerPk",
+            "span": "pubkey ownerPk",
+            "type_span": "pubkey ",
+            "name_span": "ownerPk"
+          },
+          {
+            "type_ref": {
+              "base": "sig"
+            },
+            "name": "ownerSig",
+            "span": "sig ownerSig",
+            "type_span": "sig ",
+            "name_span": "ownerSig"
+          }
+        ],
+        "entrypoint": true,
+        "return_types": [],
+        "body": [
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "eq",
+                  "left": {
+                    "kind": "call",
+                    "data": {
+                      "name": "blake2b",
+                      "args": [
+                        {
+                          "kind": "identifier",
+                          "data": "ownerPk",
+                          "span": "ownerPk"
+                        }
+                      ],
+                      "name_span": "blake2b"
+                    },
+                    "span": "blake2b(ownerPk)"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "ownerKeyHash",
+                    "span": "ownerKeyHash"
+                  }
+                },
+                "span": "blake2b(ownerPk) == ownerKeyHash"
+              },
+              "message": null,
+              "span": "require(blake2b(ownerPk) == ownerKeyHash);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "call",
+                "data": {
+                  "name": "checkSig",
+                  "args": [
+                    {
+                      "kind": "identifier",
+                      "data": "ownerSig",
+                      "span": "ownerSig"
+                    },
+                    {
+                      "kind": "identifier",
+                      "data": "ownerPk",
+                      "span": "ownerPk"
+                    }
+                  ],
+                  "name_span": "checkSig"
+                },
+                "span": "checkSig(ownerSig, ownerPk)"
+              },
+              "message": null,
+              "span": "require(checkSig(ownerSig, ownerPk));",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "int"
+              },
+              "modifiers": [],
+              "name": "inputValue",
+              "expr": {
+                "kind": "introspection",
+                "data": {
+                  "kind": "input_value",
+                  "index": {
+                    "kind": "nullary",
+                    "data": "active_input_index",
+                    "span": "this.activeInputIndex"
+                  },
+                  "field_span": ".value"
+                },
+                "span": "tx.inputs[this.activeInputIndex].value"
+              },
+              "span": "int inputValue = tx.inputs[this.activeInputIndex].value;",
+              "type_span": "int ",
+              "modifier_spans": [],
+              "name_span": "inputValue"
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "ge",
+                  "left": {
+                    "kind": "introspection",
+                    "data": {
+                      "kind": "output_value",
+                      "index": {
+                        "kind": "int",
+                        "data": 0,
+                        "span": "0"
+                      },
+                      "field_span": ".value"
+                    },
+                    "span": "tx.outputs[0].value"
+                  },
+                  "right": {
+                    "kind": "binary",
+                    "data": {
+                      "op": "sub",
+                      "left": {
+                        "kind": "identifier",
+                        "data": "inputValue",
+                        "span": "inputValue"
+                      },
+                      "right": {
+                        "kind": "identifier",
+                        "data": "MINER_FEE",
+                        "span": "MINER_FEE"
+                      }
+                    },
+                    "span": "inputValue - MINER_FEE"
+                  }
+                },
+                "span": "tx.outputs[0].value >= inputValue - MINER_FEE"
+              },
+              "message": null,
+              "span": "require(tx.outputs[0].value >= inputValue - MINER_FEE);",
+              "message_span": null
+            }
+          }
+        ],
+        "return_type_spans": [],
+        "span": "entrypoint function spend(pubkey ownerPk, sig ownerSig) {\n        require(blake2b(ownerPk) == ownerKeyHash);\n        require(checkSig(ownerSig, ownerPk));\n        int inputValue = tx.inputs[this.activeInputIndex].value;\n        require(tx.outputs[0].value >= inputValue - MINER_FEE);\n    }",
+        "name_span": "spend",
+        "body_span": "require(blake2b(ownerPk) == ownerKeyHash);\n        require(checkSig(ownerSig, ownerPk));\n        int inputValue = tx.inputs[this.activeInputIndex].value;\n        require(tx.outputs[0].value >= inputValue - MINER_FEE);"
+      }
+    ],
+    "span": "contract SimpleSpend(\n    byte[32] ownerKeyHash\n) {\n    int constant MINER_FEE = 1000;\n\n    entrypoint function spend(pubkey ownerPk, sig ownerSig) {\n        require(blake2b(ownerPk) == ownerKeyHash);\n        require(checkSig(ownerSig, ownerPk));\n        int inputValue = tx.inputs[this.activeInputIndex].value;\n        require(tx.outputs[0].value >= inputValue - MINER_FEE);\n    }\n}",
+    "name_span": "SimpleSpend"
+  },
+  "abi": [
+    {
+      "name": "spend",
+      "inputs": [
+        {
+          "name": "ownerPk",
+          "type_name": "pubkey"
+        },
+        {
+          "name": "ownerSig",
+          "type_name": "sig"
+        }
+      ]
+    }
+  ],
+  "without_selector": true,
+  "debug_info": null
+}

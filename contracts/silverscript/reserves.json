@@ -1,0 +1,1381 @@
+{
+  "contract_name": "Reserves",
+  "script": [
+    107,
+    32,
+    126,
+    76,
+    81,
+    205,
+    140,
+    110,
+    176,
+    56,
+    199,
+    222,
+    240,
+    88,
+    142,
+    150,
+    13,
+    116,
+    175,
+    15,
+    144,
+    68,
+    226,
+    247,
+    54,
+    161,
+    67,
+    141,
+    47,
+    82,
+    197,
+    209,
+    47,
+    134,
+    32,
+    215,
+    170,
+    1,
+    125,
+    191,
+    11,
+    116,
+    97,
+    104,
+    136,
+    80,
+    191,
+    205,
+    151,
+    217,
+    228,
+    249,
+    136,
+    105,
+    217,
+    90,
+    100,
+    61,
+    184,
+    248,
+    54,
+    108,
+    192,
+    48,
+    59,
+    221,
+    111,
+    8,
+    152,
+    58,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    108,
+    118,
+    0,
+    156,
+    99,
+    117,
+    88,
+    121,
+    90,
+    121,
+    172,
+    105,
+    87,
+    121,
+    170,
+    83,
+    121,
+    135,
+    105,
+    86,
+    121,
+    88,
+    121,
+    172,
+    105,
+    0,
+    194,
+    185,
+    190,
+    81,
+    121,
+    148,
+    2,
+    232,
+    3,
+    148,
+    86,
+    121,
+    0,
+    160,
+    105,
+    87,
+    121,
+    82,
+    121,
+    162,
+    105,
+    87,
+    121,
+    82,
+    121,
+    148,
+    2,
+    16,
+    39,
+    149,
+    83,
+    121,
+    88,
+    121,
+    149,
+    162,
+    105,
+    0,
+    195,
+    86,
+    121,
+    3,
+    0,
+    0,
+    32,
+    124,
+    126,
+    1,
+    172,
+    126,
+    135,
+    105,
+    81,
+    121,
+    0,
+    160,
+    105,
+    0,
+    121,
+    2,
+    232,
+    3,
+    160,
+    99,
+    81,
+    194,
+    81,
+    121,
+    156,
+    105,
+    84,
+    121,
+    1,
+    32,
+    124,
+    126,
+    84,
+    121,
+    1,
+    32,
+    124,
+    126,
+    84,
+    121,
+    88,
+    205,
+    88,
+    124,
+    126,
+    126,
+    126,
+    185,
+    118,
+    201,
+    2,
+    116,
+    1,
+    148,
+    118,
+    81,
+    147,
+    188,
+    124,
+    126,
+    185,
+    118,
+    201,
+    118,
+    2,
+    116,
+    1,
+    148,
+    1,
+    76,
+    147,
+    124,
+    188,
+    126,
+    170,
+    2,
+    0,
+    0,
+    1,
+    170,
+    126,
+    1,
+    32,
+    126,
+    124,
+    126,
+    1,
+    135,
+    126,
+    81,
+    195,
+    135,
+    105,
+    104,
+    0,
+    122,
+    117,
+    0,
+    122,
+    117,
+    117,
+    117,
+    117,
+    117,
+    117,
+    117,
+    117,
+    117,
+    117,
+    117,
+    81,
+    103,
+    118,
+    81,
+    156,
+    99,
+    117,
+    0,
+    194,
+    185,
+    190,
+    162,
+    105,
+    82,
+    121,
+    1,
+    32,
+    124,
+    126,
+    82,
+    121,
+    1,
+    32,
+    124,
+    126,
+    82,
+    121,
+    88,
+    205,
+    88,
+    124,
+    126,
+    126,
+    126,
+    185,
+    118,
+    201,
+    2,
+    116,
+    1,
+    148,
+    118,
+    81,
+    147,
+    188,
+    124,
+    126,
+    185,
+    118,
+    201,
+    118,
+    2,
+    116,
+    1,
+    148,
+    1,
+    76,
+    147,
+    124,
+    188,
+    126,
+    170,
+    2,
+    0,
+    0,
+    1,
+    170,
+    126,
+    1,
+    32,
+    126,
+    124,
+    126,
+    1,
+    135,
+    126,
+    0,
+    195,
+    135,
+    105,
+    117,
+    117,
+    117,
+    81,
+    103,
+    118,
+    82,
+    156,
+    99,
+    117,
+    84,
+    121,
+    170,
+    82,
+    121,
+    135,
+    105,
+    83,
+    121,
+    85,
+    121,
+    172,
+    105,
+    117,
+    117,
+    117,
+    117,
+    117,
+    81,
+    103,
+    117,
+    0,
+    105,
+    104,
+    104,
+    104
+  ],
+  "ast": {
+    "name": "Reserves",
+    "params": [
+      {
+        "type_ref": {
+          "base": "byte",
+          "array_dims": [
+            {
+              "kind": "fixed",
+              "value": 32
+            }
+          ]
+        },
+        "name": "initOracleKeyHash",
+        "span": "byte[32] initOracleKeyHash",
+        "type_span": "byte[32]",
+        "name_span": "initOracleKeyHash"
+      },
+      {
+        "type_ref": {
+          "base": "byte",
+          "array_dims": [
+            {
+              "kind": "fixed",
+              "value": 32
+            }
+          ]
+        },
+        "name": "initCustodianKeyHash",
+        "span": "byte[32] initCustodianKeyHash",
+        "type_span": "byte[32]",
+        "name_span": "initCustodianKeyHash"
+      },
+      {
+        "type_ref": {
+          "base": "int"
+        },
+        "name": "initMinReserveRatio",
+        "span": "int initMinReserveRatio",
+        "type_span": "int ",
+        "name_span": "initMinReserveRatio"
+      }
+    ],
+    "fields": [
+      {
+        "type_ref": {
+          "base": "byte",
+          "array_dims": [
+            {
+              "kind": "fixed",
+              "value": 32
+            }
+          ]
+        },
+        "name": "oracleKeyHash",
+        "expr": {
+          "kind": "identifier",
+          "data": "initOracleKeyHash",
+          "span": "initOracleKeyHash"
+        },
+        "span": "byte[32] oracleKeyHash = initOracleKeyHash;",
+        "type_span": "byte[32]",
+        "name_span": "oracleKeyHash"
+      },
+      {
+        "type_ref": {
+          "base": "byte",
+          "array_dims": [
+            {
+              "kind": "fixed",
+              "value": 32
+            }
+          ]
+        },
+        "name": "custodianKeyHash",
+        "expr": {
+          "kind": "identifier",
+          "data": "initCustodianKeyHash",
+          "span": "initCustodianKeyHash"
+        },
+        "span": "byte[32] custodianKeyHash = initCustodianKeyHash;",
+        "type_span": "byte[32]",
+        "name_span": "custodianKeyHash"
+      },
+      {
+        "type_ref": {
+          "base": "int"
+        },
+        "name": "minReserveRatio",
+        "expr": {
+          "kind": "identifier",
+          "data": "initMinReserveRatio",
+          "span": "initMinReserveRatio"
+        },
+        "span": "int minReserveRatio = initMinReserveRatio;",
+        "type_span": "int ",
+        "name_span": "minReserveRatio"
+      }
+    ],
+    "constants": [
+      {
+        "type_ref": {
+          "base": "int"
+        },
+        "name": "MINER_FEE",
+        "expr": {
+          "kind": "int",
+          "data": 1000,
+          "span": "1000"
+        },
+        "span": "int constant MINER_FEE = 1000;",
+        "type_span": "int ",
+        "name_span": "MINER_FEE"
+      },
+      {
+        "type_ref": {
+          "base": "int"
+        },
+        "name": "RATIO_DENOMINATOR",
+        "expr": {
+          "kind": "int",
+          "data": 10000,
+          "span": "10000"
+        },
+        "span": "int constant RATIO_DENOMINATOR = 10000;",
+        "type_span": "int ",
+        "name_span": "RATIO_DENOMINATOR"
+      }
+    ],
+    "functions": [
+      {
+        "name": "withdraw",
+        "params": [
+          {
+            "type_ref": {
+              "base": "pubkey"
+            },
+            "name": "withdrawerPk",
+            "span": "pubkey withdrawerPk",
+            "type_span": "pubkey ",
+            "name_span": "withdrawerPk"
+          },
+          {
+            "type_ref": {
+              "base": "sig"
+            },
+            "name": "withdrawerSig",
+            "span": "sig withdrawerSig",
+            "type_span": "sig ",
+            "name_span": "withdrawerSig"
+          },
+          {
+            "type_ref": {
+              "base": "pubkey"
+            },
+            "name": "oraclePk",
+            "span": "pubkey oraclePk",
+            "type_span": "pubkey ",
+            "name_span": "oraclePk"
+          },
+          {
+            "type_ref": {
+              "base": "sig"
+            },
+            "name": "oracleAttestation",
+            "span": "sig oracleAttestation",
+            "type_span": "sig ",
+            "name_span": "oracleAttestation"
+          },
+          {
+            "type_ref": {
+              "base": "int"
+            },
+            "name": "attestedReserveValue",
+            "span": "int attestedReserveValue",
+            "type_span": "int ",
+            "name_span": "attestedReserveValue"
+          },
+          {
+            "type_ref": {
+              "base": "int"
+            },
+            "name": "attestedTokenSupplyValue",
+            "span": "int attestedTokenSupplyValue",
+            "type_span": "int ",
+            "name_span": "attestedTokenSupplyValue"
+          },
+          {
+            "type_ref": {
+              "base": "pubkey"
+            },
+            "name": "recipientPk",
+            "span": "pubkey recipientPk",
+            "type_span": "pubkey ",
+            "name_span": "recipientPk"
+          }
+        ],
+        "entrypoint": true,
+        "return_types": [],
+        "body": [
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "call",
+                "data": {
+                  "name": "checkSig",
+                  "args": [
+                    {
+                      "kind": "identifier",
+                      "data": "withdrawerSig",
+                      "span": "withdrawerSig"
+                    },
+                    {
+                      "kind": "identifier",
+                      "data": "withdrawerPk",
+                      "span": "withdrawerPk"
+                    }
+                  ],
+                  "name_span": "checkSig"
+                },
+                "span": "checkSig(withdrawerSig, withdrawerPk)"
+              },
+              "message": null,
+              "span": "require(checkSig(withdrawerSig, withdrawerPk));",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "eq",
+                  "left": {
+                    "kind": "call",
+                    "data": {
+                      "name": "blake2b",
+                      "args": [
+                        {
+                          "kind": "identifier",
+                          "data": "oraclePk",
+                          "span": "oraclePk"
+                        }
+                      ],
+                      "name_span": "blake2b"
+                    },
+                    "span": "blake2b(oraclePk)"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "oracleKeyHash",
+                    "span": "oracleKeyHash"
+                  }
+                },
+                "span": "blake2b(oraclePk) == oracleKeyHash"
+              },
+              "message": null,
+              "span": "require(blake2b(oraclePk) == oracleKeyHash);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "call",
+                "data": {
+                  "name": "checkSig",
+                  "args": [
+                    {
+                      "kind": "identifier",
+                      "data": "oracleAttestation",
+                      "span": "oracleAttestation"
+                    },
+                    {
+                      "kind": "identifier",
+                      "data": "oraclePk",
+                      "span": "oraclePk"
+                    }
+                  ],
+                  "name_span": "checkSig"
+                },
+                "span": "checkSig(oracleAttestation, oraclePk)"
+              },
+              "message": null,
+              "span": "require(checkSig(oracleAttestation, oraclePk));",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "int"
+              },
+              "modifiers": [],
+              "name": "inputValue",
+              "expr": {
+                "kind": "introspection",
+                "data": {
+                  "kind": "input_value",
+                  "index": {
+                    "kind": "nullary",
+                    "data": "active_input_index",
+                    "span": "this.activeInputIndex"
+                  },
+                  "field_span": ".value"
+                },
+                "span": "tx.inputs[this.activeInputIndex].value"
+              },
+              "span": "int inputValue = tx.inputs[this.activeInputIndex].value;",
+              "type_span": "int ",
+              "modifier_spans": [],
+              "name_span": "inputValue"
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "int"
+              },
+              "modifiers": [],
+              "name": "withdrawAmount",
+              "expr": {
+                "kind": "introspection",
+                "data": {
+                  "kind": "output_value",
+                  "index": {
+                    "kind": "int",
+                    "data": 0,
+                    "span": "0"
+                  },
+                  "field_span": ".value"
+                },
+                "span": "tx.outputs[0].value"
+              },
+              "span": "int withdrawAmount = tx.outputs[0].value;",
+              "type_span": "int ",
+              "modifier_spans": [],
+              "name_span": "withdrawAmount"
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "int"
+              },
+              "modifiers": [],
+              "name": "changeValue",
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "sub",
+                  "left": {
+                    "kind": "binary",
+                    "data": {
+                      "op": "sub",
+                      "left": {
+                        "kind": "identifier",
+                        "data": "inputValue",
+                        "span": "inputValue"
+                      },
+                      "right": {
+                        "kind": "identifier",
+                        "data": "withdrawAmount",
+                        "span": "withdrawAmount"
+                      }
+                    },
+                    "span": "inputValue - withdrawAmount"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "MINER_FEE",
+                    "span": "MINER_FEE"
+                  }
+                },
+                "span": "inputValue - withdrawAmount - MINER_FEE"
+              },
+              "span": "int changeValue = inputValue - withdrawAmount - MINER_FEE;",
+              "type_span": "int ",
+              "modifier_spans": [],
+              "name_span": "changeValue"
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "gt",
+                  "left": {
+                    "kind": "identifier",
+                    "data": "attestedTokenSupplyValue",
+                    "span": "attestedTokenSupplyValue"
+                  },
+                  "right": {
+                    "kind": "int",
+                    "data": 0,
+                    "span": "0"
+                  }
+                },
+                "span": "attestedTokenSupplyValue > 0"
+              },
+              "message": null,
+              "span": "require(attestedTokenSupplyValue > 0);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "ge",
+                  "left": {
+                    "kind": "identifier",
+                    "data": "attestedReserveValue",
+                    "span": "attestedReserveValue"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "withdrawAmount",
+                    "span": "withdrawAmount"
+                  }
+                },
+                "span": "attestedReserveValue >= withdrawAmount"
+              },
+              "message": null,
+              "span": "require(attestedReserveValue >= withdrawAmount);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "int"
+              },
+              "modifiers": [],
+              "name": "remainingReserve",
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "sub",
+                  "left": {
+                    "kind": "identifier",
+                    "data": "attestedReserveValue",
+                    "span": "attestedReserveValue"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "withdrawAmount",
+                    "span": "withdrawAmount"
+                  }
+                },
+                "span": "attestedReserveValue - withdrawAmount"
+              },
+              "span": "int remainingReserve = attestedReserveValue - withdrawAmount;",
+              "type_span": "int ",
+              "modifier_spans": [],
+              "name_span": "remainingReserve"
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "ge",
+                  "left": {
+                    "kind": "binary",
+                    "data": {
+                      "op": "mul",
+                      "left": {
+                        "kind": "identifier",
+                        "data": "remainingReserve",
+                        "span": "remainingReserve"
+                      },
+                      "right": {
+                        "kind": "identifier",
+                        "data": "RATIO_DENOMINATOR",
+                        "span": "RATIO_DENOMINATOR"
+                      }
+                    },
+                    "span": "remainingReserve * RATIO_DENOMINATOR"
+                  },
+                  "right": {
+                    "kind": "binary",
+                    "data": {
+                      "op": "mul",
+                      "left": {
+                        "kind": "identifier",
+                        "data": "minReserveRatio",
+                        "span": "minReserveRatio"
+                      },
+                      "right": {
+                        "kind": "identifier",
+                        "data": "attestedTokenSupplyValue",
+                        "span": "attestedTokenSupplyValue"
+                      }
+                    },
+                    "span": "minReserveRatio * attestedTokenSupplyValue"
+                  }
+                },
+                "span": "remainingReserve * RATIO_DENOMINATOR >= minReserveRatio * attestedTokenSupplyValue"
+              },
+              "message": null,
+              "span": "require(\n            remainingReserve * RATIO_DENOMINATOR >= minReserveRatio * attestedTokenSupplyValue\n        );",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "byte",
+                "array_dims": [
+                  {
+                    "kind": "fixed",
+                    "value": 34
+                  }
+                ]
+              },
+              "modifiers": [],
+              "name": "recipientLock",
+              "expr": {
+                "kind": "new",
+                "data": {
+                  "name": "ScriptPubKeyP2PK",
+                  "args": [
+                    {
+                      "kind": "identifier",
+                      "data": "recipientPk",
+                      "span": "recipientPk"
+                    }
+                  ],
+                  "name_span": "ScriptPubKeyP2PK"
+                },
+                "span": "new ScriptPubKeyP2PK(recipientPk)"
+              },
+              "span": "byte[34] recipientLock = new ScriptPubKeyP2PK(recipientPk);",
+              "type_span": "byte[34]",
+              "modifier_spans": [],
+              "name_span": "recipientLock"
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "eq",
+                  "left": {
+                    "kind": "introspection",
+                    "data": {
+                      "kind": "output_script_pub_key",
+                      "index": {
+                        "kind": "int",
+                        "data": 0,
+                        "span": "0"
+                      },
+                      "field_span": ".scriptPubKey"
+                    },
+                    "span": "tx.outputs[0].scriptPubKey"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "recipientLock",
+                    "span": "recipientLock"
+                  }
+                },
+                "span": "tx.outputs[0].scriptPubKey == recipientLock"
+              },
+              "message": null,
+              "span": "require(tx.outputs[0].scriptPubKey == recipientLock);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "gt",
+                  "left": {
+                    "kind": "identifier",
+                    "data": "withdrawAmount",
+                    "span": "withdrawAmount"
+                  },
+                  "right": {
+                    "kind": "int",
+                    "data": 0,
+                    "span": "0"
+                  }
+                },
+                "span": "withdrawAmount > 0"
+              },
+              "message": null,
+              "span": "require(withdrawAmount > 0);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "if",
+            "data": {
+              "condition": {
+                "kind": "binary",
+                "data": {
+                  "op": "gt",
+                  "left": {
+                    "kind": "identifier",
+                    "data": "changeValue",
+                    "span": "changeValue"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "MINER_FEE",
+                    "span": "MINER_FEE"
+                  }
+                },
+                "span": "changeValue > MINER_FEE"
+              },
+              "then_branch": [
+                {
+                  "kind": "require",
+                  "data": {
+                    "expr": {
+                      "kind": "binary",
+                      "data": {
+                        "op": "eq",
+                        "left": {
+                          "kind": "introspection",
+                          "data": {
+                            "kind": "output_value",
+                            "index": {
+                              "kind": "int",
+                              "data": 1,
+                              "span": "1"
+                            },
+                            "field_span": ".value"
+                          },
+                          "span": "tx.outputs[1].value"
+                        },
+                        "right": {
+                          "kind": "identifier",
+                          "data": "changeValue",
+                          "span": "changeValue"
+                        }
+                      },
+                      "span": "tx.outputs[1].value == changeValue"
+                    },
+                    "message": null,
+                    "span": "require(tx.outputs[1].value == changeValue);",
+                    "message_span": null
+                  }
+                },
+                {
+                  "kind": "function_call",
+                  "data": {
+                    "name": "validateOutputState",
+                    "args": [
+                      {
+                        "kind": "int",
+                        "data": 1,
+                        "span": "1"
+                      },
+                      {
+                        "kind": "state_object",
+                        "data": [
+                          {
+                            "name": "oracleKeyHash",
+                            "expr": {
+                              "kind": "identifier",
+                              "data": "oracleKeyHash",
+                              "span": "oracleKeyHash"
+                            },
+                            "span": "oracleKeyHash: oracleKeyHash",
+                            "name_span": "oracleKeyHash"
+                          },
+                          {
+                            "name": "custodianKeyHash",
+                            "expr": {
+                              "kind": "identifier",
+                              "data": "custodianKeyHash",
+                              "span": "custodianKeyHash"
+                            },
+                            "span": "custodianKeyHash: custodianKeyHash",
+                            "name_span": "custodianKeyHash"
+                          },
+                          {
+                            "name": "minReserveRatio",
+                            "expr": {
+                              "kind": "identifier",
+                              "data": "minReserveRatio",
+                              "span": "minReserveRatio"
+                            },
+                            "span": "minReserveRatio: minReserveRatio\n            ",
+                            "name_span": "minReserveRatio"
+                          }
+                        ],
+                        "span": "{\n                oracleKeyHash: oracleKeyHash,\n                custodianKeyHash: custodianKeyHash,\n                minReserveRatio: minReserveRatio\n            }"
+                      }
+                    ],
+                    "span": "validateOutputState(1, {\n                oracleKeyHash: oracleKeyHash,\n                custodianKeyHash: custodianKeyHash,\n                minReserveRatio: minReserveRatio\n            });",
+                    "name_span": "validateOutputState"
+                  }
+                }
+              ],
+              "else_branch": null,
+              "span": "if (changeValue > MINER_FEE) {\n            require(tx.outputs[1].value == changeValue);\n            validateOutputState(1, {\n                oracleKeyHash: oracleKeyHash,\n                custodianKeyHash: custodianKeyHash,\n                minReserveRatio: minReserveRatio\n            });\n        }\n    ",
+              "then_span": "require(tx.outputs[1].value == changeValue);\n            validateOutputState(1, {\n                oracleKeyHash: oracleKeyHash,\n                custodianKeyHash: custodianKeyHash,\n                minReserveRatio: minReserveRatio\n            });",
+              "else_span": null
+            }
+          }
+        ],
+        "return_type_spans": [],
+        "span": "entrypoint function withdraw(\n        pubkey withdrawerPk,\n        sig withdrawerSig,\n        pubkey oraclePk,\n        sig oracleAttestation,\n        int attestedReserveValue,\n        int attestedTokenSupplyValue,\n        pubkey recipientPk\n    ) {\n        // 1. Verify withdrawer signature\n        require(checkSig(withdrawerSig, withdrawerPk));\n\n        // 2. Verify oracle attestation\n        require(blake2b(oraclePk) == oracleKeyHash);\n        require(checkSig(oracleAttestation, oraclePk));\n\n        // 3. Calculate withdrawal amount\n        int inputValue = tx.inputs[this.activeInputIndex].value;\n        int withdrawAmount = tx.outputs[0].value;\n        int changeValue = inputValue - withdrawAmount - MINER_FEE;\n\n        // 4. Verify reserve ratio remains above minimum after withdrawal\n        //    ratio = (attestedReserveValue - withdrawAmount) * RATIO_DENOMINATOR / attestedTokenSupplyValue\n        //    We check: (attestedReserveValue - withdrawAmount) * RATIO_DENOMINATOR >= minReserveRatio * attestedTokenSupplyValue\n        require(attestedTokenSupplyValue > 0);\n        require(attestedReserveValue >= withdrawAmount);\n        int remainingReserve = attestedReserveValue - withdrawAmount;\n        require(\n            remainingReserve * RATIO_DENOMINATOR >= minReserveRatio * attestedTokenSupplyValue\n        );\n\n        // 5. First output: send to recipient\n        byte[34] recipientLock = new ScriptPubKeyP2PK(recipientPk);\n        require(tx.outputs[0].scriptPubKey == recipientLock);\n        require(withdrawAmount > 0);\n\n        // 6. Covenant preservation: change goes back to reserve contract\n        if (changeValue > MINER_FEE) {\n            require(tx.outputs[1].value == changeValue);\n            validateOutputState(1, {\n                oracleKeyHash: oracleKeyHash,\n                custodianKeyHash: custodianKeyHash,\n                minReserveRatio: minReserveRatio\n            });\n        }\n    }",
+        "name_span": "withdraw",
+        "body_span": "require(checkSig(withdrawerSig, withdrawerPk));\n\n        // 2. Verify oracle attestation\n        require(blake2b(oraclePk) == oracleKeyHash);\n        require(checkSig(oracleAttestation, oraclePk));\n\n        // 3. Calculate withdrawal amount\n        int inputValue = tx.inputs[this.activeInputIndex].value;\n        int withdrawAmount = tx.outputs[0].value;\n        int changeValue = inputValue - withdrawAmount - MINER_FEE;\n\n        // 4. Verify reserve ratio remains above minimum after withdrawal\n        //    ratio = (attestedReserveValue - withdrawAmount) * RATIO_DENOMINATOR / attestedTokenSupplyValue\n        //    We check: (attestedReserveValue - withdrawAmount) * RATIO_DENOMINATOR >= minReserveRatio * attestedTokenSupplyValue\n        require(attestedTokenSupplyValue > 0);\n        require(attestedReserveValue >= withdrawAmount);\n        int remainingReserve = attestedReserveValue - withdrawAmount;\n        require(\n            remainingReserve * RATIO_DENOMINATOR >= minReserveRatio * attestedTokenSupplyValue\n        );\n\n        // 5. First output: send to recipient\n        byte[34] recipientLock = new ScriptPubKeyP2PK(recipientPk);\n        require(tx.outputs[0].scriptPubKey == recipientLock);\n        require(withdrawAmount > 0);\n\n        // 6. Covenant preservation: change goes back to reserve contract\n        if (changeValue > MINER_FEE) {\n            require(tx.outputs[1].value == changeValue);\n            validateOutputState(1, {\n                oracleKeyHash: oracleKeyHash,\n                custodianKeyHash: custodianKeyHash,\n                minReserveRatio: minReserveRatio\n            });\n        }\n    "
+      },
+      {
+        "name": "deposit",
+        "params": [],
+        "entrypoint": true,
+        "return_types": [],
+        "body": [
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "int"
+              },
+              "modifiers": [],
+              "name": "inputValue",
+              "expr": {
+                "kind": "introspection",
+                "data": {
+                  "kind": "input_value",
+                  "index": {
+                    "kind": "nullary",
+                    "data": "active_input_index",
+                    "span": "this.activeInputIndex"
+                  },
+                  "field_span": ".value"
+                },
+                "span": "tx.inputs[this.activeInputIndex].value"
+              },
+              "span": "int inputValue = tx.inputs[this.activeInputIndex].value;",
+              "type_span": "int ",
+              "modifier_spans": [],
+              "name_span": "inputValue"
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "ge",
+                  "left": {
+                    "kind": "introspection",
+                    "data": {
+                      "kind": "output_value",
+                      "index": {
+                        "kind": "int",
+                        "data": 0,
+                        "span": "0"
+                      },
+                      "field_span": ".value"
+                    },
+                    "span": "tx.outputs[0].value"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "inputValue",
+                    "span": "inputValue"
+                  }
+                },
+                "span": "tx.outputs[0].value >= inputValue"
+              },
+              "message": null,
+              "span": "require(tx.outputs[0].value >= inputValue);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "function_call",
+            "data": {
+              "name": "validateOutputState",
+              "args": [
+                {
+                  "kind": "int",
+                  "data": 0,
+                  "span": "0"
+                },
+                {
+                  "kind": "state_object",
+                  "data": [
+                    {
+                      "name": "oracleKeyHash",
+                      "expr": {
+                        "kind": "identifier",
+                        "data": "oracleKeyHash",
+                        "span": "oracleKeyHash"
+                      },
+                      "span": "oracleKeyHash: oracleKeyHash",
+                      "name_span": "oracleKeyHash"
+                    },
+                    {
+                      "name": "custodianKeyHash",
+                      "expr": {
+                        "kind": "identifier",
+                        "data": "custodianKeyHash",
+                        "span": "custodianKeyHash"
+                      },
+                      "span": "custodianKeyHash: custodianKeyHash",
+                      "name_span": "custodianKeyHash"
+                    },
+                    {
+                      "name": "minReserveRatio",
+                      "expr": {
+                        "kind": "identifier",
+                        "data": "minReserveRatio",
+                        "span": "minReserveRatio"
+                      },
+                      "span": "minReserveRatio: minReserveRatio\n        ",
+                      "name_span": "minReserveRatio"
+                    }
+                  ],
+                  "span": "{\n            oracleKeyHash: oracleKeyHash,\n            custodianKeyHash: custodianKeyHash,\n            minReserveRatio: minReserveRatio\n        }"
+                }
+              ],
+              "span": "validateOutputState(0, {\n            oracleKeyHash: oracleKeyHash,\n            custodianKeyHash: custodianKeyHash,\n            minReserveRatio: minReserveRatio\n        });",
+              "name_span": "validateOutputState"
+            }
+          }
+        ],
+        "return_type_spans": [],
+        "span": "entrypoint function deposit() {\n        // Preserve the covenant: output must go back to the same contract\n        // The deposit increases the UTXO value (additional inputs fund the increase)\n        int inputValue = tx.inputs[this.activeInputIndex].value;\n        require(tx.outputs[0].value >= inputValue);\n\n        // Covenant preservation\n        validateOutputState(0, {\n            oracleKeyHash: oracleKeyHash,\n            custodianKeyHash: custodianKeyHash,\n            minReserveRatio: minReserveRatio\n        });\n    }",
+        "name_span": "deposit",
+        "body_span": "int inputValue = tx.inputs[this.activeInputIndex].value;\n        require(tx.outputs[0].value >= inputValue);\n\n        // Covenant preservation\n        validateOutputState(0, {\n            oracleKeyHash: oracleKeyHash,\n            custodianKeyHash: custodianKeyHash,\n            minReserveRatio: minReserveRatio\n        });"
+      },
+      {
+        "name": "custodianReclaim",
+        "params": [
+          {
+            "type_ref": {
+              "base": "pubkey"
+            },
+            "name": "custodianPk",
+            "span": "pubkey custodianPk",
+            "type_span": "pubkey ",
+            "name_span": "custodianPk"
+          },
+          {
+            "type_ref": {
+              "base": "sig"
+            },
+            "name": "custodianSig",
+            "span": "sig custodianSig",
+            "type_span": "sig ",
+            "name_span": "custodianSig"
+          }
+        ],
+        "entrypoint": true,
+        "return_types": [],
+        "body": [
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "eq",
+                  "left": {
+                    "kind": "call",
+                    "data": {
+                      "name": "blake2b",
+                      "args": [
+                        {
+                          "kind": "identifier",
+                          "data": "custodianPk",
+                          "span": "custodianPk"
+                        }
+                      ],
+                      "name_span": "blake2b"
+                    },
+                    "span": "blake2b(custodianPk)"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "custodianKeyHash",
+                    "span": "custodianKeyHash"
+                  }
+                },
+                "span": "blake2b(custodianPk) == custodianKeyHash"
+              },
+              "message": null,
+              "span": "require(blake2b(custodianPk) == custodianKeyHash);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "call",
+                "data": {
+                  "name": "checkSig",
+                  "args": [
+                    {
+                      "kind": "identifier",
+                      "data": "custodianSig",
+                      "span": "custodianSig"
+                    },
+                    {
+                      "kind": "identifier",
+                      "data": "custodianPk",
+                      "span": "custodianPk"
+                    }
+                  ],
+                  "name_span": "checkSig"
+                },
+                "span": "checkSig(custodianSig, custodianPk)"
+              },
+              "message": null,
+              "span": "require(checkSig(custodianSig, custodianPk));",
+              "message_span": null
+            }
+          }
+        ],
+        "return_type_spans": [],
+        "span": "entrypoint function custodianReclaim(pubkey custodianPk, sig custodianSig) {\n        require(blake2b(custodianPk) == custodianKeyHash);\n        require(checkSig(custodianSig, custodianPk));\n    }",
+        "name_span": "custodianReclaim",
+        "body_span": "require(blake2b(custodianPk) == custodianKeyHash);\n        require(checkSig(custodianSig, custodianPk));"
+      }
+    ],
+    "span": "contract Reserves(\n    byte[32] initOracleKeyHash,\n    byte[32] initCustodianKeyHash,\n    int initMinReserveRatio\n) {\n    byte[32] oracleKeyHash = initOracleKeyHash;\n    byte[32] custodianKeyHash = initCustodianKeyHash;\n    int minReserveRatio = initMinReserveRatio;\n\n    int constant MINER_FEE = 1000;\n    int constant RATIO_DENOMINATOR = 10000;\n\n    // Path A: Withdraw from reserve with proof-of-reserves check\n    // Requires oracle attestation that reserves remain sufficient after withdrawal\n    entrypoint function withdraw(\n        pubkey withdrawerPk,\n        sig withdrawerSig,\n        pubkey oraclePk,\n        sig oracleAttestation,\n        int attestedReserveValue,\n        int attestedTokenSupplyValue,\n        pubkey recipientPk\n    ) {\n        // 1. Verify withdrawer signature\n        require(checkSig(withdrawerSig, withdrawerPk));\n\n        // 2. Verify oracle attestation\n        require(blake2b(oraclePk) == oracleKeyHash);\n        require(checkSig(oracleAttestation, oraclePk));\n\n        // 3. Calculate withdrawal amount\n        int inputValue = tx.inputs[this.activeInputIndex].value;\n        int withdrawAmount = tx.outputs[0].value;\n        int changeValue = inputValue - withdrawAmount - MINER_FEE;\n\n        // 4. Verify reserve ratio remains above minimum after withdrawal\n        //    ratio = (attestedReserveValue - withdrawAmount) * RATIO_DENOMINATOR / attestedTokenSupplyValue\n        //    We check: (attestedReserveValue - withdrawAmount) * RATIO_DENOMINATOR >= minReserveRatio * attestedTokenSupplyValue\n        require(attestedTokenSupplyValue > 0);\n        require(attestedReserveValue >= withdrawAmount);\n        int remainingReserve = attestedReserveValue - withdrawAmount;\n        require(\n            remainingReserve * RATIO_DENOMINATOR >= minReserveRatio * attestedTokenSupplyValue\n        );\n\n        // 5. First output: send to recipient\n        byte[34] recipientLock = new ScriptPubKeyP2PK(recipientPk);\n        require(tx.outputs[0].scriptPubKey == recipientLock);\n        require(withdrawAmount > 0);\n\n        // 6. Covenant preservation: change goes back to reserve contract\n        if (changeValue > MINER_FEE) {\n            require(tx.outputs[1].value == changeValue);\n            validateOutputState(1, {\n                oracleKeyHash: oracleKeyHash,\n                custodianKeyHash: custodianKeyHash,\n                minReserveRatio: minReserveRatio\n            });\n        }\n    }\n\n    // Path B: Deposit additional collateral into the reserve\n    // Anyone can deposit — no signature required for the deposit itself\n    entrypoint function deposit() {\n        // Preserve the covenant: output must go back to the same contract\n        // The deposit increases the UTXO value (additional inputs fund the increase)\n        int inputValue = tx.inputs[this.activeInputIndex].value;\n        require(tx.outputs[0].value >= inputValue);\n\n        // Covenant preservation\n        validateOutputState(0, {\n            oracleKeyHash: oracleKeyHash,\n            custodianKeyHash: custodianKeyHash,\n            minReserveRatio: minReserveRatio\n        });\n    }\n\n    // Path C: Custodian emergency reclaim\n    // Only the custodian can reclaim all reserve funds (emergency/migration)\n    entrypoint function custodianReclaim(pubkey custodianPk, sig custodianSig) {\n        require(blake2b(custodianPk) == custodianKeyHash);\n        require(checkSig(custodianSig, custodianPk));\n    }\n}",
+    "name_span": "Reserves"
+  },
+  "abi": [
+    {
+      "name": "withdraw",
+      "inputs": [
+        {
+          "name": "withdrawerPk",
+          "type_name": "pubkey"
+        },
+        {
+          "name": "withdrawerSig",
+          "type_name": "sig"
+        },
+        {
+          "name": "oraclePk",
+          "type_name": "pubkey"
+        },
+        {
+          "name": "oracleAttestation",
+          "type_name": "sig"
+        },
+        {
+          "name": "attestedReserveValue",
+          "type_name": "int"
+        },
+        {
+          "name": "attestedTokenSupplyValue",
+          "type_name": "int"
+        },
+        {
+          "name": "recipientPk",
+          "type_name": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "deposit",
+      "inputs": []
+    },
+    {
+      "name": "custodianReclaim",
+      "inputs": [
+        {
+          "name": "custodianPk",
+          "type_name": "pubkey"
+        },
+        {
+          "name": "custodianSig",
+          "type_name": "sig"
+        }
+      ]
+    }
+  ],
+  "without_selector": false,
+  "debug_info": null
+}

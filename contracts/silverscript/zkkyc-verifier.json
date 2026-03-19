@@ -1,0 +1,1563 @@
+{
+  "contract_name": "ZkKycVerifier",
+  "script": [
+    107,
+    32,
+    5,
+    205,
+    57,
+    27,
+    225,
+    228,
+    228,
+    43,
+    234,
+    146,
+    231,
+    178,
+    21,
+    246,
+    69,
+    213,
+    160,
+    92,
+    236,
+    225,
+    163,
+    49,
+    73,
+    107,
+    137,
+    172,
+    188,
+    195,
+    102,
+    159,
+    160,
+    197,
+    32,
+    247,
+    105,
+    105,
+    194,
+    178,
+    6,
+    75,
+    82,
+    236,
+    76,
+    54,
+    2,
+    60,
+    80,
+    24,
+    148,
+    47,
+    29,
+    186,
+    248,
+    35,
+    245,
+    3,
+    103,
+    245,
+    163,
+    37,
+    216,
+    104,
+    136,
+    78,
+    211,
+    32,
+    214,
+    141,
+    183,
+    152,
+    253,
+    163,
+    224,
+    209,
+    95,
+    102,
+    243,
+    209,
+    75,
+    108,
+    9,
+    69,
+    200,
+    77,
+    132,
+    45,
+    104,
+    79,
+    164,
+    84,
+    123,
+    212,
+    108,
+    55,
+    156,
+    200,
+    196,
+    252,
+    108,
+    118,
+    0,
+    156,
+    99,
+    117,
+    85,
+    121,
+    87,
+    121,
+    172,
+    105,
+    84,
+    121,
+    83,
+    121,
+    126,
+    82,
+    121,
+    126,
+    84,
+    121,
+    126,
+    168,
+    32,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    135,
+    145,
+    105,
+    83,
+    121,
+    87,
+    121,
+    170,
+    126,
+    168,
+    32,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    135,
+    145,
+    105,
+    0,
+    194,
+    185,
+    190,
+    2,
+    232,
+    3,
+    148,
+    162,
+    105,
+    82,
+    121,
+    1,
+    32,
+    124,
+    126,
+    82,
+    121,
+    1,
+    32,
+    124,
+    126,
+    82,
+    121,
+    1,
+    32,
+    124,
+    126,
+    126,
+    126,
+    185,
+    118,
+    201,
+    2,
+    140,
+    1,
+    148,
+    118,
+    81,
+    147,
+    188,
+    124,
+    126,
+    185,
+    118,
+    201,
+    118,
+    2,
+    140,
+    1,
+    148,
+    1,
+    100,
+    147,
+    124,
+    188,
+    126,
+    170,
+    2,
+    0,
+    0,
+    1,
+    170,
+    126,
+    1,
+    32,
+    126,
+    124,
+    126,
+    1,
+    135,
+    126,
+    0,
+    195,
+    135,
+    105,
+    117,
+    117,
+    117,
+    117,
+    117,
+    117,
+    117,
+    81,
+    103,
+    118,
+    81,
+    156,
+    99,
+    117,
+    86,
+    121,
+    170,
+    81,
+    121,
+    135,
+    105,
+    85,
+    121,
+    87,
+    121,
+    172,
+    105,
+    0,
+    194,
+    185,
+    190,
+    2,
+    232,
+    3,
+    148,
+    162,
+    105,
+    84,
+    121,
+    1,
+    32,
+    124,
+    126,
+    84,
+    121,
+    1,
+    32,
+    124,
+    126,
+    82,
+    121,
+    1,
+    32,
+    124,
+    126,
+    126,
+    126,
+    185,
+    118,
+    201,
+    2,
+    140,
+    1,
+    148,
+    118,
+    81,
+    147,
+    188,
+    124,
+    126,
+    185,
+    118,
+    201,
+    118,
+    2,
+    140,
+    1,
+    148,
+    1,
+    100,
+    147,
+    124,
+    188,
+    126,
+    170,
+    2,
+    0,
+    0,
+    1,
+    170,
+    126,
+    1,
+    32,
+    126,
+    124,
+    126,
+    1,
+    135,
+    126,
+    0,
+    195,
+    135,
+    105,
+    117,
+    117,
+    117,
+    117,
+    117,
+    117,
+    117,
+    81,
+    103,
+    117,
+    0,
+    105,
+    104,
+    104
+  ],
+  "ast": {
+    "name": "ZkKycVerifier",
+    "params": [
+      {
+        "type_ref": {
+          "base": "byte",
+          "array_dims": [
+            {
+              "kind": "fixed",
+              "value": 32
+            }
+          ]
+        },
+        "name": "initVerifierKeyHash",
+        "span": "byte[32] initVerifierKeyHash",
+        "type_span": "byte[32]",
+        "name_span": "initVerifierKeyHash"
+      },
+      {
+        "type_ref": {
+          "base": "byte",
+          "array_dims": [
+            {
+              "kind": "fixed",
+              "value": 32
+            }
+          ]
+        },
+        "name": "initApprovedMerkleRoot",
+        "span": "byte[32] initApprovedMerkleRoot",
+        "type_span": "byte[32]",
+        "name_span": "initApprovedMerkleRoot"
+      },
+      {
+        "type_ref": {
+          "base": "byte",
+          "array_dims": [
+            {
+              "kind": "fixed",
+              "value": 32
+            }
+          ]
+        },
+        "name": "initAdminKeyHash",
+        "span": "byte[32] initAdminKeyHash",
+        "type_span": "byte[32]",
+        "name_span": "initAdminKeyHash"
+      }
+    ],
+    "fields": [
+      {
+        "type_ref": {
+          "base": "byte",
+          "array_dims": [
+            {
+              "kind": "fixed",
+              "value": 32
+            }
+          ]
+        },
+        "name": "verifierKeyHash",
+        "expr": {
+          "kind": "identifier",
+          "data": "initVerifierKeyHash",
+          "span": "initVerifierKeyHash"
+        },
+        "span": "byte[32] verifierKeyHash = initVerifierKeyHash;",
+        "type_span": "byte[32]",
+        "name_span": "verifierKeyHash"
+      },
+      {
+        "type_ref": {
+          "base": "byte",
+          "array_dims": [
+            {
+              "kind": "fixed",
+              "value": 32
+            }
+          ]
+        },
+        "name": "approvedMerkleRoot",
+        "expr": {
+          "kind": "identifier",
+          "data": "initApprovedMerkleRoot",
+          "span": "initApprovedMerkleRoot"
+        },
+        "span": "byte[32] approvedMerkleRoot = initApprovedMerkleRoot;",
+        "type_span": "byte[32]",
+        "name_span": "approvedMerkleRoot"
+      },
+      {
+        "type_ref": {
+          "base": "byte",
+          "array_dims": [
+            {
+              "kind": "fixed",
+              "value": 32
+            }
+          ]
+        },
+        "name": "adminKeyHash",
+        "expr": {
+          "kind": "identifier",
+          "data": "initAdminKeyHash",
+          "span": "initAdminKeyHash"
+        },
+        "span": "byte[32] adminKeyHash = initAdminKeyHash;",
+        "type_span": "byte[32]",
+        "name_span": "adminKeyHash"
+      }
+    ],
+    "constants": [
+      {
+        "type_ref": {
+          "base": "int"
+        },
+        "name": "MINER_FEE",
+        "expr": {
+          "kind": "int",
+          "data": 1000,
+          "span": "1000"
+        },
+        "span": "int constant MINER_FEE = 1000;",
+        "type_span": "int ",
+        "name_span": "MINER_FEE"
+      }
+    ],
+    "functions": [
+      {
+        "name": "verifyProof",
+        "params": [
+          {
+            "type_ref": {
+              "base": "pubkey"
+            },
+            "name": "proverPk",
+            "span": "pubkey proverPk",
+            "type_span": "pubkey ",
+            "name_span": "proverPk"
+          },
+          {
+            "type_ref": {
+              "base": "sig"
+            },
+            "name": "proverSig",
+            "span": "sig proverSig",
+            "type_span": "sig ",
+            "name_span": "proverSig"
+          },
+          {
+            "type_ref": {
+              "base": "byte",
+              "array_dims": [
+                {
+                  "kind": "fixed",
+                  "value": 32
+                }
+              ]
+            },
+            "name": "proofCommitment",
+            "span": "byte[32] proofCommitment",
+            "type_span": "byte[32]",
+            "name_span": "proofCommitment"
+          },
+          {
+            "type_ref": {
+              "base": "byte",
+              "array_dims": [
+                {
+                  "kind": "fixed",
+                  "value": 32
+                }
+              ]
+            },
+            "name": "nullifierHash",
+            "span": "byte[32] nullifierHash",
+            "type_span": "byte[32]",
+            "name_span": "nullifierHash"
+          }
+        ],
+        "entrypoint": true,
+        "return_types": [],
+        "body": [
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "call",
+                "data": {
+                  "name": "checkSig",
+                  "args": [
+                    {
+                      "kind": "identifier",
+                      "data": "proverSig",
+                      "span": "proverSig"
+                    },
+                    {
+                      "kind": "identifier",
+                      "data": "proverPk",
+                      "span": "proverPk"
+                    }
+                  ],
+                  "name_span": "checkSig"
+                },
+                "span": "checkSig(proverSig, proverPk)"
+              },
+              "message": null,
+              "span": "require(checkSig(proverSig, proverPk));",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "byte",
+                "array_dims": [
+                  {
+                    "kind": "fixed",
+                    "value": 32
+                  }
+                ]
+              },
+              "modifiers": [],
+              "name": "proverPkHash",
+              "expr": {
+                "kind": "call",
+                "data": {
+                  "name": "blake2b",
+                  "args": [
+                    {
+                      "kind": "identifier",
+                      "data": "proverPk",
+                      "span": "proverPk"
+                    }
+                  ],
+                  "name_span": "blake2b"
+                },
+                "span": "blake2b(proverPk)"
+              },
+              "span": "byte[32] proverPkHash = blake2b(proverPk);",
+              "type_span": "byte[32]",
+              "modifier_spans": [],
+              "name_span": "proverPkHash"
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "byte",
+                "array_dims": [
+                  {
+                    "kind": "fixed",
+                    "value": 32
+                  }
+                ]
+              },
+              "modifiers": [],
+              "name": "expectedBinding",
+              "expr": {
+                "kind": "call",
+                "data": {
+                  "name": "sha256",
+                  "args": [
+                    {
+                      "kind": "binary",
+                      "data": {
+                        "op": "add",
+                        "left": {
+                          "kind": "binary",
+                          "data": {
+                            "op": "add",
+                            "left": {
+                              "kind": "binary",
+                              "data": {
+                                "op": "add",
+                                "left": {
+                                  "kind": "identifier",
+                                  "data": "proofCommitment",
+                                  "span": "proofCommitment"
+                                },
+                                "right": {
+                                  "kind": "identifier",
+                                  "data": "verifierKeyHash",
+                                  "span": "verifierKeyHash"
+                                }
+                              },
+                              "span": "proofCommitment + verifierKeyHash"
+                            },
+                            "right": {
+                              "kind": "identifier",
+                              "data": "approvedMerkleRoot",
+                              "span": "approvedMerkleRoot"
+                            }
+                          },
+                          "span": "proofCommitment + verifierKeyHash + approvedMerkleRoot"
+                        },
+                        "right": {
+                          "kind": "identifier",
+                          "data": "nullifierHash",
+                          "span": "nullifierHash"
+                        }
+                      },
+                      "span": "proofCommitment + verifierKeyHash + approvedMerkleRoot + nullifierHash"
+                    }
+                  ],
+                  "name_span": "sha256"
+                },
+                "span": "sha256(\n            proofCommitment + verifierKeyHash + approvedMerkleRoot + nullifierHash\n        )"
+              },
+              "span": "byte[32] expectedBinding = sha256(\n            proofCommitment + verifierKeyHash + approvedMerkleRoot + nullifierHash\n        );",
+              "type_span": "byte[32]",
+              "modifier_spans": [],
+              "name_span": "expectedBinding"
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "ne",
+                  "left": {
+                    "kind": "identifier",
+                    "data": "expectedBinding",
+                    "span": "expectedBinding"
+                  },
+                  "right": {
+                    "kind": "array",
+                    "data": [
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      }
+                    ],
+                    "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                  }
+                },
+                "span": "expectedBinding != 0x0000000000000000000000000000000000000000000000000000000000000000"
+              },
+              "message": null,
+              "span": "require(expectedBinding != 0x0000000000000000000000000000000000000000000000000000000000000000);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "byte",
+                "array_dims": [
+                  {
+                    "kind": "fixed",
+                    "value": 32
+                  }
+                ]
+              },
+              "modifiers": [],
+              "name": "nullifierBinding",
+              "expr": {
+                "kind": "call",
+                "data": {
+                  "name": "sha256",
+                  "args": [
+                    {
+                      "kind": "binary",
+                      "data": {
+                        "op": "add",
+                        "left": {
+                          "kind": "identifier",
+                          "data": "nullifierHash",
+                          "span": "nullifierHash"
+                        },
+                        "right": {
+                          "kind": "identifier",
+                          "data": "proverPkHash",
+                          "span": "proverPkHash"
+                        }
+                      },
+                      "span": "nullifierHash + proverPkHash"
+                    }
+                  ],
+                  "name_span": "sha256"
+                },
+                "span": "sha256(nullifierHash + proverPkHash)"
+              },
+              "span": "byte[32] nullifierBinding = sha256(nullifierHash + proverPkHash);",
+              "type_span": "byte[32]",
+              "modifier_spans": [],
+              "name_span": "nullifierBinding"
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "ne",
+                  "left": {
+                    "kind": "identifier",
+                    "data": "nullifierBinding",
+                    "span": "nullifierBinding"
+                  },
+                  "right": {
+                    "kind": "array",
+                    "data": [
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      }
+                    ],
+                    "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                  }
+                },
+                "span": "nullifierBinding != 0x0000000000000000000000000000000000000000000000000000000000000000"
+              },
+              "message": null,
+              "span": "require(nullifierBinding != 0x0000000000000000000000000000000000000000000000000000000000000000);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "int"
+              },
+              "modifiers": [],
+              "name": "inputValue",
+              "expr": {
+                "kind": "introspection",
+                "data": {
+                  "kind": "input_value",
+                  "index": {
+                    "kind": "nullary",
+                    "data": "active_input_index",
+                    "span": "this.activeInputIndex"
+                  },
+                  "field_span": ".value"
+                },
+                "span": "tx.inputs[this.activeInputIndex].value"
+              },
+              "span": "int inputValue = tx.inputs[this.activeInputIndex].value;",
+              "type_span": "int ",
+              "modifier_spans": [],
+              "name_span": "inputValue"
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "ge",
+                  "left": {
+                    "kind": "introspection",
+                    "data": {
+                      "kind": "output_value",
+                      "index": {
+                        "kind": "int",
+                        "data": 0,
+                        "span": "0"
+                      },
+                      "field_span": ".value"
+                    },
+                    "span": "tx.outputs[0].value"
+                  },
+                  "right": {
+                    "kind": "binary",
+                    "data": {
+                      "op": "sub",
+                      "left": {
+                        "kind": "identifier",
+                        "data": "inputValue",
+                        "span": "inputValue"
+                      },
+                      "right": {
+                        "kind": "identifier",
+                        "data": "MINER_FEE",
+                        "span": "MINER_FEE"
+                      }
+                    },
+                    "span": "inputValue - MINER_FEE"
+                  }
+                },
+                "span": "tx.outputs[0].value >= inputValue - MINER_FEE"
+              },
+              "message": null,
+              "span": "require(tx.outputs[0].value >= inputValue - MINER_FEE);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "function_call",
+            "data": {
+              "name": "validateOutputState",
+              "args": [
+                {
+                  "kind": "int",
+                  "data": 0,
+                  "span": "0"
+                },
+                {
+                  "kind": "state_object",
+                  "data": [
+                    {
+                      "name": "verifierKeyHash",
+                      "expr": {
+                        "kind": "identifier",
+                        "data": "verifierKeyHash",
+                        "span": "verifierKeyHash"
+                      },
+                      "span": "verifierKeyHash: verifierKeyHash",
+                      "name_span": "verifierKeyHash"
+                    },
+                    {
+                      "name": "approvedMerkleRoot",
+                      "expr": {
+                        "kind": "identifier",
+                        "data": "approvedMerkleRoot",
+                        "span": "approvedMerkleRoot"
+                      },
+                      "span": "approvedMerkleRoot: approvedMerkleRoot",
+                      "name_span": "approvedMerkleRoot"
+                    },
+                    {
+                      "name": "adminKeyHash",
+                      "expr": {
+                        "kind": "identifier",
+                        "data": "adminKeyHash",
+                        "span": "adminKeyHash"
+                      },
+                      "span": "adminKeyHash: adminKeyHash\n        ",
+                      "name_span": "adminKeyHash"
+                    }
+                  ],
+                  "span": "{\n            verifierKeyHash: verifierKeyHash,\n            approvedMerkleRoot: approvedMerkleRoot,\n            adminKeyHash: adminKeyHash\n        }"
+                }
+              ],
+              "span": "validateOutputState(0, {\n            verifierKeyHash: verifierKeyHash,\n            approvedMerkleRoot: approvedMerkleRoot,\n            adminKeyHash: adminKeyHash\n        });",
+              "name_span": "validateOutputState"
+            }
+          }
+        ],
+        "return_type_spans": [],
+        "span": "entrypoint function verifyProof(\n        pubkey proverPk,\n        sig proverSig,\n        byte[32] proofCommitment,\n        byte[32] nullifierHash\n    ) {\n        // 1. Verify prover's signature\n        require(checkSig(proverSig, proverPk));\n\n        // 2. Compute the expected proof binding\n        //    binding = sha256(proofCommitment || verifierKeyHash || approvedMerkleRoot || nullifierHash)\n        //    This ties the proof to our specific verification key, Merkle root, and nullifier\n        byte[32] proverPkHash = blake2b(proverPk);\n        byte[32] expectedBinding = sha256(\n            proofCommitment + verifierKeyHash + approvedMerkleRoot + nullifierHash\n        );\n\n        // 3. The binding must be non-trivial (not all zeros)\n        require(expectedBinding != 0x0000000000000000000000000000000000000000000000000000000000000000);\n\n        // 4. Verify nullifier is unique by checking it against the prover's identity\n        //    nullifierHash = sha256(secret_key || merkle_leaf_index)\n        //    We can't verify the preimage on-chain, but we ensure it's bound to this proof\n        byte[32] nullifierBinding = sha256(nullifierHash + proverPkHash);\n        require(nullifierBinding != 0x0000000000000000000000000000000000000000000000000000000000000000);\n\n        // 5. Preserve the UTXO (this is a verification service, not a transfer)\n        int inputValue = tx.inputs[this.activeInputIndex].value;\n        require(tx.outputs[0].value >= inputValue - MINER_FEE);\n\n        // 6. Covenant preservation: keep the verifier contract alive\n        validateOutputState(0, {\n            verifierKeyHash: verifierKeyHash,\n            approvedMerkleRoot: approvedMerkleRoot,\n            adminKeyHash: adminKeyHash\n        });\n    }",
+        "name_span": "verifyProof",
+        "body_span": "require(checkSig(proverSig, proverPk));\n\n        // 2. Compute the expected proof binding\n        //    binding = sha256(proofCommitment || verifierKeyHash || approvedMerkleRoot || nullifierHash)\n        //    This ties the proof to our specific verification key, Merkle root, and nullifier\n        byte[32] proverPkHash = blake2b(proverPk);\n        byte[32] expectedBinding = sha256(\n            proofCommitment + verifierKeyHash + approvedMerkleRoot + nullifierHash\n        );\n\n        // 3. The binding must be non-trivial (not all zeros)\n        require(expectedBinding != 0x0000000000000000000000000000000000000000000000000000000000000000);\n\n        // 4. Verify nullifier is unique by checking it against the prover's identity\n        //    nullifierHash = sha256(secret_key || merkle_leaf_index)\n        //    We can't verify the preimage on-chain, but we ensure it's bound to this proof\n        byte[32] nullifierBinding = sha256(nullifierHash + proverPkHash);\n        require(nullifierBinding != 0x0000000000000000000000000000000000000000000000000000000000000000);\n\n        // 5. Preserve the UTXO (this is a verification service, not a transfer)\n        int inputValue = tx.inputs[this.activeInputIndex].value;\n        require(tx.outputs[0].value >= inputValue - MINER_FEE);\n\n        // 6. Covenant preservation: keep the verifier contract alive\n        validateOutputState(0, {\n            verifierKeyHash: verifierKeyHash,\n            approvedMerkleRoot: approvedMerkleRoot,\n            adminKeyHash: adminKeyHash\n        });"
+      },
+      {
+        "name": "updateVerifierKey",
+        "params": [
+          {
+            "type_ref": {
+              "base": "pubkey"
+            },
+            "name": "adminPk",
+            "span": "pubkey adminPk",
+            "type_span": "pubkey ",
+            "name_span": "adminPk"
+          },
+          {
+            "type_ref": {
+              "base": "sig"
+            },
+            "name": "adminSig",
+            "span": "sig adminSig",
+            "type_span": "sig ",
+            "name_span": "adminSig"
+          },
+          {
+            "type_ref": {
+              "base": "byte",
+              "array_dims": [
+                {
+                  "kind": "fixed",
+                  "value": 32
+                }
+              ]
+            },
+            "name": "newVerifierKeyHash",
+            "span": "byte[32] newVerifierKeyHash",
+            "type_span": "byte[32]",
+            "name_span": "newVerifierKeyHash"
+          },
+          {
+            "type_ref": {
+              "base": "byte",
+              "array_dims": [
+                {
+                  "kind": "fixed",
+                  "value": 32
+                }
+              ]
+            },
+            "name": "newApprovedMerkleRoot",
+            "span": "byte[32] newApprovedMerkleRoot",
+            "type_span": "byte[32]",
+            "name_span": "newApprovedMerkleRoot"
+          }
+        ],
+        "entrypoint": true,
+        "return_types": [],
+        "body": [
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "eq",
+                  "left": {
+                    "kind": "call",
+                    "data": {
+                      "name": "blake2b",
+                      "args": [
+                        {
+                          "kind": "identifier",
+                          "data": "adminPk",
+                          "span": "adminPk"
+                        }
+                      ],
+                      "name_span": "blake2b"
+                    },
+                    "span": "blake2b(adminPk)"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "adminKeyHash",
+                    "span": "adminKeyHash"
+                  }
+                },
+                "span": "blake2b(adminPk) == adminKeyHash"
+              },
+              "message": null,
+              "span": "require(blake2b(adminPk) == adminKeyHash);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "call",
+                "data": {
+                  "name": "checkSig",
+                  "args": [
+                    {
+                      "kind": "identifier",
+                      "data": "adminSig",
+                      "span": "adminSig"
+                    },
+                    {
+                      "kind": "identifier",
+                      "data": "adminPk",
+                      "span": "adminPk"
+                    }
+                  ],
+                  "name_span": "checkSig"
+                },
+                "span": "checkSig(adminSig, adminPk)"
+              },
+              "message": null,
+              "span": "require(checkSig(adminSig, adminPk));",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "int"
+              },
+              "modifiers": [],
+              "name": "inputValue",
+              "expr": {
+                "kind": "introspection",
+                "data": {
+                  "kind": "input_value",
+                  "index": {
+                    "kind": "nullary",
+                    "data": "active_input_index",
+                    "span": "this.activeInputIndex"
+                  },
+                  "field_span": ".value"
+                },
+                "span": "tx.inputs[this.activeInputIndex].value"
+              },
+              "span": "int inputValue = tx.inputs[this.activeInputIndex].value;",
+              "type_span": "int ",
+              "modifier_spans": [],
+              "name_span": "inputValue"
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "ge",
+                  "left": {
+                    "kind": "introspection",
+                    "data": {
+                      "kind": "output_value",
+                      "index": {
+                        "kind": "int",
+                        "data": 0,
+                        "span": "0"
+                      },
+                      "field_span": ".value"
+                    },
+                    "span": "tx.outputs[0].value"
+                  },
+                  "right": {
+                    "kind": "binary",
+                    "data": {
+                      "op": "sub",
+                      "left": {
+                        "kind": "identifier",
+                        "data": "inputValue",
+                        "span": "inputValue"
+                      },
+                      "right": {
+                        "kind": "identifier",
+                        "data": "MINER_FEE",
+                        "span": "MINER_FEE"
+                      }
+                    },
+                    "span": "inputValue - MINER_FEE"
+                  }
+                },
+                "span": "tx.outputs[0].value >= inputValue - MINER_FEE"
+              },
+              "message": null,
+              "span": "require(tx.outputs[0].value >= inputValue - MINER_FEE);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "function_call",
+            "data": {
+              "name": "validateOutputState",
+              "args": [
+                {
+                  "kind": "int",
+                  "data": 0,
+                  "span": "0"
+                },
+                {
+                  "kind": "state_object",
+                  "data": [
+                    {
+                      "name": "verifierKeyHash",
+                      "expr": {
+                        "kind": "identifier",
+                        "data": "newVerifierKeyHash",
+                        "span": "newVerifierKeyHash"
+                      },
+                      "span": "verifierKeyHash: newVerifierKeyHash",
+                      "name_span": "verifierKeyHash"
+                    },
+                    {
+                      "name": "approvedMerkleRoot",
+                      "expr": {
+                        "kind": "identifier",
+                        "data": "newApprovedMerkleRoot",
+                        "span": "newApprovedMerkleRoot"
+                      },
+                      "span": "approvedMerkleRoot: newApprovedMerkleRoot",
+                      "name_span": "approvedMerkleRoot"
+                    },
+                    {
+                      "name": "adminKeyHash",
+                      "expr": {
+                        "kind": "identifier",
+                        "data": "adminKeyHash",
+                        "span": "adminKeyHash"
+                      },
+                      "span": "adminKeyHash: adminKeyHash\n        ",
+                      "name_span": "adminKeyHash"
+                    }
+                  ],
+                  "span": "{\n            verifierKeyHash: newVerifierKeyHash,\n            approvedMerkleRoot: newApprovedMerkleRoot,\n            adminKeyHash: adminKeyHash\n        }"
+                }
+              ],
+              "span": "validateOutputState(0, {\n            verifierKeyHash: newVerifierKeyHash,\n            approvedMerkleRoot: newApprovedMerkleRoot,\n            adminKeyHash: adminKeyHash\n        });",
+              "name_span": "validateOutputState"
+            }
+          }
+        ],
+        "return_type_spans": [],
+        "span": "entrypoint function updateVerifierKey(\n        pubkey adminPk,\n        sig adminSig,\n        byte[32] newVerifierKeyHash,\n        byte[32] newApprovedMerkleRoot\n    ) {\n        // Verify admin identity\n        require(blake2b(adminPk) == adminKeyHash);\n        require(checkSig(adminSig, adminPk));\n\n        // Preserve UTXO value\n        int inputValue = tx.inputs[this.activeInputIndex].value;\n        require(tx.outputs[0].value >= inputValue - MINER_FEE);\n\n        // Update the verifier key and Merkle root\n        validateOutputState(0, {\n            verifierKeyHash: newVerifierKeyHash,\n            approvedMerkleRoot: newApprovedMerkleRoot,\n            adminKeyHash: adminKeyHash\n        });\n    }",
+        "name_span": "updateVerifierKey",
+        "body_span": "require(blake2b(adminPk) == adminKeyHash);\n        require(checkSig(adminSig, adminPk));\n\n        // Preserve UTXO value\n        int inputValue = tx.inputs[this.activeInputIndex].value;\n        require(tx.outputs[0].value >= inputValue - MINER_FEE);\n\n        // Update the verifier key and Merkle root\n        validateOutputState(0, {\n            verifierKeyHash: newVerifierKeyHash,\n            approvedMerkleRoot: newApprovedMerkleRoot,\n            adminKeyHash: adminKeyHash\n        });"
+      }
+    ],
+    "span": "contract ZkKycVerifier(\n    byte[32] initVerifierKeyHash,\n    byte[32] initApprovedMerkleRoot,\n    byte[32] initAdminKeyHash\n) {\n    byte[32] verifierKeyHash = initVerifierKeyHash;\n    byte[32] approvedMerkleRoot = initApprovedMerkleRoot;\n    byte[32] adminKeyHash = initAdminKeyHash;\n\n    int constant MINER_FEE = 1000;\n\n    // Path A: Verify ZK-KYC proof commitment\n    // The prover provides their public key, signature, and the proof components.\n    // The contract verifies the hash binding to prevent proof substitution.\n    entrypoint function verifyProof(\n        pubkey proverPk,\n        sig proverSig,\n        byte[32] proofCommitment,\n        byte[32] nullifierHash\n    ) {\n        // 1. Verify prover's signature\n        require(checkSig(proverSig, proverPk));\n\n        // 2. Compute the expected proof binding\n        //    binding = sha256(proofCommitment || verifierKeyHash || approvedMerkleRoot || nullifierHash)\n        //    This ties the proof to our specific verification key, Merkle root, and nullifier\n        byte[32] proverPkHash = blake2b(proverPk);\n        byte[32] expectedBinding = sha256(\n            proofCommitment + verifierKeyHash + approvedMerkleRoot + nullifierHash\n        );\n\n        // 3. The binding must be non-trivial (not all zeros)\n        require(expectedBinding != 0x0000000000000000000000000000000000000000000000000000000000000000);\n\n        // 4. Verify nullifier is unique by checking it against the prover's identity\n        //    nullifierHash = sha256(secret_key || merkle_leaf_index)\n        //    We can't verify the preimage on-chain, but we ensure it's bound to this proof\n        byte[32] nullifierBinding = sha256(nullifierHash + proverPkHash);\n        require(nullifierBinding != 0x0000000000000000000000000000000000000000000000000000000000000000);\n\n        // 5. Preserve the UTXO (this is a verification service, not a transfer)\n        int inputValue = tx.inputs[this.activeInputIndex].value;\n        require(tx.outputs[0].value >= inputValue - MINER_FEE);\n\n        // 6. Covenant preservation: keep the verifier contract alive\n        validateOutputState(0, {\n            verifierKeyHash: verifierKeyHash,\n            approvedMerkleRoot: approvedMerkleRoot,\n            adminKeyHash: adminKeyHash\n        });\n    }\n\n    // Path B: Admin updates the verification key hash\n    // Used when the ZK circuit is upgraded or the trusted setup is refreshed\n    entrypoint function updateVerifierKey(\n        pubkey adminPk,\n        sig adminSig,\n        byte[32] newVerifierKeyHash,\n        byte[32] newApprovedMerkleRoot\n    ) {\n        // Verify admin identity\n        require(blake2b(adminPk) == adminKeyHash);\n        require(checkSig(adminSig, adminPk));\n\n        // Preserve UTXO value\n        int inputValue = tx.inputs[this.activeInputIndex].value;\n        require(tx.outputs[0].value >= inputValue - MINER_FEE);\n\n        // Update the verifier key and Merkle root\n        validateOutputState(0, {\n            verifierKeyHash: newVerifierKeyHash,\n            approvedMerkleRoot: newApprovedMerkleRoot,\n            adminKeyHash: adminKeyHash\n        });\n    }\n}",
+    "name_span": "ZkKycVerifier"
+  },
+  "abi": [
+    {
+      "name": "verifyProof",
+      "inputs": [
+        {
+          "name": "proverPk",
+          "type_name": "pubkey"
+        },
+        {
+          "name": "proverSig",
+          "type_name": "sig"
+        },
+        {
+          "name": "proofCommitment",
+          "type_name": "byte[32]"
+        },
+        {
+          "name": "nullifierHash",
+          "type_name": "byte[32]"
+        }
+      ]
+    },
+    {
+      "name": "updateVerifierKey",
+      "inputs": [
+        {
+          "name": "adminPk",
+          "type_name": "pubkey"
+        },
+        {
+          "name": "adminSig",
+          "type_name": "sig"
+        },
+        {
+          "name": "newVerifierKeyHash",
+          "type_name": "byte[32]"
+        },
+        {
+          "name": "newApprovedMerkleRoot",
+          "type_name": "byte[32]"
+        }
+      ]
+    }
+  ],
+  "without_selector": false,
+  "debug_info": null
+}

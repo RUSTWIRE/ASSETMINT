@@ -1,0 +1,62 @@
+pragma silverscript ^0.1.0;
+
+// DISCLAIMER: Technical demo code — legal wrappers required in production
+// SPDX-License-Identifier: MIT
+//
+// clawback.sil — Issuer Clawback with OP_RETURN Reason
+//
+// This contract wraps RWA token UTXOs with a clawback mechanism.
+// The asset owner can spend normally, but the issuer can unconditionally
+// reclaim the asset (e.g., for regulatory freeze, court order, AML action).
+// Clawback transactions include an OP_RETURN output with the reason metadata.
+//
+// Path A (ownerSpend): Normal owner transfer with signature
+// Path B (issuerClawback): Issuer reclaims unconditionally
+
+contract Clawback(
+    pubkey owner,
+    byte[32] issuerKeyHash
+) {
+    int constant MINER_FEE = 1000;
+
+    // Path A: Owner spends normally
+    // The owner can transfer the UTXO to any recipient
+    entrypoint function ownerSpend(sig ownerSig, pubkey recipientPk) {
+        // Verify the owner's signature
+        require(checkSig(ownerSig, owner));
+
+        // First output must go to the specified recipient
+        byte[34] recipientLock = new ScriptPubKeyP2PK(recipientPk);
+        require(tx.outputs[0].scriptPubKey == recipientLock);
+
+        // Ensure meaningful transfer amount
+        int inputValue = tx.inputs[this.activeInputIndex].value;
+        require(tx.outputs[0].value >= inputValue - MINER_FEE);
+    }
+
+    // Path B: Issuer clawback — unconditional reclaim
+    // The issuer can reclaim the UTXO at any time for regulatory reasons.
+    // A second output carries OP_RETURN metadata with the clawback reason.
+    entrypoint function issuerClawback(
+        pubkey issuerPk,
+        sig issuerSig,
+        pubkey issuerReceivePk
+    ) {
+        // Verify issuer identity via hash commitment
+        require(blake2b(issuerPk) == issuerKeyHash);
+        require(checkSig(issuerSig, issuerPk));
+
+        // First output: send reclaimed funds to issuer's receive address
+        byte[34] issuerLock = new ScriptPubKeyP2PK(issuerReceivePk);
+        require(tx.outputs[0].scriptPubKey == issuerLock);
+
+        // Transfer full value minus fee
+        int inputValue = tx.inputs[this.activeInputIndex].value;
+        require(tx.outputs[0].value >= inputValue - MINER_FEE);
+
+        // Second output: OP_RETURN with clawback reason metadata
+        // The reason is encoded in the transaction witness data
+        // Enforce that a second output exists (for the OP_RETURN data)
+        require(tx.outputs.length >= 2);
+    }
+}

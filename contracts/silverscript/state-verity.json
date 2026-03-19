@@ -1,0 +1,1082 @@
+{
+  "contract_name": "StateVerity",
+  "script": [
+    107,
+    32,
+    71,
+    72,
+    210,
+    224,
+    41,
+    148,
+    26,
+    93,
+    151,
+    5,
+    248,
+    109,
+    22,
+    181,
+    15,
+    139,
+    6,
+    255,
+    44,
+    174,
+    132,
+    78,
+    219,
+    12,
+    108,
+    176,
+    155,
+    99,
+    103,
+    139,
+    137,
+    233,
+    32,
+    218,
+    149,
+    78,
+    21,
+    75,
+    85,
+    226,
+    23,
+    39,
+    15,
+    177,
+    43,
+    155,
+    26,
+    203,
+    172,
+    116,
+    45,
+    227,
+    134,
+    121,
+    122,
+    123,
+    20,
+    31,
+    216,
+    222,
+    114,
+    109,
+    105,
+    75,
+    105,
+    32,
+    67,
+    231,
+    140,
+    127,
+    114,
+    214,
+    86,
+    113,
+    72,
+    249,
+    230,
+    16,
+    142,
+    213,
+    64,
+    28,
+    106,
+    97,
+    252,
+    127,
+    207,
+    240,
+    215,
+    70,
+    165,
+    204,
+    76,
+    100,
+    220,
+    154,
+    124,
+    61,
+    32,
+    214,
+    141,
+    183,
+    152,
+    253,
+    163,
+    224,
+    209,
+    95,
+    102,
+    243,
+    209,
+    75,
+    108,
+    9,
+    69,
+    200,
+    77,
+    132,
+    45,
+    104,
+    79,
+    164,
+    84,
+    123,
+    212,
+    108,
+    55,
+    156,
+    200,
+    196,
+    252,
+    108,
+    118,
+    0,
+    156,
+    99,
+    117,
+    88,
+    121,
+    170,
+    81,
+    121,
+    135,
+    105,
+    87,
+    121,
+    89,
+    121,
+    172,
+    105,
+    85,
+    121,
+    32,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    135,
+    145,
+    105,
+    0,
+    194,
+    185,
+    190,
+    2,
+    232,
+    3,
+    148,
+    162,
+    105,
+    86,
+    121,
+    1,
+    32,
+    124,
+    126,
+    86,
+    121,
+    1,
+    32,
+    124,
+    126,
+    86,
+    121,
+    1,
+    32,
+    124,
+    126,
+    83,
+    121,
+    1,
+    32,
+    124,
+    126,
+    126,
+    126,
+    126,
+    185,
+    118,
+    201,
+    2,
+    60,
+    1,
+    148,
+    118,
+    81,
+    147,
+    188,
+    124,
+    126,
+    185,
+    118,
+    201,
+    118,
+    2,
+    60,
+    1,
+    148,
+    2,
+    133,
+    0,
+    147,
+    124,
+    188,
+    126,
+    170,
+    2,
+    0,
+    0,
+    1,
+    170,
+    126,
+    1,
+    32,
+    126,
+    124,
+    126,
+    1,
+    135,
+    126,
+    0,
+    195,
+    135,
+    105,
+    117,
+    117,
+    117,
+    117,
+    117,
+    117,
+    117,
+    117,
+    117,
+    81,
+    103,
+    118,
+    81,
+    156,
+    99,
+    117,
+    85,
+    121,
+    170,
+    81,
+    121,
+    135,
+    105,
+    84,
+    121,
+    86,
+    121,
+    172,
+    105,
+    117,
+    117,
+    117,
+    117,
+    117,
+    117,
+    81,
+    103,
+    117,
+    0,
+    105,
+    104,
+    104
+  ],
+  "ast": {
+    "name": "StateVerity",
+    "params": [
+      {
+        "type_ref": {
+          "base": "byte",
+          "array_dims": [
+            {
+              "kind": "fixed",
+              "value": 32
+            }
+          ]
+        },
+        "name": "initDkgUalHash",
+        "span": "byte[32] initDkgUalHash",
+        "type_span": "byte[32]",
+        "name_span": "initDkgUalHash"
+      },
+      {
+        "type_ref": {
+          "base": "byte",
+          "array_dims": [
+            {
+              "kind": "fixed",
+              "value": 32
+            }
+          ]
+        },
+        "name": "initOracleAttestationHash",
+        "span": "byte[32] initOracleAttestationHash",
+        "type_span": "byte[32]",
+        "name_span": "initOracleAttestationHash"
+      },
+      {
+        "type_ref": {
+          "base": "byte",
+          "array_dims": [
+            {
+              "kind": "fixed",
+              "value": 32
+            }
+          ]
+        },
+        "name": "initComplianceMerkleRoot",
+        "span": "byte[32] initComplianceMerkleRoot",
+        "type_span": "byte[32]",
+        "name_span": "initComplianceMerkleRoot"
+      },
+      {
+        "type_ref": {
+          "base": "byte",
+          "array_dims": [
+            {
+              "kind": "fixed",
+              "value": 32
+            }
+          ]
+        },
+        "name": "initStateManagerKeyHash",
+        "span": "byte[32] initStateManagerKeyHash",
+        "type_span": "byte[32]",
+        "name_span": "initStateManagerKeyHash"
+      }
+    ],
+    "fields": [
+      {
+        "type_ref": {
+          "base": "byte",
+          "array_dims": [
+            {
+              "kind": "fixed",
+              "value": 32
+            }
+          ]
+        },
+        "name": "dkgUalHash",
+        "expr": {
+          "kind": "identifier",
+          "data": "initDkgUalHash",
+          "span": "initDkgUalHash"
+        },
+        "span": "byte[32] dkgUalHash = initDkgUalHash;",
+        "type_span": "byte[32]",
+        "name_span": "dkgUalHash"
+      },
+      {
+        "type_ref": {
+          "base": "byte",
+          "array_dims": [
+            {
+              "kind": "fixed",
+              "value": 32
+            }
+          ]
+        },
+        "name": "oracleAttestationHash",
+        "expr": {
+          "kind": "identifier",
+          "data": "initOracleAttestationHash",
+          "span": "initOracleAttestationHash"
+        },
+        "span": "byte[32] oracleAttestationHash = initOracleAttestationHash;",
+        "type_span": "byte[32]",
+        "name_span": "oracleAttestationHash"
+      },
+      {
+        "type_ref": {
+          "base": "byte",
+          "array_dims": [
+            {
+              "kind": "fixed",
+              "value": 32
+            }
+          ]
+        },
+        "name": "complianceMerkleRoot",
+        "expr": {
+          "kind": "identifier",
+          "data": "initComplianceMerkleRoot",
+          "span": "initComplianceMerkleRoot"
+        },
+        "span": "byte[32] complianceMerkleRoot = initComplianceMerkleRoot;",
+        "type_span": "byte[32]",
+        "name_span": "complianceMerkleRoot"
+      },
+      {
+        "type_ref": {
+          "base": "byte",
+          "array_dims": [
+            {
+              "kind": "fixed",
+              "value": 32
+            }
+          ]
+        },
+        "name": "stateManagerKeyHash",
+        "expr": {
+          "kind": "identifier",
+          "data": "initStateManagerKeyHash",
+          "span": "initStateManagerKeyHash"
+        },
+        "span": "byte[32] stateManagerKeyHash = initStateManagerKeyHash;",
+        "type_span": "byte[32]",
+        "name_span": "stateManagerKeyHash"
+      }
+    ],
+    "constants": [
+      {
+        "type_ref": {
+          "base": "int"
+        },
+        "name": "MINER_FEE",
+        "expr": {
+          "kind": "int",
+          "data": 1000,
+          "span": "1000"
+        },
+        "span": "int constant MINER_FEE = 1000;",
+        "type_span": "int ",
+        "name_span": "MINER_FEE"
+      }
+    ],
+    "functions": [
+      {
+        "name": "updateState",
+        "params": [
+          {
+            "type_ref": {
+              "base": "pubkey"
+            },
+            "name": "managerPk",
+            "span": "pubkey managerPk",
+            "type_span": "pubkey ",
+            "name_span": "managerPk"
+          },
+          {
+            "type_ref": {
+              "base": "sig"
+            },
+            "name": "managerSig",
+            "span": "sig managerSig",
+            "type_span": "sig ",
+            "name_span": "managerSig"
+          },
+          {
+            "type_ref": {
+              "base": "byte",
+              "array_dims": [
+                {
+                  "kind": "fixed",
+                  "value": 32
+                }
+              ]
+            },
+            "name": "newDkgUalHash",
+            "span": "byte[32] newDkgUalHash",
+            "type_span": "byte[32]",
+            "name_span": "newDkgUalHash"
+          },
+          {
+            "type_ref": {
+              "base": "byte",
+              "array_dims": [
+                {
+                  "kind": "fixed",
+                  "value": 32
+                }
+              ]
+            },
+            "name": "newOracleAttestationHash",
+            "span": "byte[32] newOracleAttestationHash",
+            "type_span": "byte[32]",
+            "name_span": "newOracleAttestationHash"
+          },
+          {
+            "type_ref": {
+              "base": "byte",
+              "array_dims": [
+                {
+                  "kind": "fixed",
+                  "value": 32
+                }
+              ]
+            },
+            "name": "newComplianceMerkleRoot",
+            "span": "byte[32] newComplianceMerkleRoot",
+            "type_span": "byte[32]",
+            "name_span": "newComplianceMerkleRoot"
+          }
+        ],
+        "entrypoint": true,
+        "return_types": [],
+        "body": [
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "eq",
+                  "left": {
+                    "kind": "call",
+                    "data": {
+                      "name": "blake2b",
+                      "args": [
+                        {
+                          "kind": "identifier",
+                          "data": "managerPk",
+                          "span": "managerPk"
+                        }
+                      ],
+                      "name_span": "blake2b"
+                    },
+                    "span": "blake2b(managerPk)"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "stateManagerKeyHash",
+                    "span": "stateManagerKeyHash"
+                  }
+                },
+                "span": "blake2b(managerPk) == stateManagerKeyHash"
+              },
+              "message": null,
+              "span": "require(blake2b(managerPk) == stateManagerKeyHash);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "call",
+                "data": {
+                  "name": "checkSig",
+                  "args": [
+                    {
+                      "kind": "identifier",
+                      "data": "managerSig",
+                      "span": "managerSig"
+                    },
+                    {
+                      "kind": "identifier",
+                      "data": "managerPk",
+                      "span": "managerPk"
+                    }
+                  ],
+                  "name_span": "checkSig"
+                },
+                "span": "checkSig(managerSig, managerPk)"
+              },
+              "message": null,
+              "span": "require(checkSig(managerSig, managerPk));",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "ne",
+                  "left": {
+                    "kind": "identifier",
+                    "data": "newOracleAttestationHash",
+                    "span": "newOracleAttestationHash"
+                  },
+                  "right": {
+                    "kind": "array",
+                    "data": [
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      },
+                      {
+                        "kind": "byte",
+                        "data": 0,
+                        "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                      }
+                    ],
+                    "span": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                  }
+                },
+                "span": "newOracleAttestationHash != 0x0000000000000000000000000000000000000000000000000000000000000000"
+              },
+              "message": null,
+              "span": "require(newOracleAttestationHash != 0x0000000000000000000000000000000000000000000000000000000000000000);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "int"
+              },
+              "modifiers": [],
+              "name": "inputValue",
+              "expr": {
+                "kind": "introspection",
+                "data": {
+                  "kind": "input_value",
+                  "index": {
+                    "kind": "nullary",
+                    "data": "active_input_index",
+                    "span": "this.activeInputIndex"
+                  },
+                  "field_span": ".value"
+                },
+                "span": "tx.inputs[this.activeInputIndex].value"
+              },
+              "span": "int inputValue = tx.inputs[this.activeInputIndex].value;",
+              "type_span": "int ",
+              "modifier_spans": [],
+              "name_span": "inputValue"
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "ge",
+                  "left": {
+                    "kind": "introspection",
+                    "data": {
+                      "kind": "output_value",
+                      "index": {
+                        "kind": "int",
+                        "data": 0,
+                        "span": "0"
+                      },
+                      "field_span": ".value"
+                    },
+                    "span": "tx.outputs[0].value"
+                  },
+                  "right": {
+                    "kind": "binary",
+                    "data": {
+                      "op": "sub",
+                      "left": {
+                        "kind": "identifier",
+                        "data": "inputValue",
+                        "span": "inputValue"
+                      },
+                      "right": {
+                        "kind": "identifier",
+                        "data": "MINER_FEE",
+                        "span": "MINER_FEE"
+                      }
+                    },
+                    "span": "inputValue - MINER_FEE"
+                  }
+                },
+                "span": "tx.outputs[0].value >= inputValue - MINER_FEE"
+              },
+              "message": null,
+              "span": "require(tx.outputs[0].value >= inputValue - MINER_FEE);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "function_call",
+            "data": {
+              "name": "validateOutputState",
+              "args": [
+                {
+                  "kind": "int",
+                  "data": 0,
+                  "span": "0"
+                },
+                {
+                  "kind": "state_object",
+                  "data": [
+                    {
+                      "name": "dkgUalHash",
+                      "expr": {
+                        "kind": "identifier",
+                        "data": "newDkgUalHash",
+                        "span": "newDkgUalHash"
+                      },
+                      "span": "dkgUalHash: newDkgUalHash",
+                      "name_span": "dkgUalHash"
+                    },
+                    {
+                      "name": "oracleAttestationHash",
+                      "expr": {
+                        "kind": "identifier",
+                        "data": "newOracleAttestationHash",
+                        "span": "newOracleAttestationHash"
+                      },
+                      "span": "oracleAttestationHash: newOracleAttestationHash",
+                      "name_span": "oracleAttestationHash"
+                    },
+                    {
+                      "name": "complianceMerkleRoot",
+                      "expr": {
+                        "kind": "identifier",
+                        "data": "newComplianceMerkleRoot",
+                        "span": "newComplianceMerkleRoot"
+                      },
+                      "span": "complianceMerkleRoot: newComplianceMerkleRoot",
+                      "name_span": "complianceMerkleRoot"
+                    },
+                    {
+                      "name": "stateManagerKeyHash",
+                      "expr": {
+                        "kind": "identifier",
+                        "data": "stateManagerKeyHash",
+                        "span": "stateManagerKeyHash"
+                      },
+                      "span": "stateManagerKeyHash: stateManagerKeyHash\n        ",
+                      "name_span": "stateManagerKeyHash"
+                    }
+                  ],
+                  "span": "{\n            dkgUalHash: newDkgUalHash,\n            oracleAttestationHash: newOracleAttestationHash,\n            complianceMerkleRoot: newComplianceMerkleRoot,\n            stateManagerKeyHash: stateManagerKeyHash\n        }"
+                }
+              ],
+              "span": "validateOutputState(0, {\n            dkgUalHash: newDkgUalHash,\n            oracleAttestationHash: newOracleAttestationHash,\n            complianceMerkleRoot: newComplianceMerkleRoot,\n            stateManagerKeyHash: stateManagerKeyHash\n        });",
+              "name_span": "validateOutputState"
+            }
+          }
+        ],
+        "return_type_spans": [],
+        "span": "entrypoint function updateState(\n        pubkey managerPk,\n        sig managerSig,\n        byte[32] newDkgUalHash,\n        byte[32] newOracleAttestationHash,\n        byte[32] newComplianceMerkleRoot\n    ) {\n        // 1. Verify state manager identity\n        require(blake2b(managerPk) == stateManagerKeyHash);\n        require(checkSig(managerSig, managerPk));\n\n        // 2. Verify the new oracle attestation is non-zero (actual verification\n        //    happens off-chain via the oracle-pool service; on-chain we commit the hash)\n        require(newOracleAttestationHash != 0x0000000000000000000000000000000000000000000000000000000000000000);\n\n        // 3. Preserve UTXO value\n        int inputValue = tx.inputs[this.activeInputIndex].value;\n        require(tx.outputs[0].value >= inputValue - MINER_FEE);\n\n        // 4. Covenant preservation: output must recreate contract with updated state\n        validateOutputState(0, {\n            dkgUalHash: newDkgUalHash,\n            oracleAttestationHash: newOracleAttestationHash,\n            complianceMerkleRoot: newComplianceMerkleRoot,\n            stateManagerKeyHash: stateManagerKeyHash\n        });\n    }",
+        "name_span": "updateState",
+        "body_span": "require(blake2b(managerPk) == stateManagerKeyHash);\n        require(checkSig(managerSig, managerPk));\n\n        // 2. Verify the new oracle attestation is non-zero (actual verification\n        //    happens off-chain via the oracle-pool service; on-chain we commit the hash)\n        require(newOracleAttestationHash != 0x0000000000000000000000000000000000000000000000000000000000000000);\n\n        // 3. Preserve UTXO value\n        int inputValue = tx.inputs[this.activeInputIndex].value;\n        require(tx.outputs[0].value >= inputValue - MINER_FEE);\n\n        // 4. Covenant preservation: output must recreate contract with updated state\n        validateOutputState(0, {\n            dkgUalHash: newDkgUalHash,\n            oracleAttestationHash: newOracleAttestationHash,\n            complianceMerkleRoot: newComplianceMerkleRoot,\n            stateManagerKeyHash: stateManagerKeyHash\n        });"
+      },
+      {
+        "name": "managerReclaim",
+        "params": [
+          {
+            "type_ref": {
+              "base": "pubkey"
+            },
+            "name": "managerPk",
+            "span": "pubkey managerPk",
+            "type_span": "pubkey ",
+            "name_span": "managerPk"
+          },
+          {
+            "type_ref": {
+              "base": "sig"
+            },
+            "name": "managerSig",
+            "span": "sig managerSig",
+            "type_span": "sig ",
+            "name_span": "managerSig"
+          }
+        ],
+        "entrypoint": true,
+        "return_types": [],
+        "body": [
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "eq",
+                  "left": {
+                    "kind": "call",
+                    "data": {
+                      "name": "blake2b",
+                      "args": [
+                        {
+                          "kind": "identifier",
+                          "data": "managerPk",
+                          "span": "managerPk"
+                        }
+                      ],
+                      "name_span": "blake2b"
+                    },
+                    "span": "blake2b(managerPk)"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "stateManagerKeyHash",
+                    "span": "stateManagerKeyHash"
+                  }
+                },
+                "span": "blake2b(managerPk) == stateManagerKeyHash"
+              },
+              "message": null,
+              "span": "require(blake2b(managerPk) == stateManagerKeyHash);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "call",
+                "data": {
+                  "name": "checkSig",
+                  "args": [
+                    {
+                      "kind": "identifier",
+                      "data": "managerSig",
+                      "span": "managerSig"
+                    },
+                    {
+                      "kind": "identifier",
+                      "data": "managerPk",
+                      "span": "managerPk"
+                    }
+                  ],
+                  "name_span": "checkSig"
+                },
+                "span": "checkSig(managerSig, managerPk)"
+              },
+              "message": null,
+              "span": "require(checkSig(managerSig, managerPk));",
+              "message_span": null
+            }
+          }
+        ],
+        "return_type_spans": [],
+        "span": "entrypoint function managerReclaim(pubkey managerPk, sig managerSig) {\n        require(blake2b(managerPk) == stateManagerKeyHash);\n        require(checkSig(managerSig, managerPk));\n    }",
+        "name_span": "managerReclaim",
+        "body_span": "require(blake2b(managerPk) == stateManagerKeyHash);\n        require(checkSig(managerSig, managerPk));"
+      }
+    ],
+    "span": "contract StateVerity(\n    byte[32] initDkgUalHash,\n    byte[32] initOracleAttestationHash,\n    byte[32] initComplianceMerkleRoot,\n    byte[32] initStateManagerKeyHash\n) {\n    byte[32] dkgUalHash = initDkgUalHash;\n    byte[32] oracleAttestationHash = initOracleAttestationHash;\n    byte[32] complianceMerkleRoot = initComplianceMerkleRoot;\n    byte[32] stateManagerKeyHash = initStateManagerKeyHash;\n\n    int constant MINER_FEE = 1000;\n\n    // Path A: Oracle-attested state update\n    // The state manager provides a new oracle attestation and updated DKG reference.\n    // The contract enforces that the output preserves the covenant with new state.\n    entrypoint function updateState(\n        pubkey managerPk,\n        sig managerSig,\n        byte[32] newDkgUalHash,\n        byte[32] newOracleAttestationHash,\n        byte[32] newComplianceMerkleRoot\n    ) {\n        // 1. Verify state manager identity\n        require(blake2b(managerPk) == stateManagerKeyHash);\n        require(checkSig(managerSig, managerPk));\n\n        // 2. Verify the new oracle attestation is non-zero (actual verification\n        //    happens off-chain via the oracle-pool service; on-chain we commit the hash)\n        require(newOracleAttestationHash != 0x0000000000000000000000000000000000000000000000000000000000000000);\n\n        // 3. Preserve UTXO value\n        int inputValue = tx.inputs[this.activeInputIndex].value;\n        require(tx.outputs[0].value >= inputValue - MINER_FEE);\n\n        // 4. Covenant preservation: output must recreate contract with updated state\n        validateOutputState(0, {\n            dkgUalHash: newDkgUalHash,\n            oracleAttestationHash: newOracleAttestationHash,\n            complianceMerkleRoot: newComplianceMerkleRoot,\n            stateManagerKeyHash: stateManagerKeyHash\n        });\n    }\n\n    // Path B: State manager reclaims the state UTXO\n    // Used when the asset is being retired or migrated\n    entrypoint function managerReclaim(pubkey managerPk, sig managerSig) {\n        require(blake2b(managerPk) == stateManagerKeyHash);\n        require(checkSig(managerSig, managerPk));\n    }\n}",
+    "name_span": "StateVerity"
+  },
+  "abi": [
+    {
+      "name": "updateState",
+      "inputs": [
+        {
+          "name": "managerPk",
+          "type_name": "pubkey"
+        },
+        {
+          "name": "managerSig",
+          "type_name": "sig"
+        },
+        {
+          "name": "newDkgUalHash",
+          "type_name": "byte[32]"
+        },
+        {
+          "name": "newOracleAttestationHash",
+          "type_name": "byte[32]"
+        },
+        {
+          "name": "newComplianceMerkleRoot",
+          "type_name": "byte[32]"
+        }
+      ]
+    },
+    {
+      "name": "managerReclaim",
+      "inputs": [
+        {
+          "name": "managerPk",
+          "type_name": "pubkey"
+        },
+        {
+          "name": "managerSig",
+          "type_name": "sig"
+        }
+      ]
+    }
+  ],
+  "without_selector": false,
+  "debug_info": null
+}

@@ -1,6 +1,6 @@
 // DISCLAIMER: Technical demo code — legal wrappers required in production
 // SPDX-License-Identifier: MIT
 
-export { DkgClient } from './client';
+export { DkgClient, DkgConnectionError, DkgApiError } from './client';
 export { publishAsset, type AssetMetadata } from './publish';
 export { retrieveAsset } from './retrieve';

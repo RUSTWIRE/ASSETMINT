@@ -1,0 +1,1525 @@
+{
+  "contract_name": "Dividend",
+  "script": [
+    107,
+    32,
+    44,
+    157,
+    124,
+    114,
+    164,
+    13,
+    102,
+    223,
+    183,
+    234,
+    101,
+    114,
+    166,
+    142,
+    236,
+    96,
+    63,
+    205,
+    10,
+    232,
+    109,
+    167,
+    168,
+    225,
+    157,
+    28,
+    106,
+    212,
+    124,
+    3,
+    250,
+    183,
+    32,
+    94,
+    82,
+    110,
+    249,
+    185,
+    42,
+    80,
+    71,
+    149,
+    211,
+    193,
+    152,
+    186,
+    15,
+    116,
+    68,
+    174,
+    44,
+    92,
+    170,
+    52,
+    139,
+    177,
+    7,
+    194,
+    46,
+    23,
+    149,
+    173,
+    56,
+    55,
+    23,
+    8,
+    16,
+    39,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    8,
+    255,
+    201,
+    154,
+    59,
+    0,
+    0,
+    0,
+    0,
+    108,
+    118,
+    0,
+    156,
+    99,
+    117,
+    87,
+    121,
+    89,
+    121,
+    172,
+    105,
+    86,
+    121,
+    0,
+    160,
+    105,
+    81,
+    121,
+    0,
+    160,
+    105,
+    88,
+    121,
+    168,
+    86,
+    121,
+    126,
+    168,
+    85,
+    121,
+    126,
+    168,
+    84,
+    121,
+    135,
+    105,
+    185,
+    190,
+    0,
+    121,
+    88,
+    121,
+    149,
+    83,
+    121,
+    150,
+    0,
+    121,
+    2,
+    232,
+    3,
+    160,
+    105,
+    0,
+    194,
+    81,
+    121,
+    2,
+    232,
+    3,
+    148,
+    162,
+    105,
+    81,
+    121,
+    81,
+    121,
+    148,
+    0,
+    121,
+    2,
+    232,
+    3,
+    160,
+    99,
+    81,
+    194,
+    81,
+    121,
+    2,
+    232,
+    3,
+    148,
+    162,
+    105,
+    86,
+    121,
+    1,
+    32,
+    124,
+    126,
+    86,
+    121,
+    1,
+    32,
+    124,
+    126,
+    86,
+    121,
+    88,
+    205,
+    88,
+    124,
+    126,
+    86,
+    121,
+    88,
+    205,
+    88,
+    124,
+    126,
+    126,
+    126,
+    126,
+    185,
+    118,
+    201,
+    2,
+    150,
+    1,
+    148,
+    118,
+    81,
+    147,
+    188,
+    124,
+    126,
+    185,
+    118,
+    201,
+    118,
+    2,
+    150,
+    1,
+    148,
+    1,
+    85,
+    147,
+    124,
+    188,
+    126,
+    170,
+    2,
+    0,
+    0,
+    1,
+    170,
+    126,
+    1,
+    32,
+    126,
+    124,
+    126,
+    1,
+    135,
+    126,
+    81,
+    195,
+    135,
+    105,
+    104,
+    0,
+    122,
+    117,
+    0,
+    122,
+    117,
+    0,
+    122,
+    117,
+    117,
+    117,
+    117,
+    117,
+    117,
+    117,
+    117,
+    117,
+    117,
+    81,
+    103,
+    118,
+    81,
+    156,
+    99,
+    117,
+    85,
+    121,
+    170,
+    83,
+    121,
+    135,
+    105,
+    84,
+    121,
+    86,
+    121,
+    172,
+    105,
+    0,
+    194,
+    185,
+    190,
+    162,
+    105,
+    83,
+    121,
+    1,
+    32,
+    124,
+    126,
+    83,
+    121,
+    1,
+    32,
+    124,
+    126,
+    83,
+    121,
+    88,
+    205,
+    88,
+    124,
+    126,
+    83,
+    121,
+    88,
+    205,
+    88,
+    124,
+    126,
+    126,
+    126,
+    126,
+    185,
+    118,
+    201,
+    2,
+    150,
+    1,
+    148,
+    118,
+    81,
+    147,
+    188,
+    124,
+    126,
+    185,
+    118,
+    201,
+    118,
+    2,
+    150,
+    1,
+    148,
+    1,
+    85,
+    147,
+    124,
+    188,
+    126,
+    170,
+    2,
+    0,
+    0,
+    1,
+    170,
+    126,
+    1,
+    32,
+    126,
+    124,
+    126,
+    1,
+    135,
+    126,
+    0,
+    195,
+    135,
+    105,
+    117,
+    117,
+    117,
+    117,
+    117,
+    117,
+    81,
+    103,
+    118,
+    82,
+    156,
+    99,
+    117,
+    85,
+    121,
+    170,
+    83,
+    121,
+    135,
+    105,
+    84,
+    121,
+    86,
+    121,
+    172,
+    105,
+    117,
+    117,
+    117,
+    117,
+    117,
+    117,
+    81,
+    103,
+    117,
+    0,
+    105,
+    104,
+    104,
+    104
+  ],
+  "ast": {
+    "name": "Dividend",
+    "params": [
+      {
+        "type_ref": {
+          "base": "byte",
+          "array_dims": [
+            {
+              "kind": "fixed",
+              "value": 32
+            }
+          ]
+        },
+        "name": "initHolderMerkleRoot",
+        "span": "byte[32] initHolderMerkleRoot",
+        "type_span": "byte[32]",
+        "name_span": "initHolderMerkleRoot"
+      },
+      {
+        "type_ref": {
+          "base": "byte",
+          "array_dims": [
+            {
+              "kind": "fixed",
+              "value": 32
+            }
+          ]
+        },
+        "name": "initIssuerKeyHash",
+        "span": "byte[32] initIssuerKeyHash",
+        "type_span": "byte[32]",
+        "name_span": "initIssuerKeyHash"
+      },
+      {
+        "type_ref": {
+          "base": "int"
+        },
+        "name": "initTotalShares",
+        "span": "int initTotalShares",
+        "type_span": "int ",
+        "name_span": "initTotalShares"
+      },
+      {
+        "type_ref": {
+          "base": "int"
+        },
+        "name": "initDeadline",
+        "span": "int initDeadline",
+        "type_span": "int ",
+        "name_span": "initDeadline"
+      }
+    ],
+    "fields": [
+      {
+        "type_ref": {
+          "base": "byte",
+          "array_dims": [
+            {
+              "kind": "fixed",
+              "value": 32
+            }
+          ]
+        },
+        "name": "holderMerkleRoot",
+        "expr": {
+          "kind": "identifier",
+          "data": "initHolderMerkleRoot",
+          "span": "initHolderMerkleRoot"
+        },
+        "span": "byte[32] holderMerkleRoot = initHolderMerkleRoot;",
+        "type_span": "byte[32]",
+        "name_span": "holderMerkleRoot"
+      },
+      {
+        "type_ref": {
+          "base": "byte",
+          "array_dims": [
+            {
+              "kind": "fixed",
+              "value": 32
+            }
+          ]
+        },
+        "name": "issuerKeyHash",
+        "expr": {
+          "kind": "identifier",
+          "data": "initIssuerKeyHash",
+          "span": "initIssuerKeyHash"
+        },
+        "span": "byte[32] issuerKeyHash = initIssuerKeyHash;",
+        "type_span": "byte[32]",
+        "name_span": "issuerKeyHash"
+      },
+      {
+        "type_ref": {
+          "base": "int"
+        },
+        "name": "totalShares",
+        "expr": {
+          "kind": "identifier",
+          "data": "initTotalShares",
+          "span": "initTotalShares"
+        },
+        "span": "int totalShares = initTotalShares;",
+        "type_span": "int ",
+        "name_span": "totalShares"
+      },
+      {
+        "type_ref": {
+          "base": "int"
+        },
+        "name": "deadline",
+        "expr": {
+          "kind": "identifier",
+          "data": "initDeadline",
+          "span": "initDeadline"
+        },
+        "span": "int deadline = initDeadline;",
+        "type_span": "int ",
+        "name_span": "deadline"
+      }
+    ],
+    "constants": [
+      {
+        "type_ref": {
+          "base": "int"
+        },
+        "name": "MINER_FEE",
+        "expr": {
+          "kind": "int",
+          "data": 1000,
+          "span": "1000"
+        },
+        "span": "int constant MINER_FEE = 1000;",
+        "type_span": "int ",
+        "name_span": "MINER_FEE"
+      }
+    ],
+    "functions": [
+      {
+        "name": "claimDividend",
+        "params": [
+          {
+            "type_ref": {
+              "base": "pubkey"
+            },
+            "name": "holderPk",
+            "span": "pubkey holderPk",
+            "type_span": "pubkey ",
+            "name_span": "holderPk"
+          },
+          {
+            "type_ref": {
+              "base": "sig"
+            },
+            "name": "holderSig",
+            "span": "sig holderSig",
+            "type_span": "sig ",
+            "name_span": "holderSig"
+          },
+          {
+            "type_ref": {
+              "base": "int"
+            },
+            "name": "holderShares",
+            "span": "int holderShares",
+            "type_span": "int ",
+            "name_span": "holderShares"
+          },
+          {
+            "type_ref": {
+              "base": "byte",
+              "array_dims": [
+                {
+                  "kind": "fixed",
+                  "value": 32
+                }
+              ]
+            },
+            "name": "merkleProof0",
+            "span": "byte[32] merkleProof0",
+            "type_span": "byte[32]",
+            "name_span": "merkleProof0"
+          },
+          {
+            "type_ref": {
+              "base": "byte",
+              "array_dims": [
+                {
+                  "kind": "fixed",
+                  "value": 32
+                }
+              ]
+            },
+            "name": "merkleProof1",
+            "span": "byte[32] merkleProof1",
+            "type_span": "byte[32]",
+            "name_span": "merkleProof1"
+          }
+        ],
+        "entrypoint": true,
+        "return_types": [],
+        "body": [
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "call",
+                "data": {
+                  "name": "checkSig",
+                  "args": [
+                    {
+                      "kind": "identifier",
+                      "data": "holderSig",
+                      "span": "holderSig"
+                    },
+                    {
+                      "kind": "identifier",
+                      "data": "holderPk",
+                      "span": "holderPk"
+                    }
+                  ],
+                  "name_span": "checkSig"
+                },
+                "span": "checkSig(holderSig, holderPk)"
+              },
+              "message": null,
+              "span": "require(checkSig(holderSig, holderPk));",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "gt",
+                  "left": {
+                    "kind": "identifier",
+                    "data": "holderShares",
+                    "span": "holderShares"
+                  },
+                  "right": {
+                    "kind": "int",
+                    "data": 0,
+                    "span": "0"
+                  }
+                },
+                "span": "holderShares > 0"
+              },
+              "message": null,
+              "span": "require(holderShares > 0);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "gt",
+                  "left": {
+                    "kind": "identifier",
+                    "data": "totalShares",
+                    "span": "totalShares"
+                  },
+                  "right": {
+                    "kind": "int",
+                    "data": 0,
+                    "span": "0"
+                  }
+                },
+                "span": "totalShares > 0"
+              },
+              "message": null,
+              "span": "require(totalShares > 0);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "byte",
+                "array_dims": [
+                  {
+                    "kind": "fixed",
+                    "value": 32
+                  }
+                ]
+              },
+              "modifiers": [],
+              "name": "leaf",
+              "expr": {
+                "kind": "call",
+                "data": {
+                  "name": "sha256",
+                  "args": [
+                    {
+                      "kind": "identifier",
+                      "data": "holderPk",
+                      "span": "holderPk"
+                    }
+                  ],
+                  "name_span": "sha256"
+                },
+                "span": "sha256(holderPk)"
+              },
+              "span": "byte[32] leaf = sha256(holderPk);",
+              "type_span": "byte[32]",
+              "modifier_spans": [],
+              "name_span": "leaf"
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "byte",
+                "array_dims": [
+                  {
+                    "kind": "fixed",
+                    "value": 32
+                  }
+                ]
+              },
+              "modifiers": [],
+              "name": "intermediate",
+              "expr": {
+                "kind": "call",
+                "data": {
+                  "name": "sha256",
+                  "args": [
+                    {
+                      "kind": "binary",
+                      "data": {
+                        "op": "add",
+                        "left": {
+                          "kind": "identifier",
+                          "data": "leaf",
+                          "span": "leaf"
+                        },
+                        "right": {
+                          "kind": "identifier",
+                          "data": "merkleProof0",
+                          "span": "merkleProof0"
+                        }
+                      },
+                      "span": "leaf + merkleProof0"
+                    }
+                  ],
+                  "name_span": "sha256"
+                },
+                "span": "sha256(leaf + merkleProof0)"
+              },
+              "span": "byte[32] intermediate = sha256(leaf + merkleProof0);",
+              "type_span": "byte[32]",
+              "modifier_spans": [],
+              "name_span": "intermediate"
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "byte",
+                "array_dims": [
+                  {
+                    "kind": "fixed",
+                    "value": 32
+                  }
+                ]
+              },
+              "modifiers": [],
+              "name": "computedRoot",
+              "expr": {
+                "kind": "call",
+                "data": {
+                  "name": "sha256",
+                  "args": [
+                    {
+                      "kind": "binary",
+                      "data": {
+                        "op": "add",
+                        "left": {
+                          "kind": "identifier",
+                          "data": "intermediate",
+                          "span": "intermediate"
+                        },
+                        "right": {
+                          "kind": "identifier",
+                          "data": "merkleProof1",
+                          "span": "merkleProof1"
+                        }
+                      },
+                      "span": "intermediate + merkleProof1"
+                    }
+                  ],
+                  "name_span": "sha256"
+                },
+                "span": "sha256(intermediate + merkleProof1)"
+              },
+              "span": "byte[32] computedRoot = sha256(intermediate + merkleProof1);",
+              "type_span": "byte[32]",
+              "modifier_spans": [],
+              "name_span": "computedRoot"
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "eq",
+                  "left": {
+                    "kind": "identifier",
+                    "data": "computedRoot",
+                    "span": "computedRoot"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "holderMerkleRoot",
+                    "span": "holderMerkleRoot"
+                  }
+                },
+                "span": "computedRoot == holderMerkleRoot"
+              },
+              "message": null,
+              "span": "require(computedRoot == holderMerkleRoot);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "int"
+              },
+              "modifiers": [],
+              "name": "inputValue",
+              "expr": {
+                "kind": "introspection",
+                "data": {
+                  "kind": "input_value",
+                  "index": {
+                    "kind": "nullary",
+                    "data": "active_input_index",
+                    "span": "this.activeInputIndex"
+                  },
+                  "field_span": ".value"
+                },
+                "span": "tx.inputs[this.activeInputIndex].value"
+              },
+              "span": "int inputValue = tx.inputs[this.activeInputIndex].value;",
+              "type_span": "int ",
+              "modifier_spans": [],
+              "name_span": "inputValue"
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "int"
+              },
+              "modifiers": [],
+              "name": "claimAmount",
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "div",
+                  "left": {
+                    "kind": "binary",
+                    "data": {
+                      "op": "mul",
+                      "left": {
+                        "kind": "identifier",
+                        "data": "inputValue",
+                        "span": "inputValue"
+                      },
+                      "right": {
+                        "kind": "identifier",
+                        "data": "holderShares",
+                        "span": "holderShares"
+                      }
+                    },
+                    "span": "inputValue * holderShares"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "totalShares",
+                    "span": "totalShares"
+                  }
+                },
+                "span": "inputValue * holderShares) / totalShares"
+              },
+              "span": "int claimAmount = (inputValue * holderShares) / totalShares;",
+              "type_span": "int ",
+              "modifier_spans": [],
+              "name_span": "claimAmount"
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "gt",
+                  "left": {
+                    "kind": "identifier",
+                    "data": "claimAmount",
+                    "span": "claimAmount"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "MINER_FEE",
+                    "span": "MINER_FEE"
+                  }
+                },
+                "span": "claimAmount > MINER_FEE"
+              },
+              "message": null,
+              "span": "require(claimAmount > MINER_FEE);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "ge",
+                  "left": {
+                    "kind": "introspection",
+                    "data": {
+                      "kind": "output_value",
+                      "index": {
+                        "kind": "int",
+                        "data": 0,
+                        "span": "0"
+                      },
+                      "field_span": ".value"
+                    },
+                    "span": "tx.outputs[0].value"
+                  },
+                  "right": {
+                    "kind": "binary",
+                    "data": {
+                      "op": "sub",
+                      "left": {
+                        "kind": "identifier",
+                        "data": "claimAmount",
+                        "span": "claimAmount"
+                      },
+                      "right": {
+                        "kind": "identifier",
+                        "data": "MINER_FEE",
+                        "span": "MINER_FEE"
+                      }
+                    },
+                    "span": "claimAmount - MINER_FEE"
+                  }
+                },
+                "span": "tx.outputs[0].value >= claimAmount - MINER_FEE"
+              },
+              "message": null,
+              "span": "require(tx.outputs[0].value >= claimAmount - MINER_FEE);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "int"
+              },
+              "modifiers": [],
+              "name": "remaining",
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "sub",
+                  "left": {
+                    "kind": "identifier",
+                    "data": "inputValue",
+                    "span": "inputValue"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "claimAmount",
+                    "span": "claimAmount"
+                  }
+                },
+                "span": "inputValue - claimAmount"
+              },
+              "span": "int remaining = inputValue - claimAmount;",
+              "type_span": "int ",
+              "modifier_spans": [],
+              "name_span": "remaining"
+            }
+          },
+          {
+            "kind": "if",
+            "data": {
+              "condition": {
+                "kind": "binary",
+                "data": {
+                  "op": "gt",
+                  "left": {
+                    "kind": "identifier",
+                    "data": "remaining",
+                    "span": "remaining"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "MINER_FEE",
+                    "span": "MINER_FEE"
+                  }
+                },
+                "span": "remaining > MINER_FEE"
+              },
+              "then_branch": [
+                {
+                  "kind": "require",
+                  "data": {
+                    "expr": {
+                      "kind": "binary",
+                      "data": {
+                        "op": "ge",
+                        "left": {
+                          "kind": "introspection",
+                          "data": {
+                            "kind": "output_value",
+                            "index": {
+                              "kind": "int",
+                              "data": 1,
+                              "span": "1"
+                            },
+                            "field_span": ".value"
+                          },
+                          "span": "tx.outputs[1].value"
+                        },
+                        "right": {
+                          "kind": "binary",
+                          "data": {
+                            "op": "sub",
+                            "left": {
+                              "kind": "identifier",
+                              "data": "remaining",
+                              "span": "remaining"
+                            },
+                            "right": {
+                              "kind": "identifier",
+                              "data": "MINER_FEE",
+                              "span": "MINER_FEE"
+                            }
+                          },
+                          "span": "remaining - MINER_FEE"
+                        }
+                      },
+                      "span": "tx.outputs[1].value >= remaining - MINER_FEE"
+                    },
+                    "message": null,
+                    "span": "require(tx.outputs[1].value >= remaining - MINER_FEE);",
+                    "message_span": null
+                  }
+                },
+                {
+                  "kind": "function_call",
+                  "data": {
+                    "name": "validateOutputState",
+                    "args": [
+                      {
+                        "kind": "int",
+                        "data": 1,
+                        "span": "1"
+                      },
+                      {
+                        "kind": "state_object",
+                        "data": [
+                          {
+                            "name": "holderMerkleRoot",
+                            "expr": {
+                              "kind": "identifier",
+                              "data": "holderMerkleRoot",
+                              "span": "holderMerkleRoot"
+                            },
+                            "span": "holderMerkleRoot: holderMerkleRoot",
+                            "name_span": "holderMerkleRoot"
+                          },
+                          {
+                            "name": "issuerKeyHash",
+                            "expr": {
+                              "kind": "identifier",
+                              "data": "issuerKeyHash",
+                              "span": "issuerKeyHash"
+                            },
+                            "span": "issuerKeyHash: issuerKeyHash",
+                            "name_span": "issuerKeyHash"
+                          },
+                          {
+                            "name": "totalShares",
+                            "expr": {
+                              "kind": "identifier",
+                              "data": "totalShares",
+                              "span": "totalShares"
+                            },
+                            "span": "totalShares: totalShares",
+                            "name_span": "totalShares"
+                          },
+                          {
+                            "name": "deadline",
+                            "expr": {
+                              "kind": "identifier",
+                              "data": "deadline",
+                              "span": "deadline"
+                            },
+                            "span": "deadline: deadline\n            ",
+                            "name_span": "deadline"
+                          }
+                        ],
+                        "span": "{\n                holderMerkleRoot: holderMerkleRoot,\n                issuerKeyHash: issuerKeyHash,\n                totalShares: totalShares,\n                deadline: deadline\n            }"
+                      }
+                    ],
+                    "span": "validateOutputState(1, {\n                holderMerkleRoot: holderMerkleRoot,\n                issuerKeyHash: issuerKeyHash,\n                totalShares: totalShares,\n                deadline: deadline\n            });",
+                    "name_span": "validateOutputState"
+                  }
+                }
+              ],
+              "else_branch": null,
+              "span": "if (remaining > MINER_FEE) {\n            require(tx.outputs[1].value >= remaining - MINER_FEE);\n            validateOutputState(1, {\n                holderMerkleRoot: holderMerkleRoot,\n                issuerKeyHash: issuerKeyHash,\n                totalShares: totalShares,\n                deadline: deadline\n            });\n        }\n    ",
+              "then_span": "require(tx.outputs[1].value >= remaining - MINER_FEE);\n            validateOutputState(1, {\n                holderMerkleRoot: holderMerkleRoot,\n                issuerKeyHash: issuerKeyHash,\n                totalShares: totalShares,\n                deadline: deadline\n            });",
+              "else_span": null
+            }
+          }
+        ],
+        "return_type_spans": [],
+        "span": "entrypoint function claimDividend(\n        pubkey holderPk,\n        sig holderSig,\n        int holderShares,\n        byte[32] merkleProof0,\n        byte[32] merkleProof1\n    ) {\n        // Verify holder signature\n        require(checkSig(holderSig, holderPk));\n        require(holderShares > 0);\n        require(totalShares > 0);\n\n        // Verify holder is in the Merkle tree (simplified 2-level proof)\n        byte[32] leaf = sha256(holderPk);\n        byte[32] intermediate = sha256(leaf + merkleProof0);\n        byte[32] computedRoot = sha256(intermediate + merkleProof1);\n        require(computedRoot == holderMerkleRoot);\n\n        // Calculate proportional claim\n        int inputValue = tx.inputs[this.activeInputIndex].value;\n        int claimAmount = (inputValue * holderShares) / totalShares;\n        require(claimAmount > MINER_FEE);\n\n        // Output 0: holder receives claim\n        require(tx.outputs[0].value >= claimAmount - MINER_FEE);\n\n        // Covenant preservation: remaining goes back to contract\n        int remaining = inputValue - claimAmount;\n        if (remaining > MINER_FEE) {\n            require(tx.outputs[1].value >= remaining - MINER_FEE);\n            validateOutputState(1, {\n                holderMerkleRoot: holderMerkleRoot,\n                issuerKeyHash: issuerKeyHash,\n                totalShares: totalShares,\n                deadline: deadline\n            });\n        }\n    }",
+        "name_span": "claimDividend",
+        "body_span": "require(checkSig(holderSig, holderPk));\n        require(holderShares > 0);\n        require(totalShares > 0);\n\n        // Verify holder is in the Merkle tree (simplified 2-level proof)\n        byte[32] leaf = sha256(holderPk);\n        byte[32] intermediate = sha256(leaf + merkleProof0);\n        byte[32] computedRoot = sha256(intermediate + merkleProof1);\n        require(computedRoot == holderMerkleRoot);\n\n        // Calculate proportional claim\n        int inputValue = tx.inputs[this.activeInputIndex].value;\n        int claimAmount = (inputValue * holderShares) / totalShares;\n        require(claimAmount > MINER_FEE);\n\n        // Output 0: holder receives claim\n        require(tx.outputs[0].value >= claimAmount - MINER_FEE);\n\n        // Covenant preservation: remaining goes back to contract\n        int remaining = inputValue - claimAmount;\n        if (remaining > MINER_FEE) {\n            require(tx.outputs[1].value >= remaining - MINER_FEE);\n            validateOutputState(1, {\n                holderMerkleRoot: holderMerkleRoot,\n                issuerKeyHash: issuerKeyHash,\n                totalShares: totalShares,\n                deadline: deadline\n            });\n        }\n    "
+      },
+      {
+        "name": "issuerTopUp",
+        "params": [
+          {
+            "type_ref": {
+              "base": "pubkey"
+            },
+            "name": "issuerPk",
+            "span": "pubkey issuerPk",
+            "type_span": "pubkey ",
+            "name_span": "issuerPk"
+          },
+          {
+            "type_ref": {
+              "base": "sig"
+            },
+            "name": "issuerSig",
+            "span": "sig issuerSig",
+            "type_span": "sig ",
+            "name_span": "issuerSig"
+          }
+        ],
+        "entrypoint": true,
+        "return_types": [],
+        "body": [
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "eq",
+                  "left": {
+                    "kind": "call",
+                    "data": {
+                      "name": "blake2b",
+                      "args": [
+                        {
+                          "kind": "identifier",
+                          "data": "issuerPk",
+                          "span": "issuerPk"
+                        }
+                      ],
+                      "name_span": "blake2b"
+                    },
+                    "span": "blake2b(issuerPk)"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "issuerKeyHash",
+                    "span": "issuerKeyHash"
+                  }
+                },
+                "span": "blake2b(issuerPk) == issuerKeyHash"
+              },
+              "message": null,
+              "span": "require(blake2b(issuerPk) == issuerKeyHash);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "call",
+                "data": {
+                  "name": "checkSig",
+                  "args": [
+                    {
+                      "kind": "identifier",
+                      "data": "issuerSig",
+                      "span": "issuerSig"
+                    },
+                    {
+                      "kind": "identifier",
+                      "data": "issuerPk",
+                      "span": "issuerPk"
+                    }
+                  ],
+                  "name_span": "checkSig"
+                },
+                "span": "checkSig(issuerSig, issuerPk)"
+              },
+              "message": null,
+              "span": "require(checkSig(issuerSig, issuerPk));",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "variable_definition",
+            "data": {
+              "type_ref": {
+                "base": "int"
+              },
+              "modifiers": [],
+              "name": "inputValue",
+              "expr": {
+                "kind": "introspection",
+                "data": {
+                  "kind": "input_value",
+                  "index": {
+                    "kind": "nullary",
+                    "data": "active_input_index",
+                    "span": "this.activeInputIndex"
+                  },
+                  "field_span": ".value"
+                },
+                "span": "tx.inputs[this.activeInputIndex].value"
+              },
+              "span": "int inputValue = tx.inputs[this.activeInputIndex].value;",
+              "type_span": "int ",
+              "modifier_spans": [],
+              "name_span": "inputValue"
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "ge",
+                  "left": {
+                    "kind": "introspection",
+                    "data": {
+                      "kind": "output_value",
+                      "index": {
+                        "kind": "int",
+                        "data": 0,
+                        "span": "0"
+                      },
+                      "field_span": ".value"
+                    },
+                    "span": "tx.outputs[0].value"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "inputValue",
+                    "span": "inputValue"
+                  }
+                },
+                "span": "tx.outputs[0].value >= inputValue"
+              },
+              "message": null,
+              "span": "require(tx.outputs[0].value >= inputValue);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "function_call",
+            "data": {
+              "name": "validateOutputState",
+              "args": [
+                {
+                  "kind": "int",
+                  "data": 0,
+                  "span": "0"
+                },
+                {
+                  "kind": "state_object",
+                  "data": [
+                    {
+                      "name": "holderMerkleRoot",
+                      "expr": {
+                        "kind": "identifier",
+                        "data": "holderMerkleRoot",
+                        "span": "holderMerkleRoot"
+                      },
+                      "span": "holderMerkleRoot: holderMerkleRoot",
+                      "name_span": "holderMerkleRoot"
+                    },
+                    {
+                      "name": "issuerKeyHash",
+                      "expr": {
+                        "kind": "identifier",
+                        "data": "issuerKeyHash",
+                        "span": "issuerKeyHash"
+                      },
+                      "span": "issuerKeyHash: issuerKeyHash",
+                      "name_span": "issuerKeyHash"
+                    },
+                    {
+                      "name": "totalShares",
+                      "expr": {
+                        "kind": "identifier",
+                        "data": "totalShares",
+                        "span": "totalShares"
+                      },
+                      "span": "totalShares: totalShares",
+                      "name_span": "totalShares"
+                    },
+                    {
+                      "name": "deadline",
+                      "expr": {
+                        "kind": "identifier",
+                        "data": "deadline",
+                        "span": "deadline"
+                      },
+                      "span": "deadline: deadline\n        ",
+                      "name_span": "deadline"
+                    }
+                  ],
+                  "span": "{\n            holderMerkleRoot: holderMerkleRoot,\n            issuerKeyHash: issuerKeyHash,\n            totalShares: totalShares,\n            deadline: deadline\n        }"
+                }
+              ],
+              "span": "validateOutputState(0, {\n            holderMerkleRoot: holderMerkleRoot,\n            issuerKeyHash: issuerKeyHash,\n            totalShares: totalShares,\n            deadline: deadline\n        });",
+              "name_span": "validateOutputState"
+            }
+          }
+        ],
+        "return_type_spans": [],
+        "span": "entrypoint function issuerTopUp(pubkey issuerPk, sig issuerSig) {\n        require(blake2b(issuerPk) == issuerKeyHash);\n        require(checkSig(issuerSig, issuerPk));\n\n        // Preserve covenant with all existing state\n        int inputValue = tx.inputs[this.activeInputIndex].value;\n        require(tx.outputs[0].value >= inputValue);\n        validateOutputState(0, {\n            holderMerkleRoot: holderMerkleRoot,\n            issuerKeyHash: issuerKeyHash,\n            totalShares: totalShares,\n            deadline: deadline\n        });\n    }",
+        "name_span": "issuerTopUp",
+        "body_span": "require(blake2b(issuerPk) == issuerKeyHash);\n        require(checkSig(issuerSig, issuerPk));\n\n        // Preserve covenant with all existing state\n        int inputValue = tx.inputs[this.activeInputIndex].value;\n        require(tx.outputs[0].value >= inputValue);\n        validateOutputState(0, {\n            holderMerkleRoot: holderMerkleRoot,\n            issuerKeyHash: issuerKeyHash,\n            totalShares: totalShares,\n            deadline: deadline\n        });"
+      },
+      {
+        "name": "issuerReclaim",
+        "params": [
+          {
+            "type_ref": {
+              "base": "pubkey"
+            },
+            "name": "issuerPk",
+            "span": "pubkey issuerPk",
+            "type_span": "pubkey ",
+            "name_span": "issuerPk"
+          },
+          {
+            "type_ref": {
+              "base": "sig"
+            },
+            "name": "issuerSig",
+            "span": "sig issuerSig",
+            "type_span": "sig ",
+            "name_span": "issuerSig"
+          }
+        ],
+        "entrypoint": true,
+        "return_types": [],
+        "body": [
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "binary",
+                "data": {
+                  "op": "eq",
+                  "left": {
+                    "kind": "call",
+                    "data": {
+                      "name": "blake2b",
+                      "args": [
+                        {
+                          "kind": "identifier",
+                          "data": "issuerPk",
+                          "span": "issuerPk"
+                        }
+                      ],
+                      "name_span": "blake2b"
+                    },
+                    "span": "blake2b(issuerPk)"
+                  },
+                  "right": {
+                    "kind": "identifier",
+                    "data": "issuerKeyHash",
+                    "span": "issuerKeyHash"
+                  }
+                },
+                "span": "blake2b(issuerPk) == issuerKeyHash"
+              },
+              "message": null,
+              "span": "require(blake2b(issuerPk) == issuerKeyHash);",
+              "message_span": null
+            }
+          },
+          {
+            "kind": "require",
+            "data": {
+              "expr": {
+                "kind": "call",
+                "data": {
+                  "name": "checkSig",
+                  "args": [
+                    {
+                      "kind": "identifier",
+                      "data": "issuerSig",
+                      "span": "issuerSig"
+                    },
+                    {
+                      "kind": "identifier",
+                      "data": "issuerPk",
+                      "span": "issuerPk"
+                    }
+                  ],
+                  "name_span": "checkSig"
+                },
+                "span": "checkSig(issuerSig, issuerPk)"
+              },
+              "message": null,
+              "span": "require(checkSig(issuerSig, issuerPk));",
+              "message_span": null
+            }
+          }
+        ],
+        "return_type_spans": [],
+        "span": "entrypoint function issuerReclaim(pubkey issuerPk, sig issuerSig) {\n        require(blake2b(issuerPk) == issuerKeyHash);\n        require(checkSig(issuerSig, issuerPk));\n    }",
+        "name_span": "issuerReclaim",
+        "body_span": "require(blake2b(issuerPk) == issuerKeyHash);\n        require(checkSig(issuerSig, issuerPk));"
+      }
+    ],
+    "span": "contract Dividend(\n    byte[32] initHolderMerkleRoot,\n    byte[32] initIssuerKeyHash,\n    int initTotalShares,\n    int initDeadline\n) {\n    byte[32] holderMerkleRoot = initHolderMerkleRoot;\n    byte[32] issuerKeyHash = initIssuerKeyHash;\n    int totalShares = initTotalShares;\n    int deadline = initDeadline;\n\n    int constant MINER_FEE = 1000;\n\n    // Path A: Holder claims their proportional dividend\n    entrypoint function claimDividend(\n        pubkey holderPk,\n        sig holderSig,\n        int holderShares,\n        byte[32] merkleProof0,\n        byte[32] merkleProof1\n    ) {\n        // Verify holder signature\n        require(checkSig(holderSig, holderPk));\n        require(holderShares > 0);\n        require(totalShares > 0);\n\n        // Verify holder is in the Merkle tree (simplified 2-level proof)\n        byte[32] leaf = sha256(holderPk);\n        byte[32] intermediate = sha256(leaf + merkleProof0);\n        byte[32] computedRoot = sha256(intermediate + merkleProof1);\n        require(computedRoot == holderMerkleRoot);\n\n        // Calculate proportional claim\n        int inputValue = tx.inputs[this.activeInputIndex].value;\n        int claimAmount = (inputValue * holderShares) / totalShares;\n        require(claimAmount > MINER_FEE);\n\n        // Output 0: holder receives claim\n        require(tx.outputs[0].value >= claimAmount - MINER_FEE);\n\n        // Covenant preservation: remaining goes back to contract\n        int remaining = inputValue - claimAmount;\n        if (remaining > MINER_FEE) {\n            require(tx.outputs[1].value >= remaining - MINER_FEE);\n            validateOutputState(1, {\n                holderMerkleRoot: holderMerkleRoot,\n                issuerKeyHash: issuerKeyHash,\n                totalShares: totalShares,\n                deadline: deadline\n            });\n        }\n    }\n\n    // Path B: Issuer adds more funds for distribution\n    entrypoint function issuerTopUp(pubkey issuerPk, sig issuerSig) {\n        require(blake2b(issuerPk) == issuerKeyHash);\n        require(checkSig(issuerSig, issuerPk));\n\n        // Preserve covenant with all existing state\n        int inputValue = tx.inputs[this.activeInputIndex].value;\n        require(tx.outputs[0].value >= inputValue);\n        validateOutputState(0, {\n            holderMerkleRoot: holderMerkleRoot,\n            issuerKeyHash: issuerKeyHash,\n            totalShares: totalShares,\n            deadline: deadline\n        });\n    }\n\n    // Path C: Issuer reclaims unclaimed funds\n    entrypoint function issuerReclaim(pubkey issuerPk, sig issuerSig) {\n        require(blake2b(issuerPk) == issuerKeyHash);\n        require(checkSig(issuerSig, issuerPk));\n    }\n}",
+    "name_span": "Dividend"
+  },
+  "abi": [
+    {
+      "name": "claimDividend",
+      "inputs": [
+        {
+          "name": "holderPk",
+          "type_name": "pubkey"
+        },
+        {
+          "name": "holderSig",
+          "type_name": "sig"
+        },
+        {
+          "name": "holderShares",
+          "type_name": "int"
+        },
+        {
+          "name": "merkleProof0",
+          "type_name": "byte[32]"
+        },
+        {
+          "name": "merkleProof1",
+          "type_name": "byte[32]"
+        }
+      ]
+    },
+    {
+      "name": "issuerTopUp",
+      "inputs": [
+        {
+          "name": "issuerPk",
+          "type_name": "pubkey"
+        },
+        {
+          "name": "issuerSig",
+          "type_name": "sig"
+        }
+      ]
+    },
+    {
+      "name": "issuerReclaim",
+      "inputs": [
+        {
+          "name": "issuerPk",
+          "type_name": "pubkey"
+        },
+        {
+          "name": "issuerSig",
+          "type_name": "sig"
+        }
+      ]
+    }
+  ],
+  "without_selector": false,
+  "debug_info": null
+}

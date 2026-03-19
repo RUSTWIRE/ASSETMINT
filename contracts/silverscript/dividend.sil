@@ -1,0 +1,90 @@
+pragma silverscript ^0.1.0;
+
+// DISCLAIMER: Technical demo code — legal wrappers required in production
+// SPDX-License-Identifier: MIT
+//
+// dividend.sil — Proportional Dividend Distribution via Merkle Holder Tree
+//
+// Distributes funds proportionally to token holders verified by Merkle
+// proof. The issuer funds the contract, then each holder claims their
+// share by proving membership in the holder tree.
+//
+// Path A (claimDividend): Holder claims proportional share with Merkle proof
+// Path B (issuerTopUp): Issuer adds more funds, preserving covenant
+// Path C (issuerReclaim): Issuer reclaims unclaimed funds after deadline
+
+contract Dividend(
+    byte[32] initHolderMerkleRoot,
+    byte[32] initIssuerKeyHash,
+    int initTotalShares,
+    int initDeadline
+) {
+    byte[32] holderMerkleRoot = initHolderMerkleRoot;
+    byte[32] issuerKeyHash = initIssuerKeyHash;
+    int totalShares = initTotalShares;
+    int deadline = initDeadline;
+
+    int constant MINER_FEE = 1000;
+
+    // Path A: Holder claims their proportional dividend
+    entrypoint function claimDividend(
+        pubkey holderPk,
+        sig holderSig,
+        int holderShares,
+        byte[32] merkleProof0,
+        byte[32] merkleProof1
+    ) {
+        // Verify holder signature
+        require(checkSig(holderSig, holderPk));
+        require(holderShares > 0);
+        require(totalShares > 0);
+
+        // Verify holder is in the Merkle tree (simplified 2-level proof)
+        byte[32] leaf = sha256(holderPk);
+        byte[32] intermediate = sha256(leaf + merkleProof0);
+        byte[32] computedRoot = sha256(intermediate + merkleProof1);
+        require(computedRoot == holderMerkleRoot);
+
+        // Calculate proportional claim
+        int inputValue = tx.inputs[this.activeInputIndex].value;
+        int claimAmount = (inputValue * holderShares) / totalShares;
+        require(claimAmount > MINER_FEE);
+
+        // Output 0: holder receives claim
+        require(tx.outputs[0].value >= claimAmount - MINER_FEE);
+
+        // Covenant preservation: remaining goes back to contract
+        int remaining = inputValue - claimAmount;
+        if (remaining > MINER_FEE) {
+            require(tx.outputs[1].value >= remaining - MINER_FEE);
+            validateOutputState(1, {
+                holderMerkleRoot: holderMerkleRoot,
+                issuerKeyHash: issuerKeyHash,
+                totalShares: totalShares,
+                deadline: deadline
+            });
+        }
+    }
+
+    // Path B: Issuer adds more funds for distribution
+    entrypoint function issuerTopUp(pubkey issuerPk, sig issuerSig) {
+        require(blake2b(issuerPk) == issuerKeyHash);
+        require(checkSig(issuerSig, issuerPk));
+
+        // Preserve covenant with all existing state
+        int inputValue = tx.inputs[this.activeInputIndex].value;
+        require(tx.outputs[0].value >= inputValue);
+        validateOutputState(0, {
+            holderMerkleRoot: holderMerkleRoot,
+            issuerKeyHash: issuerKeyHash,
+            totalShares: totalShares,
+            deadline: deadline
+        });
+    }
+
+    // Path C: Issuer reclaims unclaimed funds
+    entrypoint function issuerReclaim(pubkey issuerPk, sig issuerSig) {
+        require(blake2b(issuerPk) == issuerKeyHash);
+        require(checkSig(issuerSig, issuerPk));
+    }
+}
