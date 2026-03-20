@@ -4,7 +4,7 @@
 "use client";
 
 import { useState } from "react";
-import { ShieldAlert, Loader2, AlertTriangle, ExternalLink } from "lucide-react";
+import { ShieldAlert, AlertTriangle, ExternalLink } from "lucide-react";
 import { DemoBanner } from "@/components/demo-banner";
 import { useWalletStore } from "@/store/wallet";
 import { DEPLOYED_CONTRACTS } from "@/lib/contracts";
@@ -16,18 +16,14 @@ export default function ClawbackPage() {
   const { wallet } = useWalletStore();
   const [targetAddress, setTargetAddress] = useState("");
   const [reason, setReason] = useState("");
-  const [executing, setExecuting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  const handleClawback = async () => {
+  const handleClawback = () => {
     console.log("[K-RWA] Attempting clawback covenant execution");
     console.log("[K-RWA] Target:", targetAddress);
     console.log("[K-RWA] Reason:", reason);
-    setExecuting(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setExecuting(false);
     setSubmitted(true);
-    console.log("[K-RWA] Clawback requires P2SH witness — not yet implemented");
+    console.log("[K-RWA] Clawback requires P2SH witness signing — not yet implemented in demo mode");
   };
 
   if (!wallet) {
@@ -119,8 +115,8 @@ export default function ClawbackPage() {
                 P2SH Witness Required
               </p>
               <p className="text-xs text-gray-400">
-                Clawback covenant execution requires P2SH witness construction
-                — coming soon. The Clawback contract IS deployed on TN12 at:
+                Clawback requires P2SH witness signing — not yet implemented in
+                demo mode. The Clawback contract IS deployed on TN12 at:
               </p>
               <p className="text-xs">
                 <a
@@ -150,15 +146,10 @@ export default function ClawbackPage() {
 
           <button
             onClick={handleClawback}
-            disabled={!targetAddress || !reason || executing || submitted}
+            disabled={!targetAddress || !reason || submitted}
             className="w-full flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-red-600 hover:bg-red-500 text-white text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            {executing ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Executing...
-              </>
-            ) : submitted ? (
+            {submitted ? (
               "Pending P2SH Implementation"
             ) : (
               <>
@@ -255,6 +246,11 @@ export default function ClawbackPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="bg-gray-900 rounded-xl border border-gray-800 p-6">
+        <h3 className="text-lg font-semibold text-white mb-4">Clawback History</h3>
+        <p className="text-gray-500 text-sm">No clawback events recorded. Clawback operations will appear here when executed on-chain.</p>
       </div>
     </div>
   );

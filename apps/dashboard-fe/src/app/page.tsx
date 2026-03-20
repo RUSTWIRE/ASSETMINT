@@ -78,6 +78,8 @@ export default function DashboardPage() {
   const [health, setHealth] = useState<HealthStatus | null>(null);
   const [healthError, setHealthError] = useState(false);
   const [network, setNetwork] = useState<NetworkInfo | null>(null);
+  const [liveBalance, setLiveBalance] = useState<string | null>(null);
+  const [lastChecked, setLastChecked] = useState<string | null>(null);
   const services = useServiceStatus();
 
   useEffect(() => {
@@ -103,7 +105,26 @@ export default function DashboardPage() {
         console.log("[K-RWA] Network info not available");
       });
 
-  }, []);
+    if (wallet?.address) {
+      api
+        .getBalance(wallet.address)
+        .then((data) => {
+          console.log("[K-RWA] Balance response:", data);
+          const bal = data?.balance ?? data?.Balance;
+          if (bal != null) {
+            setLiveBalance(`${formatKAS(Number(bal))} KAS`);
+          } else {
+            setLiveBalance("--");
+          }
+        })
+        .catch(() => {
+          console.log("[K-RWA] Balance fetch failed, using fallback");
+          setLiveBalance("--");
+        });
+    }
+
+    setLastChecked(new Date().toLocaleTimeString());
+  }, [wallet?.address]);
 
   return (
     <div className="space-y-8">
@@ -155,17 +176,23 @@ export default function DashboardPage() {
         ))}
       </div>
 
+      {lastChecked && (
+        <p className="text-xs text-gray-600 -mt-4">
+          Last checked: {lastChecked}
+        </p>
+      )}
+
       {/* Quick Actions */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Link
-          href="/transfer"
+          href="/settings"
           className="flex items-center gap-2 bg-gray-900 border border-gray-800 rounded-lg px-4 py-3 text-sm text-gray-300 hover:border-indigo-500/50 hover:text-white transition-colors"
         >
           <UserPlus className="w-4 h-4 text-indigo-400" />
           Register Identity
         </Link>
         <Link
-          href="/transfer"
+          href="/mint"
           className="flex items-center gap-2 bg-gray-900 border border-gray-800 rounded-lg px-4 py-3 text-sm text-gray-300 hover:border-indigo-500/50 hover:text-white transition-colors"
         >
           <ClipboardCheck className="w-4 h-4 text-amber-400" />
@@ -178,13 +205,13 @@ export default function DashboardPage() {
           <Send className="w-4 h-4 text-emerald-400" />
           Transfer Asset
         </Link>
-        <a
-          href="#contracts"
+        <Link
+          href="/assets"
           className="flex items-center gap-2 bg-gray-900 border border-gray-800 rounded-lg px-4 py-3 text-sm text-gray-300 hover:border-indigo-500/50 hover:text-white transition-colors"
         >
           <FileCode className="w-4 h-4 text-purple-400" />
           View Contracts
-        </a>
+        </Link>
       </div>
 
       {/* Stats Cards */}
@@ -196,10 +223,16 @@ export default function DashboardPage() {
             <Wallet className="w-5 h-5 text-indigo-400" />
           </div>
           <p className="text-2xl font-bold text-white">
-            {wallet ? `${formatKAS(wallet.balance)} KAS` : "--"}
+            {wallet
+              ? liveBalance ?? `${formatKAS(wallet.balance)} KAS`
+              : "--"}
           </p>
           <p className="text-xs text-gray-500 mt-1">
-            {wallet ? "Testnet tokens" : "Connect wallet"}
+            {wallet
+              ? liveBalance && liveBalance !== "--"
+                ? "Live from kaspad"
+                : "Testnet tokens"
+              : "Connect wallet"}
           </p>
         </div>
 

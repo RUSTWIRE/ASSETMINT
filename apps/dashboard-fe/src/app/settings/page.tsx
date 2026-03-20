@@ -188,7 +188,7 @@ export default function SettingsPage() {
           </div>
           <div className="flex items-center justify-between py-3 border-b border-gray-800">
             <span className="text-sm text-gray-400">Block Time</span>
-            <span className="text-sm text-white">~1 second (BlockDAG)</span>
+            <span className="text-sm text-white">10 BPS (100ms BlockDAG)</span>
           </div>
           <div className="flex items-center justify-between py-3 border-b border-gray-800">
             <span className="text-sm text-gray-400">Consensus</span>

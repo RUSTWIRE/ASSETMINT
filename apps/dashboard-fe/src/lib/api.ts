@@ -82,6 +82,11 @@ export const api = {
 
   // Oracle
   oracleHealth: () => fetch(`${ORACLE_API}/health`).then((r) => r.json()),
+  oracleAttestation: (assetId: string) =>
+    fetch(`${ORACLE_API}/oracle/attestation?asset_id=${encodeURIComponent(assetId)}`).then((r) => {
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.json();
+    }),
 };
 
 // Kaspa Testnet-12 block explorer

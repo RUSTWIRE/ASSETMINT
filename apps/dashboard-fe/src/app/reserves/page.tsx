@@ -10,6 +10,7 @@ import {
   TrendingUp,
   ExternalLink,
   Activity,
+  RefreshCw,
 } from "lucide-react";
 import {
   BarChart,
@@ -76,14 +77,51 @@ const ATTESTATION_HISTORY = [
   },
 ];
 
+interface OracleAttestation {
+  asset_id: string;
+  price_usd: number;
+  timestamp: number;
+  source: string;
+  signature?: string;
+}
+
 export default function ReservesPage() {
   const [oracleOnline, setOracleOnline] = useState<boolean | null>(null);
+  const [attestation, setAttestation] = useState<OracleAttestation | null>(null);
+  const [attestationError, setAttestationError] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchAttestation = () => {
+    setRefreshing(true);
+    setAttestationError(false);
+    api
+      .oracleAttestation("KAS")
+      .then((data: OracleAttestation) => {
+        setAttestation(data);
+        setOracleOnline(true);
+        setAttestationError(false);
+      })
+      .catch(() => {
+        setAttestation(null);
+        setAttestationError(true);
+        setOracleOnline(false);
+      })
+      .finally(() => setRefreshing(false));
+  };
 
   useEffect(() => {
+    // Initial health check, then fetch attestation
     api
       .oracleHealth()
-      .then(() => setOracleOnline(true))
-      .catch(() => setOracleOnline(false));
+      .then(() => {
+        setOracleOnline(true);
+        fetchAttestation();
+      })
+      .catch(() => {
+        setOracleOnline(false);
+        setAttestationError(true);
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const totalReserves = RESERVE_BREAKDOWN.reduce(
@@ -172,15 +210,30 @@ export default function ReservesPage() {
             <span className="text-sm text-gray-400">Collateral Ratio</span>
             <TrendingUp className="w-5 h-5 text-emerald-400" />
           </div>
-          <p className="text-2xl font-bold text-emerald-400">118%</p>
+          <p className="text-2xl font-bold text-emerald-400">
+            {attestation ? `${Math.round((totalReserves / (attestation.price_usd * 1000)) * 100)}%` : "118%"}
+          </p>
           <p className="text-xs text-gray-500 mt-1">
-            Above 100% minimum requirement
+            {attestation
+              ? "Above 100% minimum requirement"
+              : "Above 100% minimum requirement (simulated - oracle offline)"}
           </p>
         </div>
 
         <div className="bg-gray-900 rounded-xl border border-gray-800 p-6">
           <div className="flex items-center justify-between mb-4">
-            <span className="text-sm text-gray-400">Oracle Status</span>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-400">Oracle Status</span>
+              <button
+                onClick={fetchAttestation}
+                disabled={refreshing}
+                className="p-1 rounded hover:bg-gray-800 transition-colors disabled:opacity-50"
+                title="Refresh Attestation"
+                aria-label="Refresh oracle attestation"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 text-gray-400 ${refreshing ? "animate-spin" : ""}`} />
+              </button>
+            </div>
             <Activity className="w-5 h-5 text-amber-400" />
           </div>
           <p className={`text-2xl font-bold ${
@@ -190,19 +243,29 @@ export default function ReservesPage() {
                 ? "text-red-400"
                 : "text-gray-500"
           }`}>
-            {oracleOnline === true
-              ? "Connected"
-              : oracleOnline === false
-                ? "Offline"
-                : "Checking..."}
+            {oracleOnline === true && attestation
+              ? `$${attestation.price_usd.toFixed(4)}`
+              : oracleOnline === true
+                ? "Connected"
+                : oracleOnline === false
+                  ? "Oracle offline"
+                  : "Checking..."}
           </p>
           <p className="text-xs text-gray-500 mt-1">
-            {oracleOnline === true
-              ? "CoinGecko feed active via oracle-pool:3002"
-              : oracleOnline === false
-                ? "oracle-pool:3002 not reachable"
-                : "Connecting to oracle..."}
+            {oracleOnline === true && attestation
+              ? `KAS/USD via ${attestation.source || "oracle-pool:3002"}`
+              : oracleOnline === true
+                ? "CoinGecko feed active via oracle-pool:3002"
+                : oracleOnline === false
+                  ? "oracle-pool:3002 not reachable"
+                  : "Connecting to oracle..."}
           </p>
+          {attestationError && (
+            <div className="flex items-center gap-1.5 mt-2">
+              <div className="w-2 h-2 rounded-full bg-red-500" />
+              <span className="text-xs text-red-400">Oracle offline</span>
+            </div>
+          )}
         </div>
       </div>
 

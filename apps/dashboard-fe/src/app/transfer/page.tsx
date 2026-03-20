@@ -68,6 +68,11 @@ export default function TransferPage() {
   };
 
   const handleTransfer = async () => {
+    const confirmed = window.confirm(
+      `You are about to transfer ${amount} sompis to ${receiverAddress}. This operation is irreversible. Continue?`
+    );
+    if (!confirmed) return;
+
     console.log("[K-RWA] Executing compliance-gated transfer via POST /transfer");
     setTransferring(true);
     setError("");
@@ -338,13 +343,29 @@ export default function TransferPage() {
                   </p>
                   <div>
                     <p className="text-xs text-gray-500">TX Hash</p>
-                    <p className="text-xs text-emerald-300 font-mono break-all mt-1">
+                    <a
+                      href={`https://explorer-tn12.kaspa.org/txs/${transferResult.tx_hash}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-indigo-400 hover:text-indigo-300 underline font-mono break-all mt-1 block"
+                    >
                       {transferResult.tx_hash}
-                    </p>
+                    </a>
                   </div>
                   <p className="text-xs text-gray-400">
                     Broadcast to Kaspa Testnet-12
                   </p>
+                  <button
+                    onClick={() => {
+                      setTransferResult(null);
+                      setComplianceResult(null);
+                      setError("");
+                    }}
+                    className="mt-3 flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium transition-colors"
+                  >
+                    <Send className="w-4 h-4" />
+                    New Transfer
+                  </button>
                 </div>
               )}
 
